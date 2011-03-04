@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>freq</key>
+	<real>400</real>
+	<key>amp</key>
+	<real>0.5</real>
+	<key>pan</key>
+	<real>0.5</real>
+	<key>wpm</key>
+	<integer>5</integer>
+	<key>cwpm</key>
+	<integer>5</integer>
+	<key>loop</key>
+	<false/>
+	<key>flash</key>
+	<false/>
+	<key>min</key>
+	<integer>5</integer>
+	<key>max</key>
+	<integer>5</integer>
+	<key>source</key>
+	<integer>0</integer>
+	<key>set</key>
+	<integer>1</integer>
+	<key>tab</key>
+	<string>1</string>
+	<key>score</key>
+	<dict/>
+	<key>practice</key>
+	<false/>
+</dict>
+</plist>

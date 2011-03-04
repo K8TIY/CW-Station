@@ -1,0 +1,599 @@
+/*
+Copyright © 2010-2011 Brian S. Hall
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+#import "MorseController.h"
+#import "Levenshtein.h"
+#import "Onizuka.h"
+
+static CGEventRef TapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon);
+static CGEventTimestamp UpTimeInNanoseconds(void);
+
+@interface MorseController (Private)
+-(void)gotoState:(unsigned)s;
+-(void)startNewTest;
+-(BOOL)checkTestResponseWithFeedback:(BOOL)fb;
+-(void)updateScore;
+-(NSArray*)randomStringsFromArray:(NSArray*)array ofLength:(NSUInteger)length;
+-(NSArray*)randomStringsFromDictionaryEntryOfLength:(NSUInteger)length;
+-(void)shiftKey:(BOOL)isdown atTime:(CGEventTimestamp)time fromTimer:(BOOL)flag;
+-(void)keycheck:(CGEventRef)event;
+-(void)timer:(NSTimer*)t;
+-(void)gotText:(NSNotification*)note;
+-(void)renderDone:(NSNotification*)note;
+-(void)tintChanged:(NSNotification*)note;
+@end
+
+
+@implementation MorseController
+-(void)awakeFromNib
+{
+  [[Onizuka sharedOnizuka] localizeMenu:[[NSApplication sharedApplication] mainMenu]];
+  [[Onizuka sharedOnizuka] localizeWindow:window];
+  [topBLV setCanBecomeFirstResponder:NO];
+  NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
+  [defs addObserver:self forKeyPath:@"freq" options:NSKeyValueObservingOptionNew context:NULL];
+  [defs addObserver:self forKeyPath:@"amp" options:NSKeyValueObservingOptionNew context:NULL];
+  [defs addObserver:self forKeyPath:@"wpm" options:NSKeyValueObservingOptionNew context:NULL];
+  [defs addObserver:self forKeyPath:@"cwpm" options:NSKeyValueObservingOptionNew context:NULL];
+  [defs addObserver:self forKeyPath:@"loop" options:NSKeyValueObservingOptionNew context:NULL];
+  [defs addObserver:self forKeyPath:@"flash" options:NSKeyValueObservingOptionNew context:NULL];
+  [defs addObserver:self forKeyPath:@"pan" options:NSKeyValueObservingOptionNew context:NULL];
+  NSString* where = [[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"];
+  NSDictionary* d = [NSDictionary dictionaryWithContentsOfFile:where];
+  [[NSUserDefaults standardUserDefaults] registerDefaults:d];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(renderDone:) name:MorseRendererFinishedNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotText:) name:BigLetterViewTextNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tintChanged:) name:NSControlTintDidChangeNotification object:nil];
+  [self tintChanged:nil];
+  [tabs selectTabViewItemWithIdentifier:[[NSUserDefaults standardUserDefaults] objectForKey:@"tab"]];
+  score = [[NSMutableDictionary alloc] init];
+  NSDictionary* scoredic = [[NSUserDefaults standardUserDefaults] objectForKey:@"score"];
+  for (NSString* key in [scoredic allKeys])
+  {
+    NSDictionary* dic = [scoredic objectForKey:key];
+    NSMutableDictionary* sdic = [dic mutableCopy];
+    [score setObject:sdic forKey:key];
+    [sdic release];
+  }
+  [scoreTable reloadData];
+  words = [[Wordlist alloc] init];
+  if (!AXIsProcessTrusted() && !AXAPIEnabled())
+  {
+    AuthorizationItem items = {kAuthorizationRightExecute, 0, NULL, 0};
+    AuthorizationRights rights = {1, &items};
+    [authView setAuthorizationRights:&rights];
+    [authView setDelegate:self];
+    [authView setAutoupdate:YES];
+    [[Onizuka sharedOnizuka] localizeWindow:authWindow];
+    [authWindow makeKeyAndOrderFront:self];
+  }
+  else
+  {
+    ProcessSerialNumber psn;
+    (void)GetProcessForPID(getpid(), &psn);
+    _tap = CGEventTapCreateForPSN(&psn, kCGTailAppendEventTap, kCGEventTapOptionListenOnly,
+                                  CGEventMaskBit(kCGEventFlagsChanged), TapCallback, self);
+    if (_tap)
+    {
+      _src = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, _tap, 0);
+      CFRunLoopAddSource(CFRunLoopGetMain(), _src, kCFRunLoopCommonModes);
+    }
+    else NSLog(@"Could not create event tap");
+  }
+  recognizer = [[MorseRecognizer alloc]
+                   initWithWPM:[[[NSUserDefaults standardUserDefaults] objectForKey:@"wpm"] doubleValue]];
+}
+
+-(void)dealloc
+{
+  [words release];
+  [recognizer release];
+  [super dealloc];
+}
+
+#pragma mark Action
+-(IBAction)startStop:(id)sender
+{
+  if (state == iMorseNotTestingState)
+  {
+    if ([[[tabs selectedTabViewItem] identifier] isEqual:@"4"]) [self gotoState:iMorseSendingState];
+    else [self gotoState:iMorsePlayingState];
+  }
+  else [self gotoState:iMorseNotTestingState];
+}
+
+-(IBAction)clearScore:(id)sender
+{
+  [score removeAllObjects];
+  [scoreTable reloadData];
+}
+
+-(IBAction)repan:(id)sender
+{
+  [[NSUserDefaults standardUserDefaults] setFloat:0.5f forKey:@"pan"];
+}
+
+#pragma mark Internal
+-(void)gotoState:(unsigned)s
+{
+  [timer invalidate];
+  timer = nil;
+  //NSLog(@"gotoState:%d", s);
+  id tabID = [[tabs selectedTabViewItem] identifier];
+  switch (s)
+  {
+    case iMorseNotTestingState:
+    [renderer stop];
+    if ([tabID isEqual:@"3"])
+    {
+      [startStopButton setImage:[NSImage imageNamed:@"PlayDisabled.tiff"]];
+    }
+    else
+    {
+      [startStopButton setImage:[NSImage imageNamed:@"PlayEnabled.tiff"]];
+      [startStopButton setAlternateImage:[NSImage imageNamed:@"PlayPressed.tiff"]];
+    }
+    //[topBLV setStrings:nil];
+    //[bottomBLV setStrings:nil];
+    //[bottomBLV setBgColor:[NSColor grayColor]];
+    [bottomBLV setCanBecomeFirstResponder:NO];
+    if (_tap) CGEventTapEnable(_tap, false);
+    lastKey = 0.0;
+    break;
+    
+    case iMorsePlayingState:
+    //NSLog(@"tab %@", tabID);
+    if ([tabID isEqual:@"1"]) [renderer start:[Morse splitString:[inputField stringValue]]];
+    else if ([tabID isEqual:@"2"]) [self startNewTest];
+    [startStopButton setImage:[NSImage imageNamed:@"StopEnabled.tiff"]];
+    [startStopButton setAlternateImage:[NSImage imageNamed:@"StopPressed.tiff"]];
+    [bottomBLV setCanBecomeFirstResponder:YES];
+    [window makeFirstResponder:bottomBLV];
+    break;
+    
+    case iMorseWaitingState:
+    timer = [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(timer:) userInfo:nil repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+    break;
+    
+    case iMorseShowingState:
+    [self checkTestResponseWithFeedback:YES];
+    timer = [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(timer:) userInfo:nil repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+    [bottomBLV setCanBecomeFirstResponder:NO];
+    break;
+    
+    case iMorseSendingState:
+    [startStopButton setImage:[NSImage imageNamed:@"StopEnabled.tiff"]];
+    [startStopButton setAlternateImage:[NSImage imageNamed:@"StopPressed.tiff"]];
+    [sentField setStringValue:@""];
+    if (_tap) CGEventTapEnable(_tap, true);
+    break;
+  }
+  state = s;
+}
+
+-(void)startNewTest
+{
+  [topBLV setStrings:nil];
+  [bottomBLV setStrings:nil];
+  [bottomBLV setBgColor:[NSColor grayColor]];
+  NSUInteger min = [[NSUserDefaults standardUserDefaults] integerForKey:@"min"];
+  NSUInteger max = [[NSUserDefaults standardUserDefaults] integerForKey:@"max"];
+  NSUInteger n = min;
+  if (min != max)
+  {
+    if (min > max)
+    {
+      min ^= max;
+      max ^= min;
+      min ^= max;
+    }
+    //NSLog(@"From %d to %d characters", min, max);
+    n = min + (arc4random() % (max-min+1));
+  }
+  //NSLog(@"%d characters", n);
+  NSArray* whichArray;
+  NSInteger set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
+  switch (set)
+  {
+    case 2: whichArray = [Morse numbers]; break;
+    case 3: whichArray = [Morse lettersAndNumbers]; break;
+    case 4: whichArray = [Morse punctuation]; break;
+    case 5: whichArray = [Morse prosigns]; n = 1; break;
+    default: whichArray = [Morse letters]; break;
+  }
+  NSUInteger which = [[[NSUserDefaults standardUserDefaults] objectForKey:@"source"] unsignedIntegerValue];
+  NSArray* a = (which == 1)? [self randomStringsFromArray:whichArray ofLength:n]:[self randomStringsFromDictionaryEntryOfLength:n];
+  if ([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"]) [topBLV setStrings:a];
+  [renderer start:a];
+  NSLog(@"%@", a);
+}
+
+-(BOOL)checkTestResponseWithFeedback:(BOOL)fb
+{
+  BOOL good = [[bottomBLV strings] isEqual:[renderer strings]];
+  if (fb && ![[NSUserDefaults standardUserDefaults] boolForKey:@"practice"])
+  {
+    NSColor* col = good? [NSColor greenColor]:[NSColor redColor];
+    [bottomBLV setBgColor:col];
+    [topBLV setStrings:[renderer strings]];
+    [self updateScore];
+  }
+  return good;
+}
+
+#define kPlaceholder @"`"
+#define kPlaceholderCh '`'
+-(void)updateScore
+{
+  NSArray* a1 = [renderer strings];
+  NSArray* a2 = [bottomBLV strings];
+  NSUInteger i;
+  NSString* s1 = [Morse formatStrings:a1];
+  NSString* s2 = [Morse formatStrings:a2];
+  Levenshtein* lev = [[Levenshtein alloc] initWithString:s1 andString:s2];
+  NSArray* a = [lev alignmentWithPlaceholder:kPlaceholder];
+  s1 = [a objectAtIndex:0];
+  s2 = [a objectAtIndex:1];
+  for (i = 0; i < [s1 length]; i++)
+  {
+    unichar c1 = [s1 characterAtIndex:i];
+    unichar c2 = [s2 characterAtIndex:i];
+    //NSLog(@"%C vs %C", c1, c2);
+    if (c1 == kPlaceholderCh) continue;
+    NSString* s3 = [[NSString alloc] initWithFormat:@"%C", c1];
+    BOOL correct = (c1 == c2 && c2 != kPlaceholderCh);
+    NSMutableDictionary* d = [score objectForKey:s3];
+    if (!d)
+    {
+      d = [[NSMutableDictionary alloc] init];
+      [score setObject:d forKey:s3];
+      [d release];
+    }
+    NSUInteger n = [[d objectForKey:@"n"] unsignedIntegerValue] + (correct)? 1:0;
+    NSUInteger of = [[d objectForKey:@"of"] unsignedIntegerValue] + 1;
+    [d setObject:[NSNumber numberWithUnsignedInteger:n] forKey:@"n"];
+    [d setObject:[NSNumber numberWithUnsignedInteger:of] forKey:@"of"];
+    [s3 release];
+  }
+  //NSLog(@"Score is now %@", score);
+}
+
+-(NSArray*)randomStringsFromArray:(NSArray*)array ofLength:(NSUInteger)length
+{
+  NSMutableArray* ma = [[NSMutableArray alloc] initWithCapacity:length];
+  NSUInteger i;
+  NSUInteger n = [array count];
+  for (i = 0; i < length; i++)
+  {
+    NSString* str1 = [array objectAtIndex:arc4random() % n];
+    NSString* str2 = [array objectAtIndex:arc4random() % n];
+    float score1 = 0.0f;
+    float score2 = 0.0f;
+    NSDictionary* d = [score objectForKey:str1];
+    if (d) score1 = 3.0f - (2.0f * [[d objectForKey:@"n"] floatValue] / [[d objectForKey:@"of"] floatValue]);
+    d = [score objectForKey:str2];
+    if (d) score2 = 3.0f - (2.0f * [[d objectForKey:@"n"] floatValue] / [[d objectForKey:@"of"] floatValue]);
+    //if (score1 > score2) NSLog(@"Chose %@ (%f) over %@ (%f)", str1, score1, str2, score2);
+    //else NSLog(@"Chose %@ (%f) over %@ (%f)", str2, score2, str1, score1);
+    [ma addObject:(score1 > score2)? str1:str2];
+  }
+  NSArray* ret = [NSArray arrayWithArray:ma];
+  [ma release];
+  return ret;
+}
+
+-(NSArray*)randomStringsFromDictionaryEntryOfLength:(NSUInteger)length
+{
+  NSString* str = [words randomStringOfLength:length];
+  NSMutableArray* ma = [[NSMutableArray alloc] initWithCapacity:[str length]];
+  NSUInteger n = [str length], i;
+  for (i = 0; i < n; i++)
+  {
+    [ma addObject:[NSString stringWithFormat:@"%C", [str characterAtIndex:i]]];
+  }
+  NSArray* ret = [NSArray arrayWithArray:ma];
+  [ma release];
+  return ret;
+}
+
+-(void)keycheck:(CGEventRef)event
+{
+  CGEventTimestamp time = CGEventGetTimestamp(event);
+  CGEventFlags mask = kCGEventFlagMaskAlphaShift | kCGEventFlagMaskShift |
+                      kCGEventFlagMaskControl | kCGEventFlagMaskAlternate |
+                      kCGEventFlagMaskCommand | kCGEventFlagMaskHelp |
+                      kCGEventFlagMaskSecondaryFn;
+  CGEventFlags flags = CGEventGetFlags(event) & mask;
+  //NSLog(@"0x%X  0x%X", down, kCGEventFlagMaskShift & flags);
+  if (kCGEventFlagMaskShift == (kCGEventFlagMaskShift & flags) || (down && !flags))
+  {
+    [self shiftKey:((kCGEventFlagMaskShift & flags) == kCGEventFlagMaskShift) atTime:time fromTimer:NO];
+    //NSLog(@"0x%X  0x%X", down, kCGEventFlagMaskShift & flags);
+  }
+}
+
+-(void)shiftKey:(BOOL)isdown atTime:(CGEventTimestamp)time fromTimer:(BOOL)flag
+{
+  if (flag && !spaceTimerGo) return;
+  if (timer) [timer invalidate];
+  timer = nil;
+  spaceTimerGo = NO;
+  //if (flag) NSLog(@"SPACE TIMER");
+  MorseRecognizerQuality q = {0.0,0.0};
+  down = isdown;
+  double wpm = [recognizer WPM];
+  MorseSpacing spacing = [Morse spacingForWPM:wpm CWPM:wpm];
+  double delay = spacing.interwordMilliseconds;
+  //NSLog(@"%s at %llu (0x%X)", (down)? "down":"up", time, flags);
+  if (lastKey)
+  {
+    double dur = ((double)time-(double)lastKey)/1000000.0;
+    if (flag) dur = delay;
+    uint16_t morse;
+    double* dp = &dur;
+    do
+    {
+      morse = [recognizer feed:dp];
+      NSString* str = [Morse stringFromMorse:morse];
+      //NSLog(@"You typed %@ (%d)", str, morse);
+      if (!str && morse != MorseNoCharacter) str = [NSString stringWithFormat:@"%C", 0x203D]; // interrobang
+      else if ([str length] > 1) str = [Morse formatStrings:[NSArray arrayWithObjects:str, NULL]];
+      if (str) [sentField setStringValue:[NSString stringWithFormat:@"%@%@", [sentField stringValue], str]];
+      dp = NULL;
+    } while (morse != MorseNoCharacter);
+    q = [recognizer quality];
+    //NSLog(@"QUALITY %f", q.quality);
+  }
+  if (down) [renderer setMode:MorseRendererOnMode];
+  else
+  {
+    [renderer setMode:MorseRendererOffMode];
+    [tWPMField setDoubleValue:q.toneWPM];
+    [sWPMField setDoubleValue:q.spaceWPM];
+    [qualityIndicator setDoubleValue:q.quality*100.0];
+    if (!flag)
+    {
+      spaceTimerGo = YES;
+      delay /= 1000.0;
+      NSLog(@"delay %f s from %f (%f WPM)", delay, [Morse millisecondsPerUnitAtWPM:[recognizer WPM]], [recognizer WPM]);
+      timer = [NSTimer scheduledTimerWithTimeInterval:delay target:self selector:@selector(spaceTimer:) userInfo:nil repeats:NO];
+    }
+  }
+  lastKey = time;
+}
+
+#pragma mark Delegate
+-(void)applicationWillTerminate:(id)sender
+{
+  //NSLog(@"applicationWillTerminate:");
+  [[NSUserDefaults standardUserDefaults] setObject:[[tabs selectedTabViewItem] identifier] forKey:@"tab"];
+  [[NSUserDefaults standardUserDefaults] setObject:score forKey:@"score"];
+  if (_tap)
+  {
+    CGEventTapEnable(_tap, false);
+    CFMachPortInvalidate(_tap);
+    CFRunLoopRemoveSource(CFRunLoopGetCurrent(), _src, kCFRunLoopCommonModes);
+    CFRelease(_tap);
+  }
+  if (_src) CFRelease(_src);
+}
+
+-(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)app
+{
+  return YES;
+}
+
+-(void)tabView:(NSTabView*)tv didSelectTabViewItem:(NSTabViewItem*)item
+{
+  [self gotoState:iMorseNotTestingState];
+  BOOL loop = ([[[tabs selectedTabViewItem] identifier] isEqual:@"1"])? [[[NSUserDefaults standardUserDefaults] valueForKey:@"loop"] boolValue]:NO;
+  [renderer setLoop:loop];
+}
+
+-(void)authorizationViewDidAuthorize:(SFAuthorizationView*)view
+{
+  AuthorizationRef auth = [[view authorization] authorizationRef];
+  NSString* me = [[NSBundle mainBundle] executablePath];
+  NSString* mktrusted = [[NSBundle mainBundle] pathForAuxiliaryExecutable:@"mktrusted"];
+  char* args[2] = {NULL,NULL};
+  args[0] = (char*)[me UTF8String];
+  OSStatus authErr = AuthorizationExecuteWithPrivileges(auth, [mktrusted UTF8String], kAuthorizationFlagDefaults, &args[0], NULL);
+  NSString* ti = [[Onizuka sharedOnizuka] copyLocalizedTitle:(0 == authErr)? @"__AUTH_SUCCESS__":@"__AUTH_FAILURE__"];
+  if (0 != authErr)
+  {
+    NSString* tmp = ti;
+    ti = [[NSString alloc] initWithFormat:ti, authErr];
+    [tmp release];
+  }
+  [authField setStringValue:ti];
+  [ti release];
+}
+
+-(BOOL)validateMenuItem:(NSMenuItem*)item
+{
+  if ([item action] == @selector(startStop:))
+  {
+    NSString* ti = [[Onizuka sharedOnizuka] copyLocalizedTitle:(state == iMorseNotTestingState)? @"__PLAY__":@"__PAUSE__"];
+    [playPauseMenuItem setTitle:ti];
+    [ti release];
+    id tabID = [[tabs selectedTabViewItem] identifier];
+    if ([tabID isEqual:@"3"]) return NO;
+  }
+  return YES;
+}
+
+#pragma mark Callbacks
+-(void)timer:(NSTimer*)t
+{
+  if (state == iMorseWaitingState) [self gotoState:iMorseShowingState];
+  else if (state == iMorseShowingState) [self gotoState:iMorsePlayingState];
+}
+
+-(void)spaceTimer:(NSTimer*)t
+{
+  if (spaceTimerGo && t == timer)
+  {
+    //NSLog(@"timer fired: %@", t);
+    [self shiftKey:NO atTime:UpTimeInNanoseconds() fromTimer:YES];
+    lastKey = 0.0;
+  }
+  spaceTimerGo = NO;
+  [timer invalidate];
+  timer = nil;
+}
+
+-(void)gotText:(NSNotification*)note
+{
+  if (state == iMorseWaitingState && [self checkTestResponseWithFeedback:NO])
+  {
+    [self gotoState:iMorseShowingState];
+  }
+}
+
+-(void)renderDone:(NSNotification*)note
+{
+  //NSLog(@"renderDone:");
+  if ([[[tabs selectedTabViewItem] identifier] isEqual:@"1"]) [self gotoState:iMorseNotTestingState];
+  else
+  {
+    if ([self checkTestResponseWithFeedback:NO]) [self gotoState:iMorseShowingState];
+    else [self gotoState:iMorseWaitingState];
+  }
+}
+
+-(void)tintChanged:(NSNotification*)note
+{
+  NSString* tintImageName = @"repeat_embedded_blue.png";
+  if ([NSColor currentControlTint] == NSGraphiteControlTint)
+    tintImageName=@"repeat_embedded_graphite.png";
+  [repeatButton setAlternateImage:[NSImage imageNamed:tintImageName]];
+}
+
+-(void)observeValueForKeyPath:(NSString*)path ofObject:(id)object change:(NSDictionary*)change context:(void*)ctx
+{
+  #pragma unused (object,ctx)
+  //NSLog(@"observeValueForKeyPath:%@ ofObject:%@ change:%@", path, object, change);
+  if ([path isEqual:@"freq"])
+  {
+    id newval = [change objectForKey:NSKeyValueChangeNewKey];
+    [renderer setFreqVal:[newval floatValue]];
+  }
+  else if ([path isEqual:@"amp"])
+  {
+    id newval = [change objectForKey:NSKeyValueChangeNewKey];
+    [renderer setAmpVal:[newval floatValue]];
+  }
+  else if ([path isEqual:@"wpm"])
+  {
+    float newval = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
+    //NSLog(@"wpm %f", newval);
+    [renderer setWPMVal:newval];
+    [recognizer setWPM:newval];
+    float cwpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"cwpm"] floatValue];
+    if (cwpm < newval) [[NSUserDefaults standardUserDefaults] setFloat:newval forKey:@"cwpm"];
+  }
+  else if ([path isEqual:@"cwpm"])
+  {
+    float newval = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
+    //NSLog(@"cwpm %f", newval);
+    [renderer setCWPMVal:newval];
+    //[recognizer setCWPM:newval];
+    float wpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"wpm"] floatValue];
+    if (wpm > newval) [[NSUserDefaults standardUserDefaults] setFloat:newval forKey:@"wpm"];
+  }
+  else if ([path isEqual:@"loop"])
+  {
+    id newval = [change objectForKey:NSKeyValueChangeNewKey];
+    [renderer setLoop:[newval boolValue]];
+  }
+  else if ([path isEqual:@"flash"])
+  {
+    id newval = [change objectForKey:NSKeyValueChangeNewKey];
+    [renderer setFlash:[newval boolValue]];
+  }
+  else if ([path isEqual:@"pan"])
+  {
+    id newval = [change objectForKey:NSKeyValueChangeNewKey];
+    [renderer setPan:[newval floatValue]];
+  }
+}
+
+#pragma mark Score Table
+-(NSInteger)numberOfRowsInTableView:(NSTableView*)tv
+{
+  return [score count];
+}
+
+-(id)tableView:(NSTableView*)tv objectValueForTableColumn:(NSTableColumn*)col row:(NSInteger)row
+{
+  NSArray* keys = [[score allKeys] sortedArrayUsingSelector:@selector(compare:)];
+  id key = [keys objectAtIndex:row];
+  if ([[col identifier] isEqual:@"Correct"])
+  {
+    NSDictionary* d = [score objectForKey:key];
+    NSUInteger n = [[d objectForKey:@"n"] unsignedIntegerValue];
+    NSUInteger of = [[d objectForKey:@"of"] unsignedIntegerValue];
+    float pct = 100.0f*(float)n/(float)of;
+    key = [NSString stringWithFormat:@"%d/%d (%.2f%%)", n, of, pct];
+    if (pct >= 95.0f)
+    {
+      NSColor* green = [NSColor colorWithCalibratedRed:0.0f green:0.67f blue:0.0f alpha:1.0f];
+      NSDictionary* attrs = [[NSDictionary alloc] initWithObjectsAndKeys:green, NSForegroundColorAttributeName, NULL];
+      key = [[NSAttributedString alloc] initWithString:key attributes:attrs];
+      [key autorelease];
+      [attrs release];
+    }
+  }
+  return key;
+}
+@end
+
+#pragma mark -
+#pragma mark Static Routines
+static CGEventRef TapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon)
+{
+  #pragma unused (proxy,type)
+  MorseController* myself = refcon;
+  [myself keycheck:event];
+  return event;
+}
+
+
+#include <mach/mach.h>
+#include <mach/mach_time.h>
+// Boosted from Apple sample code
+static CGEventTimestamp UpTimeInNanoseconds(void)
+{
+  CGEventTimestamp time;
+  CGEventTimestamp timeNano;
+  static mach_timebase_info_data_t sTimebaseInfo;
+
+  time = mach_absolute_time();
+  // Convert to nanoseconds.
+  // If this is the first time we've run, get the timebase.
+  // We can use denom == 0 to indicate that sTimebaseInfo is
+  // uninitialised because it makes no sense to have a zero
+  // denominator is a fraction.
+  if ( sTimebaseInfo.denom == 0 )
+  {
+      (void) mach_timebase_info(&sTimebaseInfo);
+  }
+  // Do the maths.  We hope that the multiplication doesn't
+  // overflow; the price you pay for working in fixed point.
+  timeNano = time * sTimebaseInfo.numer / sTimebaseInfo.denom;
+  return timeNano;
+}

@@ -1,0 +1,696 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3204AEB91284B9A800EAE00E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3204AEB81284B9A800EAE00E /* IOKit.framework */; };
+		3213560A11EE2AD800EBC97E /* iMorse.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3213560911EE2AD800EBC97E /* iMorse.icns */; };
+		32190E851222CB81008B4E80 /* mktrusted.c in Sources */ = {isa = PBXBuildFile; fileRef = 32190E841222CB81008B4E80 /* mktrusted.c */; };
+		32190F491222CD96008B4E80 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D7F92690099588A7F000001 /* CoreFoundation.framework */; };
+		32190F8A1222CFA0008B4E80 /* mktrusted in CopyFiles */ = {isa = PBXBuildFile; fileRef = 32190E6B1222C75D008B4E80 /* mktrusted */; };
+		32264F92131EC7A8006D4698 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 32264F8A131EC7A8006D4698 /* Credits.rtf */; };
+		32264F93131EC7A8006D4698 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 32264F8D131EC7A8006D4698 /* Localizable.strings */; };
+		322E274F11E4DE8400B9241E /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 322E274E11E4DE8400B9241E /* defaults.plist */; };
+		322E284511E4FC5000B9241E /* repeat_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = 322E284311E4FC5000B9241E /* repeat_embedded.png */; };
+		322E284611E4FC5000B9241E /* repeat_embedded_graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 322E284411E4FC5000B9241E /* repeat_embedded_graphite.png */; };
+		322E289B11E5002100B9241E /* repeat_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 322E289A11E5002100B9241E /* repeat_embedded_blue.png */; };
+		323183BB11E781C500E9FFA0 /* BigLetterView.h in Headers */ = {isa = PBXBuildFile; fileRef = 323183B911E781C500E9FFA0 /* BigLetterView.h */; };
+		323183BC11E781C500E9FFA0 /* BigLetterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 323183BA11E781C500E9FFA0 /* BigLetterView.m */; };
+		323183CA11E783FA00E9FFA0 /* StopPressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183C711E783FA00E9FFA0 /* StopPressed.tiff */; };
+		323183CB11E783FA00E9FFA0 /* StopEnabled.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183C811E783FA00E9FFA0 /* StopEnabled.tiff */; };
+		323183CC11E783FA00E9FFA0 /* StopDisabled.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183C911E783FA00E9FFA0 /* StopDisabled.tiff */; };
+		323183D011E7841700E9FFA0 /* PlayPressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183CD11E7841700E9FFA0 /* PlayPressed.tiff */; };
+		323183D111E7841700E9FFA0 /* PlayEnabled.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183CE11E7841700E9FFA0 /* PlayEnabled.tiff */; };
+		323183D211E7841700E9FFA0 /* PlayDisabled.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183CF11E7841700E9FFA0 /* PlayDisabled.tiff */; };
+		3237A3EF131D8D9800824AD4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97319FDCFA39411CA2CEA /* MainMenu.nib */; };
+		3237A417131D91CC00824AD4 /* Onizuka.h in Headers */ = {isa = PBXBuildFile; fileRef = 3237A411131D91CC00824AD4 /* Onizuka.h */; };
+		3237A418131D91CC00824AD4 /* Onizuka.m in Sources */ = {isa = PBXBuildFile; fileRef = 3237A412131D91CC00824AD4 /* Onizuka.m */; };
+		3237A419131D91CC00824AD4 /* Onizuka.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3237A414131D91CC00824AD4 /* Onizuka.strings */; };
+		32560641121C410700656629 /* Wordlist.h in Headers */ = {isa = PBXBuildFile; fileRef = 3256063F121C410700656629 /* Wordlist.h */; };
+		32560642121C410700656629 /* Wordlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 32560640121C410700656629 /* Wordlist.m */; };
+		325B407111DAA44D00F39F0D /* Morse.h in Headers */ = {isa = PBXBuildFile; fileRef = 325B406F11DAA44D00F39F0D /* Morse.h */; };
+		325B407211DAA44D00F39F0D /* Morse.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B407011DAA44D00F39F0D /* Morse.m */; };
+		325B409A11DAAA8500F39F0D /* Morse.strings in Resources */ = {isa = PBXBuildFile; fileRef = 325B409911DAAA8500F39F0D /* Morse.strings */; };
+		3279A4401215F614007180F1 /* SecurityInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3279A43F1215F614007180F1 /* SecurityInterface.framework */; };
+		3279A4771215FE90007180F1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3279A4761215FE90007180F1 /* Security.framework */; };
+		32859CD811E6245A003319E7 /* Morse.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32859CD711E6245A003319E7 /* Morse.plist */; };
+		32859E2F11E66FE1003319E7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32859E2E11E66FE1003319E7 /* AudioToolbox.framework */; };
+		3292CEDD123ECE5E009B0B9C /* Levenshtein.h in Headers */ = {isa = PBXBuildFile; fileRef = 3292CEDB123ECE5E009B0B9C /* Levenshtein.h */; };
+		3292CEDE123ECE5E009B0B9C /* Levenshtein.m in Sources */ = {isa = PBXBuildFile; fileRef = 3292CEDC123ECE5E009B0B9C /* Levenshtein.m */; };
+		A63F8E440C518612006781E2 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63F8E420C518612006781E2 /* AudioUnit.framework */; };
+		A64D2B5F09211FE800BA6154 /* MorseRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F64E20B00996E677F000001 /* MorseRenderer.h */; };
+		A64D2B6009211FE800BA6154 /* MorseController.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F64E20D00996E677F000001 /* MorseController.h */; };
+		A64D2B6609211FE800BA6154 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		A64D2B6709211FE800BA6154 /* MorseRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F64E20C00996E677F000001 /* MorseRenderer.m */; };
+		A64D2B6809211FE800BA6154 /* MorseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F64E20E00996E677F000001 /* MorseController.m */; };
+		A64D2B6A09211FE800BA6154 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A64D2B6B09211FE800BA6154 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D7F92510098D1857F000001 /* CoreAudio.framework */; };
+		A64D2B6C09211FE800BA6154 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D7F92690099588A7F000001 /* CoreFoundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		32190F881222CF8A008B4E80 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 32190E6A1222C75D008B4E80;
+			remoteInfo = mktrusted;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		32190F831222CEDB008B4E80 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				32190F8A1222CFA0008B4E80 /* mktrusted in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0D7F92510098D1857F000001 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
+		0D7F92690099588A7F000001 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		1F64E20B00996E677F000001 /* MorseRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MorseRenderer.h; sourceTree = "<group>"; };
+		1F64E20C00996E677F000001 /* MorseRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MorseRenderer.m; sourceTree = "<group>"; };
+		1F64E20D00996E677F000001 /* MorseController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MorseController.h; sourceTree = "<group>"; };
+		1F64E20E00996E677F000001 /* MorseController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MorseController.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		29B97319FDCFA39411CA2CEA /* MainMenu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MainMenu.nib; sourceTree = "<group>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		3204AEB81284B9A800EAE00E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		3213560911EE2AD800EBC97E /* iMorse.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = iMorse.icns; sourceTree = "<group>"; };
+		32190E6B1222C75D008B4E80 /* mktrusted */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mktrusted; sourceTree = BUILT_PRODUCTS_DIR; };
+		32190E841222CB81008B4E80 /* mktrusted.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mktrusted.c; sourceTree = "<group>"; };
+		32264F8B131EC7A8006D4698 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ja; path = ja.lproj/Credits.rtf; sourceTree = "<group>"; };
+		32264F8E131EC7A8006D4698 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		32264F90131EC7A8006D4698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		32264F91131EC7A8006D4698 /* en */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		322E274E11E4DE8400B9241E /* defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = "<group>"; };
+		322E284311E4FC5000B9241E /* repeat_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_embedded.png; sourceTree = "<group>"; };
+		322E284411E4FC5000B9241E /* repeat_embedded_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_embedded_graphite.png; sourceTree = "<group>"; };
+		322E289A11E5002100B9241E /* repeat_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_embedded_blue.png; sourceTree = "<group>"; };
+		323183B911E781C500E9FFA0 /* BigLetterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BigLetterView.h; sourceTree = "<group>"; };
+		323183BA11E781C500E9FFA0 /* BigLetterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BigLetterView.m; sourceTree = "<group>"; };
+		323183C711E783FA00E9FFA0 /* StopPressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = StopPressed.tiff; sourceTree = "<group>"; };
+		323183C811E783FA00E9FFA0 /* StopEnabled.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = StopEnabled.tiff; sourceTree = "<group>"; };
+		323183C911E783FA00E9FFA0 /* StopDisabled.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = StopDisabled.tiff; sourceTree = "<group>"; };
+		323183CD11E7841700E9FFA0 /* PlayPressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlayPressed.tiff; sourceTree = "<group>"; };
+		323183CE11E7841700E9FFA0 /* PlayEnabled.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlayEnabled.tiff; sourceTree = "<group>"; };
+		323183CF11E7841700E9FFA0 /* PlayDisabled.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlayDisabled.tiff; sourceTree = "<group>"; };
+		3237A411131D91CC00824AD4 /* Onizuka.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Onizuka.h; path = ../Onizuka/Onizuka.h; sourceTree = SOURCE_ROOT; };
+		3237A412131D91CC00824AD4 /* Onizuka.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Onizuka.m; path = ../Onizuka/Onizuka.m; sourceTree = SOURCE_ROOT; };
+		3237A415131D91CC00824AD4 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Onizuka.strings; sourceTree = "<group>"; };
+		3237A416131D91CC00824AD4 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Onizuka.strings; sourceTree = "<group>"; };
+		3256063F121C410700656629 /* Wordlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wordlist.h; sourceTree = "<group>"; };
+		32560640121C410700656629 /* Wordlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wordlist.m; sourceTree = "<group>"; };
+		325B406F11DAA44D00F39F0D /* Morse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Morse.h; sourceTree = "<group>"; };
+		325B407011DAA44D00F39F0D /* Morse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Morse.m; sourceTree = "<group>"; };
+		325B409911DAAA8500F39F0D /* Morse.strings */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; path = Morse.strings; sourceTree = "<group>"; };
+		3279A43F1215F614007180F1 /* SecurityInterface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityInterface.framework; path = /System/Library/Frameworks/SecurityInterface.framework; sourceTree = "<absolute>"; };
+		3279A4761215FE90007180F1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		32859CD711E6245A003319E7 /* Morse.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Morse.plist; sourceTree = "<group>"; };
+		32859E2E11E66FE1003319E7 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
+		3292CEDB123ECE5E009B0B9C /* Levenshtein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Levenshtein.h; sourceTree = "<group>"; };
+		3292CEDC123ECE5E009B0B9C /* Levenshtein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Levenshtein.m; sourceTree = "<group>"; };
+		A63F8E420C518612006781E2 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
+		A64D2B6E09211FE900BA6154 /* Info-iMorse.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-iMorse.plist"; sourceTree = "<group>"; };
+		A64D2B6F09211FE900BA6154 /* iMorse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMorse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		32190E691222C75D008B4E80 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32190F491222CD96008B4E80 /* CoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A64D2B6909211FE800BA6154 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A64D2B6A09211FE800BA6154 /* Cocoa.framework in Frameworks */,
+				A64D2B6B09211FE800BA6154 /* CoreAudio.framework in Frameworks */,
+				A64D2B6C09211FE800BA6154 /* CoreFoundation.framework in Frameworks */,
+				A63F8E440C518612006781E2 /* AudioUnit.framework in Frameworks */,
+				32859E2F11E66FE1003319E7 /* AudioToolbox.framework in Frameworks */,
+				3279A4401215F614007180F1 /* SecurityInterface.framework in Frameworks */,
+				3279A4771215FE90007180F1 /* Security.framework in Frameworks */,
+				3204AEB91284B9A800EAE00E /* IOKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3204AEB81284B9A800EAE00E /* IOKit.framework */,
+				3279A4761215FE90007180F1 /* Security.framework */,
+				3279A43F1215F614007180F1 /* SecurityInterface.framework */,
+				32859E2E11E66FE1003319E7 /* AudioToolbox.framework */,
+				A63F8E420C518612006781E2 /* AudioUnit.framework */,
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+				0D7F92510098D1857F000001 /* CoreAudio.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				0D7F92690099588A7F000001 /* CoreFoundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A64D2B6F09211FE900BA6154 /* iMorse.app */,
+				32190E6B1222C75D008B4E80 /* mktrusted */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* Sawtooth */ = {
+			isa = PBXGroup;
+			children = (
+				325B406F11DAA44D00F39F0D /* Morse.h */,
+				325B407011DAA44D00F39F0D /* Morse.m */,
+				1F64E20B00996E677F000001 /* MorseRenderer.h */,
+				1F64E20C00996E677F000001 /* MorseRenderer.m */,
+				3256063F121C410700656629 /* Wordlist.h */,
+				32560640121C410700656629 /* Wordlist.m */,
+				1F64E20D00996E677F000001 /* MorseController.h */,
+				1F64E20E00996E677F000001 /* MorseController.m */,
+				323183B911E781C500E9FFA0 /* BigLetterView.h */,
+				323183BA11E781C500E9FFA0 /* BigLetterView.m */,
+				3292CEDB123ECE5E009B0B9C /* Levenshtein.h */,
+				3292CEDC123ECE5E009B0B9C /* Levenshtein.m */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+				32190E841222CB81008B4E80 /* mktrusted.c */,
+				325B409911DAAA8500F39F0D /* Morse.strings */,
+				32859CD711E6245A003319E7 /* Morse.plist */,
+				322E274E11E4DE8400B9241E /* defaults.plist */,
+				3237A41C131D91EC00824AD4 /* Onizuka */,
+				29B97319FDCFA39411CA2CEA /* MainMenu.nib */,
+				32264F8A131EC7A8006D4698 /* Credits.rtf */,
+				32264F8D131EC7A8006D4698 /* Localizable.strings */,
+				322E285611E4FCBA00B9241E /* Graphics */,
+				3213560911EE2AD800EBC97E /* iMorse.icns */,
+				A64D2B6E09211FE900BA6154 /* Info-iMorse.plist */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = Sawtooth;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		322E285611E4FCBA00B9241E /* Graphics */ = {
+			isa = PBXGroup;
+			children = (
+				323183CD11E7841700E9FFA0 /* PlayPressed.tiff */,
+				323183CE11E7841700E9FFA0 /* PlayEnabled.tiff */,
+				323183CF11E7841700E9FFA0 /* PlayDisabled.tiff */,
+				323183C711E783FA00E9FFA0 /* StopPressed.tiff */,
+				323183C811E783FA00E9FFA0 /* StopEnabled.tiff */,
+				323183C911E783FA00E9FFA0 /* StopDisabled.tiff */,
+				322E284311E4FC5000B9241E /* repeat_embedded.png */,
+				322E289A11E5002100B9241E /* repeat_embedded_blue.png */,
+				322E284411E4FC5000B9241E /* repeat_embedded_graphite.png */,
+			);
+			name = Graphics;
+			sourceTree = "<group>";
+		};
+		3237A413131D91CC00824AD4 /* StandardUI */ = {
+			isa = PBXGroup;
+			children = (
+				3237A414131D91CC00824AD4 /* Onizuka.strings */,
+			);
+			name = StandardUI;
+			path = ../Onizuka/StandardUI;
+			sourceTree = SOURCE_ROOT;
+		};
+		3237A41C131D91EC00824AD4 /* Onizuka */ = {
+			isa = PBXGroup;
+			children = (
+				3237A411131D91CC00824AD4 /* Onizuka.h */,
+				3237A412131D91CC00824AD4 /* Onizuka.m */,
+				3237A413131D91CC00824AD4 /* StandardUI */,
+			);
+			name = Onizuka;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		A64D2B5E09211FE800BA6154 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A64D2B5F09211FE800BA6154 /* MorseRenderer.h in Headers */,
+				A64D2B6009211FE800BA6154 /* MorseController.h in Headers */,
+				325B407111DAA44D00F39F0D /* Morse.h in Headers */,
+				323183BB11E781C500E9FFA0 /* BigLetterView.h in Headers */,
+				32560641121C410700656629 /* Wordlist.h in Headers */,
+				3292CEDD123ECE5E009B0B9C /* Levenshtein.h in Headers */,
+				3237A417131D91CC00824AD4 /* Onizuka.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		32190E6A1222C75D008B4E80 /* mktrusted */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32190E771222C7C5008B4E80 /* Build configuration list for PBXNativeTarget "mktrusted" */;
+			buildPhases = (
+				32190E681222C75D008B4E80 /* Sources */,
+				32190E691222C75D008B4E80 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = mktrusted;
+			productName = mktrusted;
+			productReference = 32190E6B1222C75D008B4E80 /* mktrusted */;
+			productType = "com.apple.product-type.tool";
+		};
+		A64D2B5D09211FE800BA6154 /* iMorse */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "iMorse" */;
+			buildPhases = (
+				A64D2B5E09211FE800BA6154 /* Headers */,
+				A64D2B6109211FE800BA6154 /* Resources */,
+				A64D2B6509211FE800BA6154 /* Sources */,
+				A64D2B6909211FE800BA6154 /* Frameworks */,
+				32190F831222CEDB008B4E80 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				32190F891222CF8A008B4E80 /* PBXTargetDependency */,
+			);
+			name = iMorse;
+			productInstallPath = "$(HOME)/Applications";
+			productName = Sawtooth;
+			productReference = A64D2B6F09211FE900BA6154 /* iMorse.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "iMorse" */;
+			compatibilityVersion = "Xcode 3.0";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				en,
+				ja,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* Sawtooth */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A64D2B5D09211FE800BA6154 /* iMorse */,
+				32190E6A1222C75D008B4E80 /* mktrusted */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A64D2B6109211FE800BA6154 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3237A3EF131D8D9800824AD4 /* MainMenu.nib in Resources */,
+				325B409A11DAAA8500F39F0D /* Morse.strings in Resources */,
+				322E274F11E4DE8400B9241E /* defaults.plist in Resources */,
+				322E284511E4FC5000B9241E /* repeat_embedded.png in Resources */,
+				322E284611E4FC5000B9241E /* repeat_embedded_graphite.png in Resources */,
+				322E289B11E5002100B9241E /* repeat_embedded_blue.png in Resources */,
+				32859CD811E6245A003319E7 /* Morse.plist in Resources */,
+				323183CA11E783FA00E9FFA0 /* StopPressed.tiff in Resources */,
+				323183CB11E783FA00E9FFA0 /* StopEnabled.tiff in Resources */,
+				323183CC11E783FA00E9FFA0 /* StopDisabled.tiff in Resources */,
+				323183D011E7841700E9FFA0 /* PlayPressed.tiff in Resources */,
+				323183D111E7841700E9FFA0 /* PlayEnabled.tiff in Resources */,
+				323183D211E7841700E9FFA0 /* PlayDisabled.tiff in Resources */,
+				3213560A11EE2AD800EBC97E /* iMorse.icns in Resources */,
+				3237A419131D91CC00824AD4 /* Onizuka.strings in Resources */,
+				32264F92131EC7A8006D4698 /* Credits.rtf in Resources */,
+				32264F93131EC7A8006D4698 /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		32190E681222C75D008B4E80 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32190E851222CB81008B4E80 /* mktrusted.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A64D2B6509211FE800BA6154 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A64D2B6609211FE800BA6154 /* main.m in Sources */,
+				A64D2B6709211FE800BA6154 /* MorseRenderer.m in Sources */,
+				A64D2B6809211FE800BA6154 /* MorseController.m in Sources */,
+				325B407211DAA44D00F39F0D /* Morse.m in Sources */,
+				323183BC11E781C500E9FFA0 /* BigLetterView.m in Sources */,
+				32560642121C410700656629 /* Wordlist.m in Sources */,
+				3292CEDE123ECE5E009B0B9C /* Levenshtein.m in Sources */,
+				3237A418131D91CC00824AD4 /* Onizuka.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		32190F891222CF8A008B4E80 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 32190E6A1222C75D008B4E80 /* mktrusted */;
+			targetProxy = 32190F881222CF8A008B4E80 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		32264F8A131EC7A8006D4698 /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32264F8B131EC7A8006D4698 /* ja */,
+				32264F90131EC7A8006D4698 /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		32264F8D131EC7A8006D4698 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				32264F91131EC7A8006D4698 /* en */,
+				32264F8E131EC7A8006D4698 /* ja */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		3237A414131D91CC00824AD4 /* Onizuka.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3237A415131D91CC00824AD4 /* en */,
+				3237A416131D91CC00824AD4 /* ja */,
+			);
+			name = Onizuka.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		32190E6D1222C75E008B4E80 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					i386,
+					x86_64,
+					ppc,
+				);
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = mktrusted;
+			};
+			name = Development;
+		};
+		32190E6E1222C75E008B4E80 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = mktrusted;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		32190E6F1222C75E008B4E80 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = mktrusted;
+			};
+			name = Default;
+		};
+		A6E430BF0C5184DE00BA6C4B /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+					x86_64,
+				);
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "Info-iMorse.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = iMorse;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SECTORDER_FLAGS = "";
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		A6E430C00C5184DE00BA6C4B /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+					x86_64,
+				);
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "Info-iMorse.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = iMorse;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SECTORDER_FLAGS = "";
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		A6E430C10C5184DE00BA6C4B /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+					x86_64,
+				);
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "Info-iMorse.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = iMorse;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SECTORDER_FLAGS = "";
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Default;
+		};
+		A6E430C70C5184DE00BA6C4B /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					x86_64,
+					ppc,
+				);
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
+			};
+			name = Development;
+		};
+		A6E430C80C5184DE00BA6C4B /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+					x86_64,
+				);
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
+			};
+			name = Deployment;
+		};
+		A6E430C90C5184DE00BA6C4B /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		32190E771222C7C5008B4E80 /* Build configuration list for PBXNativeTarget "mktrusted" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32190E6D1222C75E008B4E80 /* Development */,
+				32190E6E1222C75E008B4E80 /* Deployment */,
+				32190E6F1222C75E008B4E80 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "iMorse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A6E430BF0C5184DE00BA6C4B /* Development */,
+				A6E430C00C5184DE00BA6C4B /* Deployment */,
+				A6E430C10C5184DE00BA6C4B /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "iMorse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A6E430C70C5184DE00BA6C4B /* Development */,
+				A6E430C80C5184DE00BA6C4B /* Deployment */,
+				A6E430C90C5184DE00BA6C4B /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}
