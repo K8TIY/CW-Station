@@ -123,7 +123,7 @@
 		3292CEDB123ECE5E009B0B9C /* Levenshtein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Levenshtein.h; sourceTree = "<group>"; };
 		3292CEDC123ECE5E009B0B9C /* Levenshtein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Levenshtein.m; sourceTree = "<group>"; };
 		A63F8E420C518612006781E2 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
-		A64D2B6E09211FE900BA6154 /* Info-iMorse.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-iMorse.plist"; sourceTree = "<group>"; };
+		A64D2B6E09211FE900BA6154 /* iMorse-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iMorse-Info.plist"; sourceTree = "<group>"; };
 		A64D2B6F09211FE900BA6154 /* iMorse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMorse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -213,7 +213,7 @@
 				32264F8D131EC7A8006D4698 /* Localizable.strings */,
 				322E285611E4FCBA00B9241E /* Graphics */,
 				3213560911EE2AD800EBC97E /* iMorse.icns */,
-				A64D2B6E09211FE900BA6154 /* Info-iMorse.plist */,
+				A64D2B6E09211FE900BA6154 /* iMorse-Info.plist */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
@@ -520,7 +520,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info-iMorse.plist";
+				INFOPLIST_FILE = "iMorse-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
@@ -553,7 +553,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info-iMorse.plist";
+				INFOPLIST_FILE = "iMorse-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
@@ -584,7 +584,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info-iMorse.plist";
+				INFOPLIST_FILE = "iMorse-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
