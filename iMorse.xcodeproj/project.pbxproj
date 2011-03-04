@@ -465,7 +465,7 @@
 			};
 			name = Development;
 		};
-		32190E6E1222C75E008B4E80 /* Deployment */ = {
+		32190E6E1222C75E008B4E80 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -484,7 +484,7 @@
 				PRODUCT_NAME = mktrusted;
 				ZERO_LINK = NO;
 			};
-			name = Deployment;
+			name = Release;
 		};
 		32190E6F1222C75E008B4E80 /* Default */ = {
 			isa = XCBuildConfiguration;
@@ -539,7 +539,7 @@
 			};
 			name = Development;
 		};
-		A6E430C00C5184DE00BA6C4B /* Deployment */ = {
+		A6E430C00C5184DE00BA6C4B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -570,7 +570,7 @@
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
-			name = Deployment;
+			name = Release;
 		};
 		A6E430C10C5184DE00BA6C4B /* Default */ = {
 			isa = XCBuildConfiguration;
@@ -622,7 +622,7 @@
 			};
 			name = Development;
 		};
-		A6E430C80C5184DE00BA6C4B /* Deployment */ = {
+		A6E430C80C5184DE00BA6C4B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -639,7 +639,7 @@
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 			};
-			name = Deployment;
+			name = Release;
 		};
 		A6E430C90C5184DE00BA6C4B /* Default */ = {
 			isa = XCBuildConfiguration;
@@ -664,7 +664,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				32190E6D1222C75E008B4E80 /* Development */,
-				32190E6E1222C75E008B4E80 /* Deployment */,
+				32190E6E1222C75E008B4E80 /* Release */,
 				32190E6F1222C75E008B4E80 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -674,7 +674,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A6E430BF0C5184DE00BA6C4B /* Development */,
-				A6E430C00C5184DE00BA6C4B /* Deployment */,
+				A6E430C00C5184DE00BA6C4B /* Release */,
 				A6E430C10C5184DE00BA6C4B /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -684,7 +684,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A6E430C70C5184DE00BA6C4B /* Development */,
-				A6E430C80C5184DE00BA6C4B /* Deployment */,
+				A6E430C80C5184DE00BA6C4B /* Release */,
 				A6E430C90C5184DE00BA6C4B /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
