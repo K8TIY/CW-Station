@@ -27,14 +27,13 @@ typedef struct
 +(NSDictionary*)dictionary;
 +(NSDictionary*)reverseDictionary;
 +(NSString*)stringFromMorse:(uint16_t)morse;
-+(uint16_t*)morseFromStrings:(NSArray*)strings length:(NSUInteger*)outLength;
++(uint16_t*)morseFromString:(NSString*)string length:(NSUInteger*)outLength;
 +(NSArray*)letters;
 +(NSArray*)numbers;
 +(NSArray*)lettersAndNumbers;
 +(NSArray*)punctuation;
 +(NSArray*)prosigns;
-+(NSString*)formatStrings:(NSArray*)strings;
-+(NSArray*)splitString:(NSString*)string;
++(NSString*)formatString:(NSString*)string;
 @end
 
 typedef struct

@@ -26,7 +26,7 @@ static const float gSampleRate = 22050.0f;
 
 @interface MorseRenderer (Private)
 -(void)_updatePadding;
--(void)setAgenda:(NSArray*)strings;
+-(void)setAgenda:(NSString*)string;
 @end
 
 
@@ -226,7 +226,7 @@ static void local_SendNote(void)
 -(id)init
 {
   self = [super init];
-  _strings = [[NSArray alloc] init];
+  _string = [[NSMutableString alloc] init];
   AUNode node;
   AudioUnit unit;
 	ComponentDescription desc;
@@ -326,12 +326,12 @@ static void local_SendNote(void)
   //NSLog(@"intercharacter %f sec, interword %f sec", tc, tw);
 }
 
--(void)setAgenda:(NSArray*)str
+-(void)setAgenda:(NSString*)str
 {
-  [self setStrings:str];
+  //[self setStrings:str];
   if (_state.agenda) free(_state.agenda);
   _state.agenda = NULL;
-  if (str) _state.agenda = [Morse morseFromStrings:_strings length:&_state.agendaCount];
+  if (str) _state.agenda = [Morse morseFromString:str length:&_state.agendaCount];
 }
 
 -(void)setMode:(MorseRendererMode)mode
@@ -345,8 +345,9 @@ static void local_SendNote(void)
   }
 }
 
--(void)start:(NSArray*)str
+-(void)start:(NSString*)str
 {
+  [_string setString:(str)? str:@""];
   if (!_state.play)
   {
     if (str) [self setAgenda:str];
@@ -382,14 +383,7 @@ static void local_SendNote(void)
 
 -(BOOL)isPlaying {return _state.play;}
 
--(void)setStrings:(NSArray*)str
-{
-  [str retain];
-  [_strings release];
-  _strings = str;
-}
-
--(NSArray*)strings { return _strings; }
+-(NSString*)string { return _string; }
 @end
 
 

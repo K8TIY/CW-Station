@@ -18,6 +18,9 @@
 "__CWPM__" = "字WPM";
 "__FLASH__" = "Caps Lock（⇪）キーのLEDを点滅します";
 
+"__GEN_QSO__" = "QSO を生成する";
+"__MAKE_PRO__" = "プロサインにする";
+
 "__MIN_CHARS__" = "最大数文字";
 "__MAX_CHARS__" = "最小数文字";
 "__RANDOM_CHARACTERS__" = "ランダムな文字";

@@ -1,7 +1,8 @@
 #import <Cocoa/Cocoa.h>
 
-int main(int argc, const char *argv[])
+int main(int argc, char* argv[])
 {
   srandom(time(NULL));
-	return NSApplicationMain(argc, argv);
+  return NSApplicationMain(argc, (const char**)argv);
 }
+

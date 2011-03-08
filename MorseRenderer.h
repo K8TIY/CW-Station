@@ -48,17 +48,17 @@ typedef struct
 
 @interface MorseRenderer : NSObject
 {
-  AUGraph          _ag;
-  MorseRenderState _state;
-  NSArray*         _strings;
-  BOOL             _ok;
+  AUGraph           _ag;
+  MorseRenderState  _state;
+  NSMutableString*  _string;
+  BOOL              _ok;
 }
 
-@property (copy, readwrite) NSArray* strings;
+//@property (copy, readwrite) NSString* string;
 @property (readwrite) BOOL flash;
 -(BOOL)isPlaying;
 -(void)setMode:(MorseRendererMode)mode;
--(void)start:(NSArray*)strings;
+-(void)start:(NSString*)string;
 -(void)stop;
 -(void)setAmpVal:(float)val;
 -(void)setFreqVal:(float)val;
@@ -66,4 +66,5 @@ typedef struct
 -(void)setCWPMVal:(float)val;
 -(void)setPan:(float)val;
 -(void)setLoop:(BOOL)flag;
+-(NSString*)string;
 @end

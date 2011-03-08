@@ -9,6 +9,10 @@
 			<dict>
 				<key>clearScore</key>
 				<string>id</string>
+				<key>genQSO</key>
+				<string>id</string>
+				<key>makeProsign</key>
+				<string>id</string>
 				<key>repan</key>
 				<string>id</string>
 				<key>startStop</key>
@@ -29,7 +33,7 @@
 				<key>bottomBLV</key>
 				<string>BigLetterView</string>
 				<key>inputField</key>
-				<string>NSTextField</string>
+				<string>NSTextView</string>
 				<key>panSlider</key>
 				<string>NSSlider</string>
 				<key>playPauseMenuItem</key>
@@ -55,10 +59,18 @@
 				<key>topBLV</key>
 				<string>BigLetterView</string>
 				<key>window</key>
-				<string>NSWindow</string>
+				<string>MorseWindow</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>MorseWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

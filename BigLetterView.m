@@ -1,18 +1,3 @@
-/*
-Copyright © 2010-2011 Brian S. Hall
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License version 2 as
-published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
 #import "BigLetterView.h"
 #import "Morse.h"
 
@@ -30,7 +15,7 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 	if(![super initWithFrame:rect]) return nil;
 	[self prepareAttributes];
 	bgColor = [[NSColor grayColor] retain];
-	strings = [[NSMutableArray alloc] init];
+	string = [[NSMutableString alloc] init];
   canBecomeFirstResponder = YES;
 	return self;
 }
@@ -46,7 +31,7 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 -(void)dealloc
 {
 	[bgColor release];
-	[strings release];
+	[string release];
 	[attributes release];
 	[super dealloc];
 }
@@ -64,14 +49,14 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 	return bgColor;
 }
 
--(void)setStrings:(NSArray*)s
+-(void)setString:(NSMutableString*)s
 {
-  if (nil == s) [strings removeAllObjects];
-  else [strings setArray:s];
+  if (nil == s) s = @"";
+  [string setString:s];
 	[self setNeedsDisplay:YES];
 }
 
--(NSArray*)strings { return strings; }
+-(NSString*)string { return string; }
 -(BOOL)isOpaque { return YES; }
 -(BOOL)acceptsFirstResponder { return canBecomeFirstResponder; }
 -(BOOL)becomeFirstResponder { return YES; }
@@ -83,16 +68,11 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
   // Handle backspace
   if ([event keyCode] == 51)
   {
-    NSString* str = [strings lastObject];
-    if (str)
+    if ([string length])
     {
-      NSString* newString = nil;
-      if ([str length] > 1) newString = [str substringToIndex:[str length]-1];
-      [strings removeLastObject];
-      if (newString) [strings addObject:newString];
-      //NSLog(@"%@", strings);
+      [string setString:[string substringToIndex:[string length]-1]];
+      [self setNeedsDisplay:YES];
     }
-    [self setNeedsDisplay:YES];
   }
   //NSLog(@"%@", event);
 }
@@ -102,15 +82,10 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 	if (canBecomeFirstResponder)
   {
     //NSLog(@"Typed %@", input);
-    input = [input uppercaseString];
-    if (modifiers & (NSShiftKeyMask | NSAlphaShiftKeyMask) && [strings count])
-    {
-      input = [NSString stringWithFormat:@"%@%@", [strings objectAtIndex:[strings count]-1], input];
-      [strings removeLastObject];
-    }
-    [strings addObject:input];
+    //input = [input uppercaseString];
+    [string appendString:input];
     [self setNeedsDisplay:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:BigLetterViewTextNotification object:strings];
+    [[NSNotificationCenter defaultCenter] postNotificationName:BigLetterViewTextNotification object:string];
     //NSLog(@"%@", strings);
   }
 }
@@ -124,17 +99,17 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 
 -(void)drawStringCenteredIn:(NSRect)r
 {
-  NSString* string = [Morse formatStrings:strings];
   if ([string length])
   {
+    NSString* toDraw = [Morse formatString:string];
     //NSLog(@"%@ from %@", string, strings);
     //CGFloat descent = [[attributes objectForKey:NSFontAttributeName] descender];
-    NSSize strSize = [string sizeWithAttributes:attributes];
+    NSSize strSize = [toDraw sizeWithAttributes:attributes];
     //NSLog(@"str height %f, rect height %f", strSize.height, r.size.height);
     NSPoint strOrigin;
     strOrigin.x = r.origin.x + (r.size.width - strSize.width)/2;
     strOrigin.y = r.origin.y + (r.size.height - strSize.height)/2;
-    [string drawAtPoint:strOrigin withAttributes:attributes];
+    [toDraw drawAtPoint:strOrigin withAttributes:attributes];
   }
 }
 

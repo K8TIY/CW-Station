@@ -138,54 +138,52 @@ uint16_t MorseInterwordSpace = 0x0018;
   return [rd objectForKey:[NSNumber numberWithUnsignedShort:morse]];
 }
 
-+(uint16_t*)morseFromStrings:(NSArray*)strings length:(NSUInteger*)outLength
++(uint16_t*)morseFromString:(NSString*)string length:(NSUInteger*)outLength
 {
-  NSMutableArray* substrings = [[NSMutableArray alloc] init];
+  NSMutableArray* symbols = [[NSMutableArray alloc] init];
   NSDictionary* d = [[Morse dictionary] objectForKey:@"Code"];
-  NSUInteger i, length = [strings count];
+  NSUInteger i, length = [string length];
   BOOL wasSpace = YES;
+  BOOL didPro = NO;
   for (i = 0; i < length; i++)
   {
     NSNumber* num;
-    NSString* str = [strings objectAtIndex:i];
-    unichar chr = [str characterAtIndex:0];
-    if (chr == ' ')
+    unichar chr = [string characterAtIndex:i];
+    if (chr == ' ' || chr == '\n' || chr == '\t')
     {
       num = [[NSNumber alloc] initWithUnsignedShort:MorseInterwordSpace];
       wasSpace = YES;
-      [substrings addObject:num];
+      [symbols addObject:num];
       [num release];
+      didPro = NO;
     }
     else
     {
-      // If not the first character group, prepend an intercharacter space.
-      if (i > 0 && !wasSpace) [substrings addObject:[NSNumber numberWithUnsignedShort:MorseIntercharacterSpace]];
-      wasSpace = NO;
-      NSUInteger slen = [str length];
-      NSUInteger j;
-      for (j = 0; j < slen; j++)
+      if (chr == 0x0305)
       {
-        NSString* asString = str;
-        if (slen > 1) 
-        {
-          chr = [str characterAtIndex:j];
-          asString = [NSString stringWithFormat:@"%C", chr];
-          if (j > 0) [substrings addObject:[NSNumber numberWithUnsignedShort:MorseInterelementSpace]];
-        }
-        asString = [asString uppercaseString];
-        num = [d objectForKey:asString];
-        if (nil == num) [[NSException exceptionWithName:@"Unsupported Character" reason:asString userInfo:nil] raise];
-        [substrings addObject:num];
+        didPro = YES;
+        [symbols addObject:[NSNumber numberWithUnsignedShort:MorseInterelementSpace]];
       }
+      else
+      {
+        if (i > 0 && !wasSpace && !didPro) [symbols addObject:[NSNumber numberWithUnsignedShort:MorseIntercharacterSpace]];
+        NSString* asString = [[NSString stringWithFormat:@"%C", chr] uppercaseString];
+        num = [d objectForKey:asString];
+        if (nil == num) [[NSException exceptionWithName:@"Unsupported Character"
+                                    reason:[NSString stringWithFormat:@"Unsupported Character: '%C' (%d)", chr, chr]
+                                    userInfo:nil] raise];
+        [symbols addObject:num];
+      }
+      wasSpace = NO;
     }
   }
-  NSUInteger count = [substrings count];
+  NSUInteger count = [symbols count];
   *outLength = count;
   uint16_t* a = malloc(sizeof(uint16_t) * count);
   uint16_t* ap = a;
   for (i = 0; i < count; i++, ap++)
-    *ap = [[substrings objectAtIndex:i] unsignedShortValue];
-  [substrings release];
+    *ap = [[symbols objectAtIndex:i] unsignedShortValue];
+  [symbols release];
   return a;
 }
 
@@ -219,53 +217,21 @@ uint16_t MorseInterwordSpace = 0x0018;
   return [[Morse dictionary] objectForKey:@"Prosigns"];
 }
 
-
-//static NSString* overline = @"\u0305";
-+(NSString*)formatStrings:(NSArray*)strings
+// Merges consecutive uppercase characters into prosigns.
++(NSString*)formatString:(NSString*)string
 {
-  NSMutableString* toDraw = [[NSMutableString alloc] init];
-  for (NSString* str in strings)
-  {
-    if ([str length] > 1)
-    {
-      NSUInteger i;
-      for (i = 0; i < [str length]; i++)
-      {
-        unichar chr = [str characterAtIndex:i];
-        [toDraw appendFormat:@"%C%C", chr, 0x0305];
-      }
-    }
-    else [toDraw appendString:str];
-  }
-  NSString* ret = [NSString stringWithString:toDraw];
-  [toDraw release];
-  return ret;
-}
-
-+(NSArray*)splitString:(NSString*)string
-{
-  NSMutableArray* array = [[NSMutableArray alloc] init];
+  NSMutableString* ms = [[NSMutableString alloc] init];
   NSUInteger i, n = [string length];
-  NSUInteger pro;
-  BOOL doingPro = NO;
+  NSCharacterSet* set = [NSCharacterSet uppercaseLetterCharacterSet];
   for (i = 0; i < n; i++)
   {
     unichar chr = [string characterAtIndex:i];
-    if (chr == '[')
-    {
-      pro = i+1;
-      doingPro = YES;
-    }
-    else if (chr == ']' && doingPro)
-    {
-      [array addObject:[string substringWithRange:NSMakeRange(pro, i - pro)]];
-      doingPro = NO;
-    }
-    else if (!doingPro) [array addObject:[NSString stringWithFormat:@"%C", chr]];
+    if ([set characterIsMember:chr]) [ms appendFormat:@"%C%C", chr, 0x0305];
+    else [ms appendFormat:@"%C", chr];
   }
-  NSArray* ret = [NSArray arrayWithArray:array];
-  [array release];
-  //NSLog(@"%@", ret);
+  NSString* ret = [ms uppercaseString];
+  [ms release];
+  //NSLog(@"%@ -> %@", string, ret);
   return ret;
 }
 @end

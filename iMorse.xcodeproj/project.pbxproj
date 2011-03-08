@@ -30,6 +30,23 @@
 		3237A417131D91CC00824AD4 /* Onizuka.h in Headers */ = {isa = PBXBuildFile; fileRef = 3237A411131D91CC00824AD4 /* Onizuka.h */; };
 		3237A418131D91CC00824AD4 /* Onizuka.m in Sources */ = {isa = PBXBuildFile; fileRef = 3237A412131D91CC00824AD4 /* Onizuka.m */; };
 		3237A419131D91CC00824AD4 /* Onizuka.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3237A414131D91CC00824AD4 /* Onizuka.strings */; };
+		324305CD13256B3A00A01CFC /* antenna.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305BB13256B3A00A01CFC /* antenna.h */; };
+		324305CE13256B3A00A01CFC /* callsign.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305BC13256B3A00A01CFC /* callsign.h */; };
+		324305CF13256B3A00A01CFC /* city.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305BD13256B3A00A01CFC /* city.h */; };
+		324305D013256B3A00A01CFC /* cityh.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305BE13256B3A00A01CFC /* cityh.h */; };
+		324305D113256B3A00A01CFC /* grammar.c in Sources */ = {isa = PBXBuildFile; fileRef = 324305BF13256B3A00A01CFC /* grammar.c */; };
+		324305D213256B3A00A01CFC /* heights.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C013256B3A00A01CFC /* heights.h */; };
+		324305D313256B3A00A01CFC /* init_str.m in Sources */ = {isa = PBXBuildFile; fileRef = 324305C113256B3A00A01CFC /* init_str.m */; };
+		324305D413256B3A00A01CFC /* jobs.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C213256B3A00A01CFC /* jobs.h */; };
+		324305D613256B3A00A01CFC /* misc.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C413256B3A00A01CFC /* misc.h */; };
+		324305D713256B3A00A01CFC /* names.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C513256B3A00A01CFC /* names.h */; };
+		324305D813256B3A00A01CFC /* newcity.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C613256B3A00A01CFC /* newcity.h */; };
+		324305D913256B3A00A01CFC /* put_form.m in Sources */ = {isa = PBXBuildFile; fileRef = 324305C713256B3A00A01CFC /* put_form.m */; };
+		324305DB13256B3A00A01CFC /* QSO.m in Sources */ = {isa = PBXBuildFile; fileRef = 324305C913256B3A00A01CFC /* QSO.m */; };
+		324305DC13256B3A00A01CFC /* rig.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305CA13256B3A00A01CFC /* rig.h */; };
+		324305DD13256B3A00A01CFC /* util.m in Sources */ = {isa = PBXBuildFile; fileRef = 324305CB13256B3A00A01CFC /* util.m */; };
+		324305DE13256B3A00A01CFC /* weather.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305CC13256B3A00A01CFC /* weather.h */; };
+		3243060613256DD300A01CFC /* QSO.h in Headers */ = {isa = PBXBuildFile; fileRef = 3243060513256DD300A01CFC /* QSO.h */; };
 		32560641121C410700656629 /* Wordlist.h in Headers */ = {isa = PBXBuildFile; fileRef = 3256063F121C410700656629 /* Wordlist.h */; };
 		32560642121C410700656629 /* Wordlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 32560640121C410700656629 /* Wordlist.m */; };
 		325B407111DAA44D00F39F0D /* Morse.h in Headers */ = {isa = PBXBuildFile; fileRef = 325B406F11DAA44D00F39F0D /* Morse.h */; };
@@ -111,6 +128,23 @@
 		3237A412131D91CC00824AD4 /* Onizuka.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Onizuka.m; path = ../Onizuka/Onizuka.m; sourceTree = SOURCE_ROOT; };
 		3237A415131D91CC00824AD4 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Onizuka.strings; sourceTree = "<group>"; };
 		3237A416131D91CC00824AD4 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Onizuka.strings; sourceTree = "<group>"; };
+		324305BB13256B3A00A01CFC /* antenna.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antenna.h; sourceTree = "<group>"; };
+		324305BC13256B3A00A01CFC /* callsign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = callsign.h; sourceTree = "<group>"; };
+		324305BD13256B3A00A01CFC /* city.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = city.h; sourceTree = "<group>"; };
+		324305BE13256B3A00A01CFC /* cityh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cityh.h; sourceTree = "<group>"; };
+		324305BF13256B3A00A01CFC /* grammar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = grammar.c; sourceTree = "<group>"; };
+		324305C013256B3A00A01CFC /* heights.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = heights.h; sourceTree = "<group>"; };
+		324305C113256B3A00A01CFC /* init_str.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = init_str.m; sourceTree = "<group>"; };
+		324305C213256B3A00A01CFC /* jobs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jobs.h; sourceTree = "<group>"; };
+		324305C413256B3A00A01CFC /* misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = misc.h; sourceTree = "<group>"; };
+		324305C513256B3A00A01CFC /* names.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = names.h; sourceTree = "<group>"; };
+		324305C613256B3A00A01CFC /* newcity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = newcity.h; sourceTree = "<group>"; };
+		324305C713256B3A00A01CFC /* put_form.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = put_form.m; sourceTree = "<group>"; };
+		324305C913256B3A00A01CFC /* QSO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSO.m; sourceTree = "<group>"; };
+		324305CA13256B3A00A01CFC /* rig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rig.h; sourceTree = "<group>"; };
+		324305CB13256B3A00A01CFC /* util.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = util.m; sourceTree = "<group>"; };
+		324305CC13256B3A00A01CFC /* weather.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = weather.h; sourceTree = "<group>"; };
+		3243060513256DD300A01CFC /* QSO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSO.h; sourceTree = "<group>"; };
 		3256063F121C410700656629 /* Wordlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wordlist.h; sourceTree = "<group>"; };
 		32560640121C410700656629 /* Wordlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wordlist.m; sourceTree = "<group>"; };
 		325B406F11DAA44D00F39F0D /* Morse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Morse.h; sourceTree = "<group>"; };
@@ -207,6 +241,7 @@
 				325B409911DAAA8500F39F0D /* Morse.strings */,
 				32859CD711E6245A003319E7 /* Morse.plist */,
 				322E274E11E4DE8400B9241E /* defaults.plist */,
+				324305BA13256B3A00A01CFC /* qso.d */,
 				3237A41C131D91EC00824AD4 /* Onizuka */,
 				29B97319FDCFA39411CA2CEA /* MainMenu.nib */,
 				32264F8A131EC7A8006D4698 /* Credits.rtf */,
@@ -264,6 +299,30 @@
 			name = Onizuka;
 			sourceTree = "<group>";
 		};
+		324305BA13256B3A00A01CFC /* qso.d */ = {
+			isa = PBXGroup;
+			children = (
+				324305BB13256B3A00A01CFC /* antenna.h */,
+				324305BC13256B3A00A01CFC /* callsign.h */,
+				324305BD13256B3A00A01CFC /* city.h */,
+				324305BE13256B3A00A01CFC /* cityh.h */,
+				324305BF13256B3A00A01CFC /* grammar.c */,
+				324305C013256B3A00A01CFC /* heights.h */,
+				324305C113256B3A00A01CFC /* init_str.m */,
+				324305C213256B3A00A01CFC /* jobs.h */,
+				324305C413256B3A00A01CFC /* misc.h */,
+				324305C513256B3A00A01CFC /* names.h */,
+				324305C613256B3A00A01CFC /* newcity.h */,
+				324305C713256B3A00A01CFC /* put_form.m */,
+				3243060513256DD300A01CFC /* QSO.h */,
+				324305C913256B3A00A01CFC /* QSO.m */,
+				324305CA13256B3A00A01CFC /* rig.h */,
+				324305CB13256B3A00A01CFC /* util.m */,
+				324305CC13256B3A00A01CFC /* weather.h */,
+			);
+			path = qso.d;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -278,6 +337,18 @@
 				32560641121C410700656629 /* Wordlist.h in Headers */,
 				3292CEDD123ECE5E009B0B9C /* Levenshtein.h in Headers */,
 				3237A417131D91CC00824AD4 /* Onizuka.h in Headers */,
+				324305CD13256B3A00A01CFC /* antenna.h in Headers */,
+				324305CE13256B3A00A01CFC /* callsign.h in Headers */,
+				324305CF13256B3A00A01CFC /* city.h in Headers */,
+				324305D013256B3A00A01CFC /* cityh.h in Headers */,
+				324305D213256B3A00A01CFC /* heights.h in Headers */,
+				324305D413256B3A00A01CFC /* jobs.h in Headers */,
+				324305D613256B3A00A01CFC /* misc.h in Headers */,
+				324305D713256B3A00A01CFC /* names.h in Headers */,
+				324305D813256B3A00A01CFC /* newcity.h in Headers */,
+				324305DC13256B3A00A01CFC /* rig.h in Headers */,
+				324305DE13256B3A00A01CFC /* weather.h in Headers */,
+				3243060613256DD300A01CFC /* QSO.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,6 +466,11 @@
 				32560642121C410700656629 /* Wordlist.m in Sources */,
 				3292CEDE123ECE5E009B0B9C /* Levenshtein.m in Sources */,
 				3237A418131D91CC00824AD4 /* Onizuka.m in Sources */,
+				324305D113256B3A00A01CFC /* grammar.c in Sources */,
+				324305D313256B3A00A01CFC /* init_str.m in Sources */,
+				324305D913256B3A00A01CFC /* put_form.m in Sources */,
+				324305DB13256B3A00A01CFC /* QSO.m in Sources */,
+				324305DD13256B3A00A01CFC /* util.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

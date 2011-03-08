@@ -72,7 +72,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   NSArray* a = [offsets objectForKey:[NSNumber numberWithUnsignedInt:(unsigned)length]];
   //NSLog(@"Array 0x%8X of %d items from length %d", a, [a count], length);
   NSString* str = [[self getEntryAtOffset:[a objectAtIndex:arc4random() % [a count]]] uppercaseString];
-  NSLog(@"%@", str);
   return str;
 }
 

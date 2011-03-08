@@ -16,6 +16,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #import "MorseController.h"
 #import "Levenshtein.h"
 #import "Onizuka.h"
+#import "QSO.h"
+
+
+@implementation MorseWindow
+-(void)keyDown:(NSEvent*)event
+{
+  /*NSLog(@"keyDown: '%@'", [event charactersIgnoringModifiers]);
+  if ([[event charactersIgnoringModifiers] isEqual:@" "] &&
+      [event modifierFlags] == 0)
+  {
+    id del = [self delegate];
+    if (del && [del respondsToSelector:@selector(space:)])
+    {
+      [del space:self];
+      return;
+    }
+  }*/
+  [super keyDown:event];
+}
+@end
 
 static CGEventRef TapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon);
 static CGEventTimestamp UpTimeInNanoseconds(void);
@@ -25,8 +45,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(void)startNewTest;
 -(BOOL)checkTestResponseWithFeedback:(BOOL)fb;
 -(void)updateScore;
--(NSArray*)randomStringsFromArray:(NSArray*)array ofLength:(NSUInteger)length;
--(NSArray*)randomStringsFromDictionaryEntryOfLength:(NSUInteger)length;
+-(NSString*)randomStringFromArray:(NSArray*)array ofLength:(NSUInteger)length;
 -(void)shiftKey:(BOOL)isdown atTime:(CGEventTimestamp)time fromTimer:(BOOL)flag;
 -(void)keycheck:(CGEventRef)event;
 -(void)timer:(NSTimer*)t;
@@ -89,6 +108,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     {
       _src = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, _tap, 0);
       CFRunLoopAddSource(CFRunLoopGetMain(), _src, kCFRunLoopCommonModes);
+      CGEventTapEnable(_tap, false);
     }
     else NSLog(@"Could not create event tap");
   }
@@ -104,6 +124,11 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 }
 
 #pragma mark Action
+/*-(IBAction)space:(id)sender
+{
+  [self startStop:sender];
+}*/
+
 -(IBAction)startStop:(id)sender
 {
   if (state == iMorseNotTestingState)
@@ -123,6 +148,38 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(IBAction)repan:(id)sender
 {
   [[NSUserDefaults standardUserDefaults] setFloat:0.5f forKey:@"pan"];
+}
+
+-(IBAction)genQSO:(id)sender
+{
+  #pragma unused (sender)
+  [inputField setString:@""];
+  QSO* q = [[QSO alloc] init];
+  [inputField setString:[q QSO]];
+  [q release];
+}
+
+-(IBAction)makeProsign:(id)sender
+{
+  NSRange sel = [inputField selectedRange];
+  if (sel.length)
+  {
+    NSTextStorage* sto = [inputField textStorage];
+    NSMutableString* ms = [[NSMutableString alloc] initWithString:[[sto string] substringWithRange:sel]];
+    NSString* ph = [NSString stringWithFormat:@"%C", 0x0305];
+    unsigned i;
+    for (i = 0; i < [ms length]; i++)
+    {
+      unichar ch = [ms characterAtIndex:i];
+      if (ch == ' ') return;
+      if (ch == 0x0305) return;
+      [ms insertString:ph atIndex:i+1];
+      i++;
+    }
+    [sto replaceCharactersInRange:sel withString:ms];
+    sel.length = [ms length];
+    [inputField setSelectedRange:sel];
+  }
 }
 
 #pragma mark Internal
@@ -145,9 +202,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
       [startStopButton setImage:[NSImage imageNamed:@"PlayEnabled.tiff"]];
       [startStopButton setAlternateImage:[NSImage imageNamed:@"PlayPressed.tiff"]];
     }
-    //[topBLV setStrings:nil];
-    //[bottomBLV setStrings:nil];
-    //[bottomBLV setBgColor:[NSColor grayColor]];
+    [topBLV setString:nil];
+    [bottomBLV setString:nil];
+    [bottomBLV setBgColor:[NSColor grayColor]];
     [bottomBLV setCanBecomeFirstResponder:NO];
     if (_tap) CGEventTapEnable(_tap, false);
     lastKey = 0.0;
@@ -155,7 +212,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     
     case iMorsePlayingState:
     //NSLog(@"tab %@", tabID);
-    if ([tabID isEqual:@"1"]) [renderer start:[Morse splitString:[inputField stringValue]]];
+    if ([tabID isEqual:@"1"]) [renderer start:[inputField string]];
     else if ([tabID isEqual:@"2"]) [self startNewTest];
     [startStopButton setImage:[NSImage imageNamed:@"StopEnabled.tiff"]];
     [startStopButton setAlternateImage:[NSImage imageNamed:@"StopPressed.tiff"]];
@@ -187,8 +244,8 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 
 -(void)startNewTest
 {
-  [topBLV setStrings:nil];
-  [bottomBLV setStrings:nil];
+  [topBLV setString:nil];
+  [bottomBLV setString:nil];
   [bottomBLV setBgColor:[NSColor grayColor]];
   NSUInteger min = [[NSUserDefaults standardUserDefaults] integerForKey:@"min"];
   NSUInteger max = [[NSUserDefaults standardUserDefaults] integerForKey:@"max"];
@@ -216,20 +273,20 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     default: whichArray = [Morse letters]; break;
   }
   NSUInteger which = [[[NSUserDefaults standardUserDefaults] objectForKey:@"source"] unsignedIntegerValue];
-  NSArray* a = (which == 1)? [self randomStringsFromArray:whichArray ofLength:n]:[self randomStringsFromDictionaryEntryOfLength:n];
-  if ([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"]) [topBLV setStrings:a];
-  [renderer start:a];
-  NSLog(@"%@", a);
+  NSString* s = (which == 1)? [self randomStringFromArray:whichArray ofLength:n]:[words randomStringOfLength:n];
+  if ([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"]) [topBLV setString:s];
+  [renderer start:s];
+  //NSLog(@"%@", s);
 }
 
 -(BOOL)checkTestResponseWithFeedback:(BOOL)fb
 {
-  BOOL good = [[bottomBLV strings] isEqual:[renderer strings]];
+  BOOL good = [[bottomBLV string] isEqual:[renderer string]];
   if (fb && ![[NSUserDefaults standardUserDefaults] boolForKey:@"practice"])
   {
     NSColor* col = good? [NSColor greenColor]:[NSColor redColor];
     [bottomBLV setBgColor:col];
-    [topBLV setStrings:[renderer strings]];
+    [topBLV setString:[renderer string]];
     [self updateScore];
   }
   return good;
@@ -239,11 +296,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 #define kPlaceholderCh '`'
 -(void)updateScore
 {
-  NSArray* a1 = [renderer strings];
-  NSArray* a2 = [bottomBLV strings];
   NSUInteger i;
-  NSString* s1 = [Morse formatStrings:a1];
-  NSString* s2 = [Morse formatStrings:a2];
+  NSString* s1 = [Morse formatString:[renderer string]];
+  NSString* s2 = [Morse formatString:[bottomBLV string]];
   Levenshtein* lev = [[Levenshtein alloc] initWithString:s1 andString:s2];
   NSArray* a = [lev alignmentWithPlaceholder:kPlaceholder];
   s1 = [a objectAtIndex:0];
@@ -272,9 +327,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   //NSLog(@"Score is now %@", score);
 }
 
--(NSArray*)randomStringsFromArray:(NSArray*)array ofLength:(NSUInteger)length
+-(NSString*)randomStringFromArray:(NSArray*)array ofLength:(NSUInteger)length
 {
-  NSMutableArray* ma = [[NSMutableArray alloc] initWithCapacity:length];
+  NSMutableString* ms = [[NSMutableString alloc] init];
   NSUInteger i;
   NSUInteger n = [array count];
   for (i = 0; i < length; i++)
@@ -289,24 +344,10 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     if (d) score2 = 3.0f - (2.0f * [[d objectForKey:@"n"] floatValue] / [[d objectForKey:@"of"] floatValue]);
     //if (score1 > score2) NSLog(@"Chose %@ (%f) over %@ (%f)", str1, score1, str2, score2);
     //else NSLog(@"Chose %@ (%f) over %@ (%f)", str2, score2, str1, score1);
-    [ma addObject:(score1 > score2)? str1:str2];
+    [ms appendString:(score1 > score2)? str1:str2];
   }
-  NSArray* ret = [NSArray arrayWithArray:ma];
-  [ma release];
-  return ret;
-}
-
--(NSArray*)randomStringsFromDictionaryEntryOfLength:(NSUInteger)length
-{
-  NSString* str = [words randomStringOfLength:length];
-  NSMutableArray* ma = [[NSMutableArray alloc] initWithCapacity:[str length]];
-  NSUInteger n = [str length], i;
-  for (i = 0; i < n; i++)
-  {
-    [ma addObject:[NSString stringWithFormat:@"%C", [str characterAtIndex:i]]];
-  }
-  NSArray* ret = [NSArray arrayWithArray:ma];
-  [ma release];
+  NSString* ret = [NSString stringWithString:ms];
+  [ms release];
   return ret;
 }
 
@@ -351,7 +392,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
       NSString* str = [Morse stringFromMorse:morse];
       //NSLog(@"You typed %@ (%d)", str, morse);
       if (!str && morse != MorseNoCharacter) str = [NSString stringWithFormat:@"%C", 0x203D]; // interrobang
-      else if ([str length] > 1) str = [Morse formatStrings:[NSArray arrayWithObjects:str, NULL]];
+      else if ([str length] > 1) str = [Morse formatString:str];
       if (str) [sentField setStringValue:[NSString stringWithFormat:@"%@%@", [sentField stringValue], str]];
       dp = NULL;
     } while (morse != MorseNoCharacter);
@@ -369,7 +410,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     {
       spaceTimerGo = YES;
       delay /= 1000.0;
-      NSLog(@"delay %f s from %f (%f WPM)", delay, [Morse millisecondsPerUnitAtWPM:[recognizer WPM]], [recognizer WPM]);
+      //NSLog(@"delay %f s from %f (%f WPM)", delay, [Morse millisecondsPerUnitAtWPM:[recognizer WPM]], [recognizer WPM]);
       timer = [NSTimer scheduledTimerWithTimeInterval:delay target:self selector:@selector(spaceTimer:) userInfo:nil repeats:NO];
     }
   }
@@ -531,6 +572,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     [renderer setPan:[newval floatValue]];
   }
 }
+
 
 #pragma mark Score Table
 -(NSInteger)numberOfRowsInTableView:(NSTableView*)tv
