@@ -4,9 +4,9 @@ extern NSString* BigLetterViewTextNotification;
 
 @interface BigLetterView : NSView
 {
-	NSColor* bgColor;
-	NSMutableString* string;
-	NSMutableDictionary *attributes;
+  NSColor* bgColor;
+  NSMutableString* string;
+  NSMutableDictionary *attributes;
   BOOL canBecomeFirstResponder;
   NSUInteger modifiers;
 }

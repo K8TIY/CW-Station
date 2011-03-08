@@ -12,48 +12,48 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 @synthesize canBecomeFirstResponder;
 -(id)initWithFrame:(NSRect)rect
 {
-	if(![super initWithFrame:rect]) return nil;
-	[self prepareAttributes];
-	bgColor = [[NSColor grayColor] retain];
-	string = [[NSMutableString alloc] init];
+  if(![super initWithFrame:rect]) return nil;
+  [self prepareAttributes];
+  bgColor = [[NSColor grayColor] retain];
+  string = [[NSMutableString alloc] init];
   canBecomeFirstResponder = YES;
-	return self;
+  return self;
 }
 
 -(void)drawRect:(NSRect)rect
 {
-	NSRect bounds = [self bounds];
-	[bgColor set];
-	[NSBezierPath fillRect:bounds];
-	[self drawStringCenteredIn:bounds];
+  NSRect bounds = [self bounds];
+  [bgColor set];
+  [NSBezierPath fillRect:bounds];
+  [self drawStringCenteredIn:bounds];
 }
 
 -(void)dealloc
 {
-	[bgColor release];
-	[string release];
-	[attributes release];
-	[super dealloc];
+  [bgColor release];
+  [string release];
+  [attributes release];
+  [super dealloc];
 }
 
 -(void)setBgColor:(NSColor*)c
 {
-	[c retain];
-	[bgColor release];
-	bgColor = c;
-	[self setNeedsDisplay:YES];
+  [c retain];
+  [bgColor release];
+  bgColor = c;
+  [self setNeedsDisplay:YES];
 }
 
 -(NSColor*)bgColor
 {
-	return bgColor;
+  return bgColor;
 }
 
 -(void)setString:(NSMutableString*)s
 {
   if (nil == s) s = @"";
   [string setString:s];
-	[self setNeedsDisplay:YES];
+  [self setNeedsDisplay:YES];
 }
 
 -(NSString*)string { return string; }
@@ -64,7 +64,7 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 -(void)keyDown:(NSEvent*)event
 {
   modifiers = [event modifierFlags];
-	[self interpretKeyEvents:[NSArray arrayWithObject:event]];
+  [self interpretKeyEvents:[NSArray arrayWithObject:event]];
   // Handle backspace
   if ([event keyCode] == 51)
   {
@@ -79,7 +79,7 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 
 -(void)insertText:(NSString*)input
 {
-	if (canBecomeFirstResponder)
+  if (canBecomeFirstResponder)
   {
     //NSLog(@"Typed %@", input);
     //input = [input uppercaseString];
@@ -92,9 +92,9 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 
 -(void)prepareAttributes
 {
-	attributes = [[NSMutableDictionary alloc] init];
-	[attributes setObject:[NSFont fontWithName:@"Monaco" size:48] forKey:NSFontAttributeName];
-	[attributes setObject:[NSColor blackColor] forKey:NSForegroundColorAttributeName];
+  attributes = [[NSMutableDictionary alloc] init];
+  [attributes setObject:[NSFont fontWithName:@"Monaco" size:48] forKey:NSFontAttributeName];
+  [attributes setObject:[NSColor blackColor] forKey:NSForegroundColorAttributeName];
 }
 
 -(void)drawStringCenteredIn:(NSRect)r
