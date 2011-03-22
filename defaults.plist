@@ -30,5 +30,7 @@
 	<dict/>
 	<key>practice</key>
 	<false/>
+	<key>lowercaseQSO</key>
+	<false/>
 </dict>
 </plist>
