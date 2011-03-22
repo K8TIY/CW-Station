@@ -4,21 +4,10 @@
 #import <SecurityInterface/SFAuthorizationView.h>
 #import "Wordlist.h";
 
-@interface MorseWindow : NSWindow
-@end
-
-enum
-{
-  iMorseNotTestingState,
-  iMorsePlayingState,
-  iMorseWaitingState,
-  iMorseShowingState,
-  iMorseSendingState
-};
-
 @interface MorseController : NSObject
 {
-  IBOutlet MorseWindow* window;
+  IBOutlet NSWindow* window;
+  IBOutlet NSWindow* prefsWindow;
   IBOutlet NSTabView* tabs;
 	IBOutlet NSTextView* inputField;
   IBOutlet NSButton* repeatButton;
@@ -47,10 +36,11 @@ enum
   BOOL down;
   BOOL spaceTimerGo;
 }
-//-(IBAction)space:(id)sender;
 -(IBAction)startStop:(id)sender;
 -(IBAction)clearScore:(id)sender;
 -(IBAction)repan:(id)sender;
 -(IBAction)genQSO:(id)sender;
 -(IBAction)makeProsign:(id)sender;
+-(IBAction)orderFrontPrefsWindow:(id)sender;
+-(IBAction)exportAIFF:(id)sender;
 @end

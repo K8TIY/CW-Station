@@ -18,24 +18,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #import "Onizuka.h"
 #import "QSO.h"
 
-
-@implementation MorseWindow
--(void)keyDown:(NSEvent*)event
+enum
 {
-  /*NSLog(@"keyDown: '%@'", [event charactersIgnoringModifiers]);
-  if ([[event charactersIgnoringModifiers] isEqual:@" "] &&
-      [event modifierFlags] == 0)
-  {
-    id del = [self delegate];
-    if (del && [del respondsToSelector:@selector(space:)])
-    {
-      [del space:self];
-      return;
-    }
-  }*/
-  [super keyDown:event];
-}
-@end
+  iMorseNotTestingState,
+  iMorsePlayingState,
+  iMorseWaitingState,
+  iMorseShowingState,
+  iMorseSendingState
+};
 
 static CGEventRef TapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon);
 static CGEventTimestamp UpTimeInNanoseconds(void);
@@ -60,6 +50,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 {
   [[Onizuka sharedOnizuka] localizeMenu:[[NSApplication sharedApplication] mainMenu]];
   [[Onizuka sharedOnizuka] localizeWindow:window];
+  [[Onizuka sharedOnizuka] localizeWindow:prefsWindow];
   [topBLV setCanBecomeFirstResponder:NO];
   NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
   [defs addObserver:self forKeyPath:@"freq" options:NSKeyValueObservingOptionNew context:NULL];
@@ -124,11 +115,6 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 }
 
 #pragma mark Action
-/*-(IBAction)space:(id)sender
-{
-  [self startStop:sender];
-}*/
-
 -(IBAction)startStop:(id)sender
 {
   if (state == iMorseNotTestingState)
@@ -155,7 +141,10 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   #pragma unused (sender)
   [inputField setString:@""];
   QSO* q = [[QSO alloc] init];
-  [inputField setString:[q QSO]];
+  NSString* qso = [q QSO];
+  if (![[NSUserDefaults standardUserDefaults] boolForKey:@"lowercaseQSO"])
+    qso = [qso uppercaseString];
+  [inputField setString:qso];
   [q release];
 }
 
@@ -180,6 +169,22 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     sel.length = [ms length];
     [inputField setSelectedRange:sel];
   }
+}
+
+-(IBAction)orderFrontPrefsWindow:(id)sender
+{
+  [prefsWindow makeKeyAndOrderFront:sender];
+}
+
+-(IBAction)exportAIFF:(id)sender
+{
+  #pragma unused (sender)
+    NSSavePanel* panel = [NSSavePanel savePanel];
+    [panel setRequiredFileType:@"aiff"];
+    [panel beginSheetForDirectory:nil file:nil modalForWindow:window
+           modalDelegate:self
+           didEndSelector:@selector(aiffExportDidEnd:returnCode:contextInfo:)
+           contextInfo:nil];
 }
 
 #pragma mark Internal
@@ -531,18 +536,18 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   if ([path isEqual:@"freq"])
   {
     id newval = [change objectForKey:NSKeyValueChangeNewKey];
-    [renderer setFreqVal:[newval floatValue]];
+    [renderer setFreq:[newval floatValue]];
   }
   else if ([path isEqual:@"amp"])
   {
     id newval = [change objectForKey:NSKeyValueChangeNewKey];
-    [renderer setAmpVal:[newval floatValue]];
+    [renderer setAmp:[newval floatValue]];
   }
   else if ([path isEqual:@"wpm"])
   {
     float newval = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
     //NSLog(@"wpm %f", newval);
-    [renderer setWPMVal:newval];
+    [renderer setWPM:newval];
     [recognizer setWPM:newval];
     float cwpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"cwpm"] floatValue];
     if (cwpm < newval) [[NSUserDefaults standardUserDefaults] setFloat:newval forKey:@"cwpm"];
@@ -551,7 +556,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   {
     float newval = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
     //NSLog(@"cwpm %f", newval);
-    [renderer setCWPMVal:newval];
+    [renderer setCWPM:newval];
     //[recognizer setCWPM:newval];
     float wpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"wpm"] floatValue];
     if (wpm > newval) [[NSUserDefaults standardUserDefaults] setFloat:newval forKey:@"wpm"];
@@ -573,6 +578,20 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   }
 }
 
+-(void)aiffExportDidEnd:(NSSavePanel*)sheet returnCode:(int)code contextInfo:(void*)contextInfo
+{
+  #pragma unused (contextInfo)
+  if (code == NSOKButton)
+  {
+    NSURL* url = [sheet URL];
+    [sheet orderOut:nil];
+    MorseRenderer* mr = [renderer copy];
+    [mr setMode:MorseRendererAgendaMode];
+    [mr setString:[inputField string]];
+    [mr exportAIFFToURL:url];
+    [mr release];
+  }
+}
 
 #pragma mark Score Table
 -(NSInteger)numberOfRowsInTableView:(NSTableView*)tv
