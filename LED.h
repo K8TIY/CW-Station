@@ -1,0 +1,1 @@
+void manipulate_led(UInt32 value);

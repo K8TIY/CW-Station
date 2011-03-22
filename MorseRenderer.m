@@ -14,11 +14,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 #import "MorseRenderer.h"
-
-#include <mach/mach_error.h>
-#include <IOKit/IOCFPlugIn.h>
-#include <IOKit/hid/IOHIDLib.h>
-#include <IOKit/hid/IOHIDUsageTables.h>
+#import "LED.h"
 
 #define __MORSE_RENDERER_DEBUG__ 0
 
@@ -37,10 +33,7 @@ static OSStatus	RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionF
 				                   UInt32 inNumberFrames, AudioBufferList* ioData);
 static unsigned	Renderer(MorseRenderState* inState, UInt32 inNumberFrames, AudioBufferList* ioData);
 static void local_SendNote(void);
-static io_service_t find_a_keyboard(void);
-static void find_led_cookies(IOHIDDeviceInterface122** handle);
-static HRESULT create_hid_interface(io_object_t hidDevice, IOHIDDeviceInterface*** hdi);
-static void manipulate_led(UInt32 value);
+
 #if __MORSE_RENDERER_DEBUG__
 static void hexdump(void *data, int size);
 #endif
@@ -476,158 +469,6 @@ static void local_SendNote(void)
   }
 }
 @end
-
-
-static io_service_t find_a_keyboard(void)
-{
-  io_service_t result = (io_service_t)0;
-  CFNumberRef usagePageRef = (CFNumberRef)0;
-  CFNumberRef usageRef = (CFNumberRef)0;
-  CFMutableDictionaryRef matchingDictRef = (CFMutableDictionaryRef)0;
-
-  if (!(matchingDictRef = IOServiceMatching(kIOHIDDeviceKey))) return result;
-  UInt32 usagePage = kHIDPage_GenericDesktop;
-  UInt32 usage = kHIDUsage_GD_Keyboard;
-  if (!(usagePageRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &usagePage))) goto out;
-  if (!(usageRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &usage))) goto out;
-  CFDictionarySetValue(matchingDictRef, CFSTR(kIOHIDPrimaryUsagePageKey), usagePageRef);
-  CFDictionarySetValue(matchingDictRef, CFSTR(kIOHIDPrimaryUsageKey), usageRef);
-  result = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDictRef);
-out:
-  if (usageRef) CFRelease(usageRef);
-  if (usagePageRef) CFRelease(usagePageRef);
-  return result;
-}
-
-static IOHIDElementCookie capslock_cookie = (IOHIDElementCookie)0;
-static IOHIDElementCookie numlock_cookie  = (IOHIDElementCookie)0;
-static void find_led_cookies(IOHIDDeviceInterface122** handle)
-{
-  IOHIDElementCookie cookie;
-  CFTypeRef          object;
-  long               number;
-  long               usage;
-  long               usagePage;
-  CFArrayRef         elements;
-  CFDictionaryRef    element;
-  IOReturn           result;
-
-  if (!handle || !(*handle)) return;
-  result = (*handle)->copyMatchingElements(handle, NULL, &elements);
-  if (result != kIOReturnSuccess) return;
-  CFIndex i;
-  for (i = 0; i < CFArrayGetCount(elements); i++)
-  {
-    element = CFArrayGetValueAtIndex(elements, i);
-    object = (CFDictionaryGetValue(element, CFSTR(kIOHIDElementCookieKey)));
-    if (object == 0 || CFGetTypeID(object) != CFNumberGetTypeID()) continue;
-    if (!CFNumberGetValue((CFNumberRef) object, kCFNumberLongType, &number)) continue;
-    cookie = (IOHIDElementCookie)number;
-    object = CFDictionaryGetValue(element, CFSTR(kIOHIDElementUsageKey));
-    if (object == 0 || CFGetTypeID(object) != CFNumberGetTypeID()) continue;
-    if (!CFNumberGetValue((CFNumberRef)object, kCFNumberLongType, &number)) continue;
-    usage = number;
-    object = CFDictionaryGetValue(element,CFSTR(kIOHIDElementUsagePageKey));
-    if (object == 0 || CFGetTypeID(object) != CFNumberGetTypeID()) continue;
-    if (!CFNumberGetValue((CFNumberRef)object, kCFNumberLongType, &number)) continue;
-    usagePage = number;
-    if (usagePage == kHIDPage_LEDs)
-    {
-      switch (usage)
-      {
-        case kHIDUsage_LED_NumLock:
-        numlock_cookie = cookie;
-        break;
-
-        case kHIDUsage_LED_CapsLock:
-        capslock_cookie = cookie;
-        break;
-
-        default:
-        break;
-      }
-    }
-  }
-}
-
-static HRESULT create_hid_interface(io_object_t hidDevice, IOHIDDeviceInterface*** hdi)
-{
-  IOCFPlugInInterface** plugInInterface = NULL;
-  io_name_t className;
-  HRESULT   plugInResult = S_OK;
-  SInt32    score = 0;
-  IOReturn  ioReturnValue;
-
-  ioReturnValue = IOObjectGetClass(hidDevice, className);
-  if (ioReturnValue != kIOReturnSuccess) return S_FALSE;
-  ioReturnValue = IOCreatePlugInInterfaceForService(hidDevice, kIOHIDDeviceUserClientTypeID,
-                                                    kIOCFPlugInInterfaceID, &plugInInterface, &score);
-  if (ioReturnValue != kIOReturnSuccess) return S_FALSE;
-  plugInResult = (*plugInInterface)->QueryInterface(plugInInterface,
-                   CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID)hdi);
-  (*plugInInterface)->Release(plugInInterface);
-  return plugInResult;
-}
-
-static void manipulate_led(UInt32 value)
-{
-  static UInt32 whichLED = kHIDUsage_LED_CapsLock;
-  io_service_t           hidService = (io_service_t)0;
-  io_object_t            hidDevice = (io_object_t)0;
-  IOHIDDeviceInterface **hidDeviceInterface = NULL;
-  IOReturn               ioReturnValue = kIOReturnError;
-  IOHIDElementCookie     theCookie = (IOHIDElementCookie)0;
-  IOHIDEventStruct       theEvent;
-  HRESULT                result;
-  
-  if (!(hidService = find_a_keyboard()))
-  {
-    //fprintf(stderr, "No keyboard found.\n");
-    return;
-  }
-  hidDevice = (io_object_t)hidService;
-  result = create_hid_interface(hidDevice, &hidDeviceInterface);
-  if (result != S_OK) return;
-  find_led_cookies((IOHIDDeviceInterface122**)hidDeviceInterface);
-  ioReturnValue = IOObjectRelease(hidDevice);
-  if (ioReturnValue != kIOReturnSuccess) goto out;
-  ioReturnValue = kIOReturnError;
-  if (hidDeviceInterface == NULL)
-  {
-    //fprintf(stderr, "Failed to create HID device interface.\n");
-    return;
-  }
-  if (whichLED == kHIDUsage_LED_NumLock) theCookie = numlock_cookie;
-  else if (whichLED == kHIDUsage_LED_CapsLock) theCookie = capslock_cookie;
-  if (theCookie == 0)
-  {
-    //fprintf(stderr, "Bad or missing LED cookie.\n");
-    goto out;
-  }
-  ioReturnValue = (*hidDeviceInterface)->open(hidDeviceInterface, 0);
-  if (ioReturnValue != kIOReturnSuccess)
-  {
-    //fprintf(stderr, "Failed to open HID device interface.\n");
-    goto out;
-  }
-  ioReturnValue = (*hidDeviceInterface)->getElementValue(hidDeviceInterface, theCookie, &theEvent);
-  if (ioReturnValue != kIOReturnSuccess)
-  {
-    (void)(*hidDeviceInterface)->close(hidDeviceInterface);
-    goto out;
-  }
-  if (value != -1)
-  {
-    if (theEvent.value != value)
-    {
-      theEvent.value = value;
-      ioReturnValue = (*hidDeviceInterface)->setElementValue(hidDeviceInterface, theCookie, &theEvent, 0, 0, 0, 0);
-    }
-  }
-  ioReturnValue = (*hidDeviceInterface)->close(hidDeviceInterface);
-out:
-  (void)(*hidDeviceInterface)->Release(hidDeviceInterface);
-}
 
 #if __MORSE_RENDERER_DEBUG__
 static void hexdump(void *data, int size)
