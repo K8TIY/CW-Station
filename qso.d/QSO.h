@@ -25,7 +25,7 @@
 -(void)putLocation;
 -(void)putRig;
 -(void)putRST;
--(void)putQ_And_Freq;
+-(void)putQFreq;
 -(void)putFirstCallsign;
 -(void)putLastCallsign;
 -(int)licenseSeed;
@@ -47,4 +47,4 @@ int CountStrings(char* StringVector[]);
 int CountNSStrings(NSString* StringVector[]);
 int Roll (int Number);
 char* Choose (char *Words[], int Number);
-int make_freq(void);
+

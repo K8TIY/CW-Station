@@ -102,7 +102,9 @@
  *
  * Always have fun!
  */
-
+/* Translated into Objective C and semi-librarified (or de-printf-ified)
+   by Brian "Moses" Hall K8TIY in 2011.
+*/
 
 #include <sys/types.h>
 #include <stdio.h>
@@ -192,6 +194,7 @@ int NRST;
 {
   self = [super init];
   _qso = [[NSMutableString alloc] init];
+  _age = Roll(70) + 16;
   [self PutQSO];
   return self;
 }
@@ -269,59 +272,58 @@ int NRST;
 
 -(void)putJob
 {
-  switch (Roll (20))
+  if (_age > 17)
   {
-    case 2:
-    case 3:
-    [_qso appendFormat:@"my occupation is %s.\n", Choose (Job, NJOB)];
-    break;
+    switch (Roll (20))
+    {
+      case 2:
+      case 3:
+      [_qso appendFormat:@"my occupation is %s.\n", Choose (Job, NJOB)];
+      break;
 
-    case 4:
-    case 5:
-    [_qso appendFormat:@"i work as %s.\n", A_Or_An (Choose (Job, NJOB))];
-    break;
+      case 4:
+      case 5:
+      [_qso appendFormat:@"i work as %s.\n", A_Or_An (Choose (Job, NJOB))];
+      break;
 
-    case 6:
-    [_qso appendFormat:@"i was %s, now unemployed.\n", A_Or_An (Choose (Job, NJOB))];
-    break;
+      case 6:
+      [_qso appendFormat:@"i was %s, now unemployed.\n", A_Or_An (Choose (Job, NJOB))];
+      break;
 
-    case 11:
-    case 12:
-    [_qso appendFormat:@"occupation is %s.\n", Choose (Job, NJOB)];
-    break;
+      case 11:
+      case 12:
+      [_qso appendFormat:@"occupation is %s.\n", Choose (Job, NJOB)];
+      break;
 
-    default:
-    [_qso appendFormat:@"i am %s.\n", A_Or_An (Choose (Job, NJOB))];
-    break;
+      default:
+      [_qso appendFormat:@"i am %s.\n", A_Or_An (Choose (Job, NJOB))];
+      break;
+    }
   }
 }
 
 -(void)putAge
 {
-    _age = Roll (60) + 16;
-    switch (Roll (5))
-    {
-      case 3:
-	    [_qso appendFormat:@"my age is %d.\n", _age];
-	    break;
+  switch (Roll (5))
+  {
+    case 3:
+    [_qso appendFormat:@"my age is %d.\n", _age];
+    break;
 
-      case 4:
-	    [_qso appendFormat:@"i am %d years old.\n", _age];
-	    break;
+    case 4:
+    [_qso appendFormat:@"i am %d years old.\n", _age];
+    break;
 
-      default:
-	    [_qso appendFormat:@"age is %d.\n", _age];
-	    break;
-    }
+    default:
+    [_qso appendFormat:@"age is %d.\n", _age];
+    break;
+  }
 }
 
 -(void)putLicense
 {
-  int get_years_licence = Roll([self licenseSeed]);
-  if (get_years_licence < 2)
-  get_years_licence = 2;
-
-  switch (Roll (12))
+  int years = Roll([self licenseSeed]) + 1;
+  switch (Roll (13))
   {
     case 1:
     [_qso appendFormat:@"i have %s class licence.\n",
@@ -339,8 +341,8 @@ int NRST;
     break;
 
     case 4:
-    [_qso appendFormat:@"i have been licenced %d years as %s class.\n",
-      get_years_licence, Choose (License, NLICENSE)];
+    [_qso appendFormat:@"i have been licenced %d year%s as %s class.\n",
+      years, (years==1)? "":"s", Choose (License, NLICENSE)];
     break;
 
     case 5:
@@ -354,13 +356,18 @@ int NRST;
     break;
 
     case 7:
-    [_qso appendFormat:@"i have been licensed %d years as %s class.\n",
-      get_years_licence, Choose (License, NLICENSE)];
+    [_qso appendFormat:@"i have been licensed %d year%s as %s class.\n",
+      years, (years==1)? "":"s", Choose (License, NLICENSE)];
+    break;
+    
+    case 8:
+    [_qso appendFormat:@"just got my %s license.\n",
+      Choose (License, NLICENSE)];
     break;
 
     default:
-    [_qso appendFormat:@"i have been %s class ham for %d years.\n",
-      A_Or_An (Choose (License, NLICENSE)), get_years_licence];
+    [_qso appendFormat:@"i have been %s class ham for %d year%s.\n",
+      A_Or_An (Choose (License, NLICENSE)), years, (years==1)? "":"s"];
     break;
   }
 }
@@ -606,30 +613,30 @@ int NRST;
 
     case 15:
     [_qso appendFormat:@"rig is %s watt %s and antenna is %s.\n",
-      A_Or_An (Choose (Power, NPOWER)),
-      Choose (Transceiver, NXCVR),
-      Choose (Antenna, NANTENNA)];
+      A_Or_An(Choose(Power, NPOWER)),
+      Choose(Transceiver, NXCVR),
+      Choose(Antenna, NANTENNA)];
     break;
 
     case 16:
     [_qso appendFormat:@"my transceiver is %s.\n",
-      A_Or_An (Choose (Transceiver, NXCVR))];
+      A_Or_An(Choose (Transceiver, NXCVR))];
     [_qso appendFormat:@"it runs %s watts into %s.\n",
-      Choose (Power, NPOWER),
-      A_Or_An (Choose (Antenna, NANTENNA))];
+      Choose(Power, NPOWER),
+      A_Or_An(Choose (Antenna, NANTENNA))];
     break;
 
     case 17:
     [_qso appendFormat:@"the rig is %s running %s watts.\n",
-      A_Or_An (Choose (Transceiver, NXCVR)),
-      Choose (Power, NPOWER)];
+      A_Or_An(Choose (Transceiver, NXCVR)),
+      Choose(Power, NPOWER)];
     [_qso appendFormat:@"antenna is %s up %s feet.\n",
-      A_Or_An (Choose (Antenna, NANTENNA)),
-      Choose (UpFeet, NUPFEET)];
+      A_Or_An(Choose (Antenna, NANTENNA)),
+      Choose(UpFeet, NUPFEET)];
     break;
 
     default:
-    [_qso appendFormat:@"rig is %s ",A_Or_An (Choose (Transceiver, NXCVR))];
+    [_qso appendFormat:@"rig is %s ", A_Or_An(Choose(Transceiver, NXCVR))];
     [_qso appendFormat:@"running %s watts into %s up %s feet.\n",
       Choose (Power, NPOWER),
       A_Or_An (Choose (Antenna, NANTENNA)),
@@ -679,7 +686,7 @@ int NRST;
 }
 
 
--(void)putQ_And_Freq
+-(void)putQFreq
 {
   switch (Roll (8))
   {
@@ -715,13 +722,13 @@ int NRST;
 
 -(void)putLastCallsign
 {
-  [_qso appendFormat:@"%s de %s\n", _receiver, _sender];
+  [_qso appendFormat:@"%s de %s", _receiver, _sender];
 }
 
 -(int)licenseSeed
 {
   if (_age > 20) return 20;
-  if (_age < 10) return (10);
+  if (_age < 10) return 10;
   return _age - 8;
 }
 

@@ -12,7 +12,7 @@
     [self putJob];
     [self putAge];
     [self putMisc];
-    [self putQ_And_Freq];
+    [self putQFreq];
     [self putLicense];
 }
 
@@ -26,7 +26,7 @@
     [self putName];
     [self putLicense];
     [self putMisc];
-    [self putQ_And_Freq];
+    [self putQFreq];
     [self putAge];
     [self putJob];
 }
@@ -42,7 +42,7 @@
     [self putLicense];
     [self putRig];
     [self putAge];
-    [self putQ_And_Freq];
+    [self putQFreq];
 }
 
 -(void)putForm3
@@ -59,7 +59,7 @@
     [self putMisc];
     [self putWeather];
     [self putMisc];
-    [self putQ_And_Freq];
+    [self putQFreq];
 }
 
 -(void)putForm4
@@ -90,7 +90,7 @@
     [self putLicense];
     [self putWeather];
     [self putMisc];
-    [self putQ_And_Freq];
+    [self putQFreq];
 }
 
 -(void)PutQSO
@@ -121,6 +121,6 @@
   unichar ol = 0x0305;
   [_qso appendFormat:@"A%CR%C S%CK%C\n", ol, ol, ol, ol];
   [self putLastCallsign];
-  [_qso appendFormat:@"\n"];
+  //[_qso appendFormat:@"\n"];
 }
 @end
