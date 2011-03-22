@@ -111,7 +111,7 @@
 		32264F8B131EC7A8006D4698 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ja; path = ja.lproj/Credits.rtf; sourceTree = "<group>"; };
 		32264F8E131EC7A8006D4698 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		32264F90131EC7A8006D4698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
-		32264F91131EC7A8006D4698 /* en */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		32264F91131EC7A8006D4698 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		322E274E11E4DE8400B9241E /* defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = "<group>"; };
 		322E284311E4FC5000B9241E /* repeat_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_embedded.png; sourceTree = "<group>"; };
 		322E284411E4FC5000B9241E /* repeat_embedded_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_embedded_graphite.png; sourceTree = "<group>"; };
@@ -488,8 +488,8 @@
 		32264F8A131EC7A8006D4698 /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
-				32264F8B131EC7A8006D4698 /* ja */,
 				32264F90131EC7A8006D4698 /* en */,
+				32264F8B131EC7A8006D4698 /* ja */,
 			);
 			name = Credits.rtf;
 			sourceTree = "<group>";
