@@ -1,6 +1,6 @@
 /*
 Copyright © 2010-2011 Brian S. Hall
-Loosely based on code by Rick Bourner
+Loosely based on NString-Levenshtein by Rick Bourner
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as
