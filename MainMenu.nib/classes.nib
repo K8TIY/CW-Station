@@ -5,13 +5,25 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>CLASS</key>
+			<string>MorseWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>clearScore</key>
 				<string>id</string>
+				<key>exportAIFF</key>
+				<string>id</string>
 				<key>genQSO</key>
 				<string>id</string>
 				<key>makeProsign</key>
+				<string>id</string>
+				<key>orderFrontPrefsWindow</key>
 				<string>id</string>
 				<key>repan</key>
 				<string>id</string>
@@ -38,6 +50,8 @@
 				<string>NSSlider</string>
 				<key>playPauseMenuItem</key>
 				<string>NSMenuItem</string>
+				<key>prefsWindow</key>
+				<string>NSWindow</string>
 				<key>qualityIndicator</key>
 				<string>NSLevelIndicator</string>
 				<key>renderer</key>
@@ -63,14 +77,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>MorseWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
