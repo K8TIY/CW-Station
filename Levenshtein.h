@@ -1,9 +1,3 @@
-//
-//  NSString-Levenshtein.h
-//
-//  Created by Rick Bourner on Sat Aug 09 2003.
-//  rick@bourner.com
-
 #import <Cocoa/Cocoa.h>
 
 @interface Levenshtein : NSObject
