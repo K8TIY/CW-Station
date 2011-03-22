@@ -162,7 +162,7 @@ uint16_t MorseInterwordSpace = 0x0018;
       if (chr == 0x0305)
       {
         didPro = YES;
-        [symbols addObject:[NSNumber numberWithUnsignedShort:MorseInterelementSpace]];
+        if (i > 1 && !wasSpace) [symbols addObject:[NSNumber numberWithUnsignedShort:MorseInterelementSpace]];
       }
       else
       {
@@ -170,8 +170,8 @@ uint16_t MorseInterwordSpace = 0x0018;
         NSString* asString = [[NSString stringWithFormat:@"%C", chr] uppercaseString];
         num = [d objectForKey:asString];
         if (nil == num) [[NSException exceptionWithName:@"Unsupported Character"
-                                    reason:[NSString stringWithFormat:@"Unsupported Character: '%C' (%d)", chr, chr]
-                                    userInfo:nil] raise];
+                                      reason:[NSString stringWithFormat:@"Unsupported Character: '%C' (%d)", chr, chr]
+                                      userInfo:nil] raise];
         [symbols addObject:num];
       }
       wasSpace = NO;
@@ -182,7 +182,10 @@ uint16_t MorseInterwordSpace = 0x0018;
   uint16_t* a = malloc(sizeof(uint16_t) * count);
   uint16_t* ap = a;
   for (i = 0; i < count; i++, ap++)
+  {
     *ap = [[symbols objectAtIndex:i] unsignedShortValue];
+    //NSLog(@"%d", *ap);
+  }
   [symbols release];
   return a;
 }
