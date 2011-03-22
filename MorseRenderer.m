@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <IOKit/hid/IOHIDLib.h>
 #include <IOKit/hid/IOHIDUsageTables.h>
 
+#define __MORSE_RENDERER_DEBUG__ 0
 
 NSString* MorseRendererFinishedNotification = @"MorseRendererFinishedNotification";
 static const float gSampleRate = 22050.0f;
@@ -31,22 +32,33 @@ static const float gSampleRate = 22050.0f;
 
 
 
-static OSStatus	MyRenderer(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
+static OSStatus	RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
 			      	             const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
 				                   UInt32 inNumberFrames, AudioBufferList* ioData);
+static unsigned	Renderer(MorseRenderState* inState, UInt32 inNumberFrames, AudioBufferList* ioData);
 static void local_SendNote(void);
 static io_service_t find_a_keyboard(void);
 static void find_led_cookies(IOHIDDeviceInterface122** handle);
 static HRESULT create_hid_interface(io_object_t hidDevice, IOHIDDeviceInterface*** hdi);
 static void manipulate_led(UInt32 value);
+#if __MORSE_RENDERER_DEBUG__
+static void hexdump(void *data, int size);
+#endif
 
 // Audio processing callback
-static OSStatus	MyRenderer(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
+static OSStatus	RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
 			      	             const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
 				                   UInt32 inNumberFrames, AudioBufferList* ioData)
 {
+  unsigned s = Renderer((MorseRenderState*)inRefCon, inNumberFrames, ioData);
+  if (!s) *ioActionFlags |= kAudioUnitRenderAction_OutputIsSilence;
+  return noErr;
+}
+
+static unsigned	Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBufferList* ioData)
+{
+  unsigned samples = 0;
   float fadeSamples = gSampleRate * 0.004f;
-  MorseRenderState* state = (MorseRenderState*)inRefCon;
   CGFloat phase = state->phase;
   CGFloat amp = state->amp;
   CGFloat freq = state->freq;
@@ -57,7 +69,8 @@ static OSStatus	MyRenderer(void* inRefCon, AudioUnitRenderActionFlags* ioActionF
   float* rBuffer = ioData->mBuffers[1].mData;
   uint16_t* item = NULL;
   uint16_t code = 0;
-  BOOL gotNoise = NO;
+  BOOL atEnd = (state->agendaCount < 1 || state->agendaCount <= state->agendaDone);
+  //NSLog(@"atEnd (%d > %d) = %s", state->agendaCount, state->agendaDone, (atEnd)? "yes":"no");
   if (state->agenda && state->play)
   {
     item = &(state->agenda)[state->agendaDone];
@@ -132,7 +145,7 @@ static OSStatus	MyRenderer(void* inRefCon, AudioUnitRenderActionFlags* ioActionF
           rsample = lsample;
           if (lsample != 0.0f)
           {
-            gotNoise = YES;
+            //gotNoise = YES;
             lsample *= ((-2.0f * state->pan) + 2.0f);
             rsample *= (2.0f * state->pan);
           }
@@ -194,7 +207,7 @@ static OSStatus	MyRenderer(void* inRefCon, AudioUnitRenderActionFlags* ioActionF
           else
           {
             item = NULL;
-            state->play = NO;
+            atEnd = YES;
             local_SendNote();
           }
         }
@@ -205,13 +218,14 @@ static OSStatus	MyRenderer(void* inRefCon, AudioUnitRenderActionFlags* ioActionF
     else code = 0;
     lengthBits = code & 0x0007;
     elements = lengthBits? lengthBits:1;
+    if (atEnd) state->play = NO;
+    else samples++;
   }
   state->phase = phase;
   state->freqz = freqz;
   state->ampz = ampz;
   state->lastMode = state->mode;
-  if (!gotNoise) *ioActionFlags |= kAudioUnitRenderAction_OutputIsSilence;
-  return kAudioHardwareNoError;
+  return samples;
 }
 
 static void local_SendNote(void)
@@ -263,7 +277,7 @@ static void local_SendNote(void)
         //CAShow(_ag);
         if (err) printf ("AUGraphInitialize=%ld\n", (long)err);
         AURenderCallbackStruct input;
-        input.inputProc = MyRenderer;
+        input.inputProc = RendererCB;
         input.inputProcRefCon = &_state;
         err = AudioUnitSetProperty(unit, kAudioUnitProperty_SetRenderCallback, 
                                    kAudioUnitScope_Input, 0, &input, sizeof(input));
@@ -280,26 +294,33 @@ static void local_SendNote(void)
 	return self;
 }
 
+-(id)copyWithZone:(NSZone*)z
+{
+  MorseRenderer* cpy = [[MorseRenderer alloc] init];
+  [cpy setString:_string];
+  [cpy setState:&_state];
+  return cpy;
+}
 
--(void)setAmpVal:(float)val
+-(void)setAmp:(float)val
 {
   _state.amp = val;
   _state.ampz = val;
 }
 
--(void)setFreqVal:(float)val
+-(void)setFreq:(float)val
 {
   _state.freq = val * 2.0f * 3.14159265359f / gSampleRate;
   _state.freqz = _state.freq;
 }
 
--(void)setWPMVal:(float)val
+-(void)setWPM:(float)val
 {
   _state.wpm = val;
   [self _updatePadding];
 }
 
--(void)setCWPMVal:(float)val
+-(void)setCWPM:(float)val
 {
   _state.cwpm = val;
   _state.samplesPerDit = 1.2f/val * gSampleRate;
@@ -328,7 +349,6 @@ static void local_SendNote(void)
 
 -(void)setAgenda:(NSString*)str
 {
-  //[self setStrings:str];
   if (_state.agenda) free(_state.agenda);
   _state.agenda = NULL;
   if (str) _state.agenda = [Morse morseFromString:str length:&_state.agendaCount];
@@ -347,17 +367,9 @@ static void local_SendNote(void)
 
 -(void)start:(NSString*)str
 {
-  [_string setString:(str)? str:@""];
+  [self setString:(str)? str:@""];
   if (!_state.play)
   {
-    if (str) [self setAgenda:str];
-    // initialize phase and de-zipper filters.
-    _state.phase = 0.0f;
-    _state.freqz = _state.freq;
-    _state.ampz = _state.amp;
-    _state.agendaDone = 0;
-    _state.agendaItemElementsDone = 0;
-    _state.agendaItemElementSamplesDone = 0;
     OSStatus err = AUGraphStart(_ag);
     if (err) printf ("AUGraphStart=%ld\n", (long)err);
     else _state.play = YES;
@@ -384,6 +396,85 @@ static void local_SendNote(void)
 -(BOOL)isPlaying {return _state.play;}
 
 -(NSString*)string { return _string; }
+
+-(void)setString:(NSString*)s
+{
+  [_string setString:s];
+  if (s) [self setAgenda:s];
+  // initialize phase and de-zipper filters.
+  _state.phase = 0.0f;
+  _state.freqz = _state.freq;
+  _state.ampz = _state.amp;
+  _state.agendaDone = 0;
+  _state.agendaItemElementsDone = 0;
+  _state.agendaItemElementSamplesDone = 0;
+}
+
+-(void)setState:(MorseRenderState*)s
+{
+  memcpy(&_state, s, sizeof(_state));
+}
+
+#define BUFF_SIZE 0x20000L
+-(void)exportAIFFToURL:(NSURL*)url
+{
+  float* buff1 = NULL;
+  float* buff2 = NULL;
+  buff1 = malloc(BUFF_SIZE);
+  buff2 = malloc(BUFF_SIZE);
+  AudioBufferList* abl = malloc(sizeof(*abl) + sizeof(abl->mBuffers[0]));
+  abl->mNumberBuffers = 2;
+  abl->mBuffers[0].mData = buff1;
+  abl->mBuffers[0].mDataByteSize = BUFF_SIZE;
+  abl->mBuffers[0].mNumberChannels = 1;
+  abl->mBuffers[1].mData = buff2;
+  abl->mBuffers[1].mDataByteSize = BUFF_SIZE;
+  abl->mBuffers[1].mNumberChannels = 1;
+  if (_state.amp == 0.0) [self setAmp:0.5];
+  [self setLoop:NO];
+  [self setFlash:NO];
+  if (buff1 && buff2)
+  {
+    AudioStreamBasicDescription streamFormat;
+    streamFormat.mSampleRate = gSampleRate;
+    streamFormat.mFormatID = kAudioFormatLinearPCM;
+    streamFormat.mFormatFlags = kLinearPCMFormatFlagIsBigEndian | kLinearPCMFormatFlagIsPacked;
+    streamFormat.mChannelsPerFrame = 2;
+    streamFormat.mFramesPerPacket = 1;
+    streamFormat.mBitsPerChannel = 16;
+    streamFormat.mBytesPerFrame = 4;
+    streamFormat.mBytesPerPacket = 4;
+    SInt64 packetidx = 0;
+    AudioFileID fileID;
+    OSStatus err = AudioFileCreateWithURL((CFURLRef)url, kAudioFileAIFFType, &streamFormat, kAudioFileFlags_EraseFile, &fileID);
+    _state.play = YES;
+    //NSLog(@"AudioFileCreateWithURL %.4s rate %f file %d", &err, streamFormat.mSampleRate, fileID);
+    while (_state.play)
+    {
+      unsigned samples = Renderer(&_state, BUFF_SIZE/sizeof(float), abl);
+      if (!samples) break;
+      unsigned i;
+      int16_t* buff3 = malloc(samples * 2 * sizeof(int16_t));
+      unsigned i3 = 0;
+      UInt32 ioNumPackets = samples;
+      for (i = 0; i < samples; i++)
+      {
+        int16_t samp = 32767.0 * buff1[i];
+        buff3[i3++] = CFSwapInt16HostToBig(samp);
+        samp = 32767.0 * buff2[i];
+        buff3[i3++] = CFSwapInt16HostToBig(samp);
+      }
+      //hexdump(buff3, 1000);
+      err = AudioFileWritePackets(fileID, false, samples, NULL, packetidx, &ioNumPackets, buff3);
+      packetidx += ioNumPackets;
+      free(buff3);
+    }
+    AudioFileClose(fileID);
+    if (buff1) free(buff1);
+    if (buff2) free(buff2);
+    if (abl) free(abl);
+  }
+}
 @end
 
 
@@ -537,3 +628,59 @@ static void manipulate_led(UInt32 value)
 out:
   (void)(*hidDeviceInterface)->Release(hidDeviceInterface);
 }
+
+#if __MORSE_RENDERER_DEBUG__
+static void hexdump(void *data, int size)
+{
+  /* dumps size bytes of *data to stdout. Looks like:
+   * [0000] 75 6E 6B 6E 6F 77 6E 20
+   *                  30 FF 00 00 00 00 39 00 unknown 0.....9.
+   * (in a single line of course)
+   */
+  unsigned char *p = data;
+  unsigned char c;
+  int n;
+  char bytestr[4] = {0};
+  char addrstr[10] = {0};
+  char hexstr[ 16*3 + 5] = {0};
+  char charstr[16*1 + 5] = {0};
+  for (n=1;n<=size;n++)
+  {
+    if (n%16 == 1)
+    {
+      /* store address for this line */
+      snprintf(addrstr, sizeof(addrstr), "%.4x", ((unsigned int)p-(unsigned int)data));
+    }
+    c = *p;
+    if (isalnum(c) == 0)
+    {
+      c = '.';
+    }
+    /* store hex str (for left side) */
+    snprintf(bytestr, sizeof(bytestr), "%02X ", *p);
+    strncat(hexstr, bytestr, sizeof(hexstr)-strlen(hexstr)-1);
+    /* store char str (for right side) */
+    snprintf(bytestr, sizeof(bytestr), "%c", c);
+    strncat(charstr, bytestr, sizeof(charstr)-strlen(charstr)-1);
+    if (n%16 == 0)
+    { 
+      /* line completed */
+      printf("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
+      hexstr[0] = 0;
+      charstr[0] = 0;
+    }
+    else if (n%8 == 0)
+    {
+      /* half line: add whitespaces */
+      strncat(hexstr, "  ", sizeof(hexstr)-strlen(hexstr)-1);
+      strncat(charstr, " ", sizeof(charstr)-strlen(charstr)-1);
+    }
+    p++; /* next byte */
+  }
+  if (strlen(hexstr) > 0)
+  {
+    /* print rest of buffer if not empty */
+    printf("[%4.4s]   %-50.50s  %s\n", addrstr, hexstr, charstr);
+  }
+}
+#endif

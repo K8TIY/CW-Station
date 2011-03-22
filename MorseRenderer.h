@@ -46,12 +46,11 @@ typedef struct
   BOOL flash;
 } MorseRenderState;
 
-@interface MorseRenderer : NSObject
+@interface MorseRenderer : NSObject <NSCopying>
 {
   AUGraph           _ag;
   MorseRenderState  _state;
   NSMutableString*  _string;
-  BOOL              _ok;
 }
 
 //@property (copy, readwrite) NSString* string;
@@ -60,11 +59,14 @@ typedef struct
 -(void)setMode:(MorseRendererMode)mode;
 -(void)start:(NSString*)string;
 -(void)stop;
--(void)setAmpVal:(float)val;
--(void)setFreqVal:(float)val;
--(void)setWPMVal:(float)val;
--(void)setCWPMVal:(float)val;
+-(void)setAmp:(float)val;
+-(void)setFreq:(float)val;
+-(void)setWPM:(float)val;
+-(void)setCWPM:(float)val;
 -(void)setPan:(float)val;
 -(void)setLoop:(BOOL)flag;
 -(NSString*)string;
+-(void)setString:(NSString*)s;
+-(void)setState:(MorseRenderState*)s;
+-(void)exportAIFFToURL:(NSURL*)url;
 @end
