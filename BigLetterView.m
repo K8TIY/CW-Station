@@ -10,9 +10,10 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 
 @implementation BigLetterView
 @synthesize canBecomeFirstResponder;
+@synthesize prosignFormat;
 -(id)initWithFrame:(NSRect)rect
 {
-  if(![super initWithFrame:rect]) return nil;
+  if (![super initWithFrame:rect]) return nil;
   [self prepareAttributes];
   bgColor = [[NSColor grayColor] retain];
   string = [[NSMutableString alloc] init];
@@ -101,7 +102,8 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 {
   if ([string length])
   {
-    NSString* toDraw = [Morse formatString:string];
+    NSString* toDraw = string;
+    if (prosignFormat) toDraw = [Morse formatString:string];
     //NSLog(@"%@ from %@", string, strings);
     //CGFloat descent = [[attributes objectForKey:NSFontAttributeName] descender];
     NSSize strSize = [toDraw sizeWithAttributes:attributes];
