@@ -1,4 +1,4 @@
-﻿"__AUTH_INFO__" = "In order to use the shift key as a CW keyer, this application needs to be \"trusted\" by your computer's Accessibility software. If you are an authorized user, click the lock below and iMorse will try to do so. You must restart iMorse for the change to take effect. You only need to do this once.";
+﻿"__AUTH_INFO__" = "In order to use the shift key as a CW keyer, this application needs to be \"trusted\" by your computer's Accessibility software. If you are an authorized user, click the lock below and __APPNAME__ will try to do so. You must restart __APPNAME__ for the change to take effect. You only need to do this once.";
 "__AUTH_SUCCESS__" = "Operation was successful. You must quit and relaunch __APPNAME__ to use the new settings.";
 "__AUTH_FAILURE__" = "Operation was unsuccessful (error code %d). You may not have sufficient privileges.";
 
@@ -24,8 +24,8 @@
 
 "__MIN_CHARS__" = "Min Characters";
 "__MAX_CHARS__" = "Max Characters";
-"__RANDOM_CHARACTERS__" = "Random Characters";
-"__DICTIONARY_WORDS__" = "Dictionary Words";
+"__RAND_CHARACTERS__" = "Random Characters";
+"__DICT_WORDS__" = "Dictionary Words";
 "__LETTERS__" = "Letters";
 "__NUMBERS__" = "Numbers";
 "__LETTERS_NUMBERS__" = "Letters & Numbers";
@@ -42,3 +42,4 @@
 
 // Prefs
 "__LOWERCASE_QSO__" = "Lowercase QSO";
+"__QRN_WHITE__" = "QRN is White noise";
