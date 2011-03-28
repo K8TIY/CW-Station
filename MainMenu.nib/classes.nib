@@ -5,16 +5,10 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
-			<key>CLASS</key>
-			<string>MorseWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>chooseSource</key>
+				<string>id</string>
 				<key>clearScore</key>
 				<string>id</string>
 				<key>exportAIFF</key>
@@ -73,7 +67,7 @@
 				<key>topBLV</key>
 				<string>BigLetterView</string>
 				<key>window</key>
-				<string>MorseWindow</string>
+				<string>NSWindow</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
