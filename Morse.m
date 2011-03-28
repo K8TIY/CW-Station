@@ -138,55 +138,80 @@ uint16_t MorseInterwordSpace = 0x0018;
   return [rd objectForKey:[NSNumber numberWithUnsignedShort:morse]];
 }
 
-+(uint16_t*)morseFromString:(NSString*)string length:(NSUInteger*)outLength
++(uint16_t*)morseFromString:(NSString*)string length:(NSUInteger*)outLength offsets:(NSDictionary**)offsets
 {
   NSMutableArray* symbols = [[NSMutableArray alloc] init];
+  NSMutableDictionary* offs = (offsets)? [[NSMutableDictionary alloc] init] : nil;
   NSDictionary* d = [[Morse dictionary] objectForKey:@"Code"];
   NSUInteger i, length = [string length];
   BOOL wasSpace = YES;
   BOOL didPro = NO;
+  int wordStart = -1;
+  int wordStartElem = -1;
   for (i = 0; i < length; i++)
   {
     NSNumber* num;
     unichar chr = [string characterAtIndex:i];
     if (chr == ' ' || chr == '\n' || chr == '\t')
     {
+      if (didPro) [symbols removeLastObject];
       num = [[NSNumber alloc] initWithUnsignedShort:MorseInterwordSpace];
-      wasSpace = YES;
       [symbols addObject:num];
       [num release];
+      wasSpace = YES;
       didPro = NO;
+      if (wordStart > -1 && wordStartElem > -1)
+      {
+        [offs setObject:NSStringFromRange(NSMakeRange(wordStart,i-wordStart))
+              forKey:[NSNumber numberWithUnsignedShort:wordStartElem]];
+      }
+      wordStart = wordStartElem = -1;
     }
     else
     {
       if (chr == 0x0305)
       {
-        didPro = YES;
-        if (i > 1 && !wasSpace) [symbols addObject:[NSNumber numberWithUnsignedShort:MorseInterelementSpace]];
+        if (i > 0 && !wasSpace && i < length-1)
+        {
+          [symbols addObject:[NSNumber numberWithUnsignedShort:MorseInterelementSpace]];
+          didPro = YES;
+        }
       }
       else
       {
         if (i > 0 && !wasSpace && !didPro) [symbols addObject:[NSNumber numberWithUnsignedShort:MorseIntercharacterSpace]];
         NSString* asString = [[NSString stringWithFormat:@"%C", chr] uppercaseString];
+        //NSLog(@"%@", asString);
         num = [d objectForKey:asString];
         if (nil == num) [[NSException exceptionWithName:@"Unsupported Character"
                                       reason:[NSString stringWithFormat:@"Unsupported Character: '%C' (%d)", chr, chr]
                                       userInfo:nil] raise];
         [symbols addObject:num];
+        if (wordStart == -1 && wordStartElem == -1)
+        {
+          wordStart = i;
+          wordStartElem = [symbols count]-1;
+        }
+        didPro = NO;
       }
       wasSpace = NO;
     }
+  }
+  if (wordStart > 0 && wordStartElem > 0)
+  {
+    [offs setObject:NSStringFromRange(NSMakeRange(wordStart,i-wordStart))
+          forKey:[NSNumber numberWithUnsignedShort:wordStartElem]];
   }
   NSUInteger count = [symbols count];
   *outLength = count;
   uint16_t* a = malloc(sizeof(uint16_t) * count);
   uint16_t* ap = a;
   for (i = 0; i < count; i++, ap++)
-  {
     *ap = [[symbols objectAtIndex:i] unsignedShortValue];
-    //NSLog(@"%d", *ap);
-  }
+  //NSLog(@"%@", offs);
   [symbols release];
+  if (offsets) *offsets = [NSDictionary dictionaryWithDictionary:offs];
+  if (offs) [offs release];
   return a;
 }
 

@@ -27,7 +27,7 @@ typedef struct
 +(NSDictionary*)dictionary;
 +(NSDictionary*)reverseDictionary;
 +(NSString*)stringFromMorse:(uint16_t)morse;
-+(uint16_t*)morseFromString:(NSString*)string length:(NSUInteger*)outLength;
++(uint16_t*)morseFromString:(NSString*)string length:(NSUInteger*)outLength offsets:(NSDictionary**)offsets;
 +(NSArray*)letters;
 +(NSArray*)numbers;
 +(NSArray*)lettersAndNumbers;
