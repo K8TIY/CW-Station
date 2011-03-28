@@ -165,17 +165,25 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     NSMutableString* ms = [[NSMutableString alloc] initWithString:[[sto string] substringWithRange:sel]];
     NSString* ph = [NSString stringWithFormat:@"%C", 0x0305];
     unsigned i;
+    BOOL ok = YES;
     for (i = 0; i < [ms length]; i++)
     {
       unichar ch = [ms characterAtIndex:i];
-      if (ch == ' ') return;
-      if (ch == 0x0305) return;
+      if (ch == ' ' || ch == 0x0305)
+      {
+        ok = NO;
+        break;
+      }
       [ms insertString:ph atIndex:i+1];
       i++;
     }
-    [sto replaceCharactersInRange:sel withString:ms];
-    sel.length = [ms length];
-    [inputField setSelectedRange:sel];
+    if (ok)
+    {
+      [sto replaceCharactersInRange:sel withString:ms];
+      sel.length = [ms length];
+      [inputField setSelectedRange:sel];
+    }
+    [ms release];
   }
 }
 
