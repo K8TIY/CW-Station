@@ -9,6 +9,7 @@
 #import "Morse.h"
 
 extern NSString* MorseRendererFinishedNotification;
+extern NSString* MorseRendererStartedWordNotification;
 
 typedef enum
 {
@@ -18,9 +19,14 @@ typedef enum
   MorseRendererDecayMode // Used internally
 } MorseRendererMode;
 
+#define kPinkMaxRandomRows 32
+#define kPinkRandomBits    30
+#define kPinkRandomShift   ((sizeof(long)*8)-kPinkRandomBits)
+
 typedef struct
 {
   uint16_t* agenda;
+  NSDictionary* offsets;
   CGFloat freq;
   CGFloat amp;
   CGFloat pan;
@@ -44,11 +50,21 @@ typedef struct
   BOOL play;
   BOOL wasOn;
   BOOL flash;
+  BOOL noNote;
+  // Noise stuff
+  CGFloat qrn;
+  long pinkRows[kPinkMaxRandomRows];
+  long pinkRunningSum;    // Used to optimize summing of generators
+  int  pinkIndex;         // Incremented each sample
+  int  pinkIndexMask;     // Index wrapped by &ing with this mask
+  float pinkScalar;       // Used to scale within range of -1.0 to 1.0
+  BOOL goWhite;
 } MorseRenderState;
 
 @interface MorseRenderer : NSObject <NSCopying>
 {
   AUGraph           _ag;
+  AudioUnit         _mixer;
   MorseRenderState  _state;
   NSMutableString*  _string;
 }
@@ -64,6 +80,8 @@ typedef struct
 -(void)setWPM:(float)val;
 -(void)setCWPM:(float)val;
 -(void)setPan:(float)val;
+-(void)setQRN:(float)val;
+-(void)setQRNWhite:(BOOL)flag;
 -(void)setLoop:(BOOL)flag;
 -(NSString*)string;
 -(void)setString:(NSString*)s;

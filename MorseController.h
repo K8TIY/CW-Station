@@ -26,6 +26,8 @@
 	IBOutlet MorseRenderer* renderer;
   IBOutlet NSMenuItem* playPauseMenuItem;
   Wordlist* words;
+  NSMutableArray* qso;
+  NSUInteger qsoIndex;
   MorseRecognizer* recognizer;
   NSTimer* timer;
   unsigned state;

@@ -6,6 +6,10 @@
 	<real>400</real>
 	<key>amp</key>
 	<real>0.5</real>
+	<key>qrn</key>
+	<integer>0</integer>
+	<key>qrnWhite</key>
+	<false/>
 	<key>pan</key>
 	<real>0.5</real>
 	<key>wpm</key>

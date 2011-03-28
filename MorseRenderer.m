@@ -19,9 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #define __MORSE_RENDERER_DEBUG__ 0
 
 NSString* MorseRendererFinishedNotification = @"MorseRendererFinishedNotification";
+NSString* MorseRendererStartedWordNotification = @"MorseRendererStartedWordNotification";
 static const float gSampleRate = 22050.0f;
 
 @interface MorseRenderer (Private)
+-(void)_initAUGraph;
+-(void)_initRandomEnv:(long)numRows;
 -(void)_updatePadding;
 -(void)setAgenda:(NSString*)string;
 @end
@@ -31,8 +34,12 @@ static const float gSampleRate = 22050.0f;
 static OSStatus	RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
 			      	             const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
 				                   UInt32 inNumberFrames, AudioBufferList* ioData);
+static OSStatus	NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
+			      	             const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
+				                   UInt32 inNumberFrames, AudioBufferList* ioData);
 static unsigned	Renderer(MorseRenderState* inState, UInt32 inNumberFrames, AudioBufferList* ioData);
 static void local_SendNote(void);
+static void local_SendRange(MorseRenderState* state);
 
 #if __MORSE_RENDERER_DEBUG__
 static void hexdump(void *data, int size);
@@ -43,8 +50,84 @@ static OSStatus	RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionF
 			      	             const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
 				                   UInt32 inNumberFrames, AudioBufferList* ioData)
 {
-  unsigned s = Renderer((MorseRenderState*)inRefCon, inNumberFrames, ioData);
+  MorseRenderState* state = (MorseRenderState*)inRefCon;
+  unsigned s = Renderer(state, inNumberFrames, ioData);
   if (!s) *ioActionFlags |= kAudioUnitRenderAction_OutputIsSilence;
+  return noErr;
+}
+
+static unsigned long GenerateRandomNumber()
+{
+	static unsigned long randSeed = 22222;  /* Change this for different random sequences. */
+	randSeed = (randSeed * 196314165) + 907633515;
+	return randSeed;
+}
+
+static OSStatus	NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
+			      	             const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
+				                   UInt32 inNumberFrames, AudioBufferList* ioData)
+{
+  MorseRenderState* state = (MorseRenderState*)inRefCon;
+  //printf("qrn %f\n", state->qrn);
+  float* lBuffer = ioData->mBuffers[0].mData;
+  float* rBuffer = ioData->mBuffers[1].mData;
+  UInt32 i;
+  for (i = 0; i < inNumberFrames; i++)
+  {
+    float lsample = 0.0f;
+    float rsample = 0.0f;
+    // White Noise
+    if (state->goWhite)
+    {
+      lsample = (float)random()/(float)INT_MAX;
+    }
+    else
+    {
+      long newRandom;
+      // Increment and mask index
+      state->pinkIndex = (state->pinkIndex + 1) & state->pinkIndexMask;
+      // If index is zero, don't update any random values
+      if (state->pinkIndex)
+      {
+        int numZeros = 0;
+        int n = state->pinkIndex;
+        // Determine how many trailing zeros in pinkIndex
+        // this will hang if n == 0 so test first
+        while ((n & 1) == 0)
+        {
+          n = n >> 1;
+          ++numZeros;
+        }
+        // Replace the indexed rows random value
+        // Subtract and add back to pinkRunningSum instead of adding all 
+        // the random values together. only one changes each time
+        state->pinkRunningSum -= state->pinkRows[numZeros];
+        newRandom = ((long)GenerateRandomNumber()) >> kPinkRandomShift;
+        state->pinkRunningSum += newRandom;
+        state->pinkRows[numZeros] = newRandom;
+      }
+      // Add extra white noise value
+      newRandom = ((long)GenerateRandomNumber()) >> kPinkRandomShift;
+      long sum = state->pinkRunningSum + newRandom;
+      // Scale to range of -1.0 to 0.999 and factor in volume
+      lsample = state->pinkScalar * sum;
+    }
+    //float old = lsample;
+    lsample *= state->qrn;
+    //printf("%f from %f*%f\n", lsample, old, state->qrn);
+    //lsample = 0.0;
+    if (lsample > 1.0) lsample = 1.0;
+    if (lsample < -1.0) lsample = -1.0;
+    rsample = lsample;
+    if (lsample != 0.0f && state->pan != 0.5f)
+    {
+      lsample *= ((-2.0f * state->pan) + 2.0f);
+      rsample *= (2.0f * state->pan);
+    }
+    //printf("sample %f\n", lsample);
+    *lBuffer++ = lsample;
+    *rBuffer++ = rsample;
+  }
   return noErr;
 }
 
@@ -67,6 +150,8 @@ static unsigned	Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
   if (state->agenda && state->play)
   {
     item = &(state->agenda)[state->agendaDone];
+    //local_SendRange(state);
+    //NSLog(@"range");
     code = *item;
   }
   uint16_t lengthBits = code & 0x0007;
@@ -138,7 +223,6 @@ static unsigned	Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
           rsample = lsample;
           if (lsample != 0.0f)
           {
-            //gotNoise = YES;
             lsample *= ((-2.0f * state->pan) + 2.0f);
             rsample *= (2.0f * state->pan);
           }
@@ -147,6 +231,7 @@ static unsigned	Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
     }
     *lBuffer++ = lsample;
     *rBuffer++ = rsample;
+    //printf("%f\n", lsample);
     ampz  = 0.001f * amp  + 0.999f * ampz;
     freqz = 0.001f * freq + 0.999f * freqz;
     state->agendaItemElementSamplesDone++;
@@ -173,7 +258,11 @@ static unsigned	Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
         }
         else
         {
-          (state->agendaItemElementsDone)++;
+          if (state->doingLoopSpace)
+          {
+            local_SendRange(state);
+          }
+          else (state->agendaItemElementsDone)++;
           state->doingInterelementSpace = NO;
           state->doingLoopSpace = NO;
           decay = 0.0f;
@@ -184,7 +273,8 @@ static unsigned	Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
         ampz = amp;
         if (state->agendaItemElementsDone >= elements)
         {
-          (state->agendaDone)++;
+          state->agendaDone++;
+          local_SendRange(state);
           state->agendaItemElementsDone = 0;
           if (state->mode != MorseRendererOnMode) item = &(state->agenda)[state->agendaDone];
         }
@@ -229,11 +319,31 @@ static void local_SendNote(void)
   [arp release];
 }
 
+static void local_SendRange(MorseRenderState* state)
+{
+  if (!state->noNote)
+  {
+    NSAutoreleasePool* arp = [[NSAutoreleasePool alloc] init];
+    NSString* s = [state->offsets objectForKey:[NSNumber numberWithUnsignedShort:state->agendaDone]];
+    //NSLog(@"%@ for %d", s, state->agendaDone);
+    if (s)
+    {
+      NSNotification* note = [NSNotification notificationWithName:MorseRendererStartedWordNotification object:s];
+      [[NSNotificationCenter defaultCenter] performSelectorOnMainThread:@selector(postNotification:) withObject:note waitUntilDone:NO];
+    }
+    [arp release];
+  }
+}
+
 @implementation MorseRenderer
 -(id)init
 {
   self = [super init];
   _string = [[NSMutableString alloc] init];
+#if 1
+  [self _initAUGraph];
+  [self _initRandomEnv:5];
+#else
   AUNode node;
   AudioUnit unit;
 	ComponentDescription desc;
@@ -252,22 +362,21 @@ static void local_SendNote(void)
     if (err) printf("AUGraphOpen/AUGraphAddNode/AUGraphNodeInfo=%ld\n", (long)err);
     else
     {
-      AudioStreamBasicDescription fmt;
-      fmt.mSampleRate = gSampleRate;
-      fmt.mFormatID = kAudioFormatLinearPCM;
-      fmt.mFormatFlags = kAudioFormatFlagsCanonical | kAudioFormatFlagIsNonInterleaved;
-      fmt.mBytesPerPacket = 4;
-      fmt.mFramesPerPacket = 1;
-      fmt.mBytesPerFrame = 4;
-      fmt.mChannelsPerFrame = 2;
-      fmt.mBitsPerChannel = 32;
+      AudioStreamBasicDescription desc;
+      desc.mSampleRate = gSampleRate;
+      desc.mFormatID = kAudioFormatLinearPCM;
+      desc.mFormatFlags = kAudioFormatFlagsCanonical | kAudioFormatFlagIsNonInterleaved;
+      desc.mBytesPerPacket = 4;
+      desc.mFramesPerPacket = 1;
+      desc.mBytesPerFrame = 4;
+      desc.mChannelsPerFrame = 2;
+      desc.mBitsPerChannel = 32;
       err = AudioUnitSetProperty(unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input,
-                                 0, &fmt, sizeof(AudioStreamBasicDescription));
+                                 0, &desc, sizeof(AudioStreamBasicDescription));
       if (err) printf ("AudioUnitSetProperty-SF=%4.4s, %ld\n", (char*)&err, (long)err);
       else
       {
         err = AUGraphInitialize(_ag);
-        //CAShow(_ag);
         if (err) printf ("AUGraphInitialize=%ld\n", (long)err);
         AURenderCallbackStruct input;
         input.inputProc = RendererCB;
@@ -284,7 +393,133 @@ static void local_SendNote(void)
     [self dealloc];
     self = nil;
   }
+#endif
+  //CAShow(_ag);
 	return self;
+}
+
+-(void)_initAUGraph
+{
+	//************************************************************
+	//*** Setup the AUGraph, add AUNodes, and make connections ***
+	//************************************************************
+	// Error checking result
+	OSStatus result = noErr;
+
+	// create a new AUGraph
+	result = NewAUGraph(&_ag);
+  // AUNodes represent AudioUnits on the AUGraph and provide an
+	// easy means for connecting audioUnits together.
+  AUNode outputNode;
+	AUNode mixerNode;
+
+  // Create AudioComponentDescriptions for the AUs we want in the graph
+  // mixer component
+	ComponentDescription mixer_desc;
+	mixer_desc.componentType = kAudioUnitType_Mixer;
+	mixer_desc.componentSubType = kAudioUnitSubType_StereoMixer;
+	mixer_desc.componentFlags = 0;
+	mixer_desc.componentFlagsMask = 0;
+	mixer_desc.componentManufacturer = kAudioUnitManufacturer_Apple;
+
+	//  output component
+	ComponentDescription output_desc;
+	output_desc.componentType = kAudioUnitType_Output;
+	output_desc.componentSubType = kAudioUnitSubType_DefaultOutput;
+	output_desc.componentFlags = 0;
+	output_desc.componentFlagsMask = 0;
+	output_desc.componentManufacturer = kAudioUnitManufacturer_Apple;
+
+  // Add nodes to the graph to hold our AudioUnits,
+	// You pass in a reference to the  AudioComponentDescription
+	// and get back an  AudioUnit
+	result = AUGraphAddNode(_ag, &output_desc, &outputNode);
+	result = AUGraphAddNode(_ag, &mixer_desc, &mixerNode );
+	// Now we can manage connections using nodes in the graph.
+  // Connect the mixer node's output to the output node's input
+	result = AUGraphConnectNodeInput(_ag, mixerNode, 0, outputNode, 0);
+  // open the graph AudioUnits are open but not initialized (no resource allocation occurs here)
+	result = AUGraphOpen(_ag);
+	// Get a link to the mixer AU so we can talk to it later
+	result = AUGraphNodeInfo(_ag, mixerNode, NULL, &_mixer);
+	//************************************************************
+	//*** Make connections to the mixer unit's inputs ***
+	//************************************************************
+  // Set the number of input busses on the Mixer Unit
+	UInt32 numbuses = 1;
+	UInt32 size = sizeof(numbuses);
+  result = AudioUnitSetProperty(_mixer, kAudioUnitProperty_ElementCount, kAudioUnitScope_Input, 0, &numbuses, size);
+	AudioStreamBasicDescription desc;
+  desc.mSampleRate = gSampleRate;
+  desc.mFormatID = kAudioFormatLinearPCM;
+  desc.mFormatFlags = kAudioFormatFlagsCanonical | kAudioFormatFlagIsNonInterleaved;
+  desc.mBytesPerPacket = 4;
+  desc.mFramesPerPacket = 1;
+  desc.mBytesPerFrame = 4;
+  desc.mChannelsPerFrame = 2;
+  desc.mBitsPerChannel = 32;
+  AURenderCallback cbs[2] = {RendererCB,NoiseCB};
+  void* rcs[2] = {&_state,&_state};
+	// Loop through and setup a callback for each source you want to send to the mixer.
+	// Right now we are only doing a single bus so we could do without the loop.
+	int i;
+  for (i = 0; i < numbuses; ++i)
+  {
+		// Setup render callback struct
+		// This struct describes the function that will be called
+		// to provide a buffer of audio samples for the mixer unit.
+		AURenderCallbackStruct renderCallbackStruct;
+		renderCallbackStruct.inputProc = cbs[i];
+		renderCallbackStruct.inputProcRefCon = rcs[i];
+    // Set a callback for the specified node's specified input
+    result = AUGraphSetNodeInputCallback(_ag, mixerNode, i, &renderCallbackStruct);
+		//printf("Mixer file format: "); desc.Print();
+		// Apply the modified CAStreamBasicDescription to the mixer input bus
+		result = AudioUnitSetProperty(_mixer,
+						kAudioUnitProperty_StreamFormat,
+						kAudioUnitScope_Input,
+						i,
+						&desc,
+						sizeof(desc));
+	}
+	// Apply the CAStreamBasicDescription to the mixer output bus
+	result = AudioUnitSetProperty(_mixer,
+					 kAudioUnitProperty_StreamFormat,
+					 kAudioUnitScope_Output,
+					 0,
+					 &desc,
+					 sizeof(desc));
+	//************************************************************
+	//*** Setup the audio output stream ***
+	//************************************************************
+  // Apply the modified CAStreamBasicDescription to the output Audio Unit
+	result = AudioUnitSetProperty(  _mixer,
+					kAudioUnitProperty_StreamFormat,
+					kAudioUnitScope_Output,
+					0,
+					&desc,
+					sizeof(desc));
+  // Once everything is set up call initialize to validate connections
+	result = AUGraphInitialize(_ag);
+}
+
+-(void)_initRandomEnv:(long)numRows
+{
+  int index;
+	long pmax;
+	
+	_state.pinkIndex = 0;
+	_state.pinkIndexMask = (1 << numRows) - 1;
+	_state.goWhite = NO;
+	// Calculate max possible signed random value. extra 1 for white noise always added
+	pmax = (numRows + 1) * (1 << (kPinkRandomBits-1));
+	_state.pinkScalar = 1.0f / pmax;
+	// Initialize rows
+	for( index = 0; index < numRows; index++ )
+	{
+		_state.pinkRows[index] = 0;		
+	}
+	_state.pinkRunningSum = 0;
 }
 
 -(id)copyWithZone:(NSZone*)z
@@ -293,6 +528,16 @@ static void local_SendNote(void)
   [cpy setString:_string];
   [cpy setState:&_state];
   return cpy;
+}
+
+-(void)dealloc
+{
+  [self stop];
+  DisposeAUGraph(_ag);
+  if (_state.agenda) free(_state.agenda);
+  if (_state.offsets) [_state.offsets release];
+  if (_string) [_string release];
+  [super dealloc];
 }
 
 -(void)setAmp:(float)val
@@ -329,6 +574,8 @@ static void local_SendNote(void)
 
 
 -(void)setLoop:(BOOL)flag {_state.loop = flag;}
+-(void)setQRN:(float)val { _state.qrn = val; }
+-(void)setQRNWhite:(BOOL)flag { _state.goWhite = flag; }
 -(BOOL)flash { return _state.flash; }
 -(void)setFlash:(BOOL)flag { _state.flash = flag; }
 
@@ -344,7 +591,13 @@ static void local_SendNote(void)
 {
   if (_state.agenda) free(_state.agenda);
   _state.agenda = NULL;
-  if (str) _state.agenda = [Morse morseFromString:str length:&_state.agendaCount];
+  if (_state.offsets) [_state.offsets release];
+  _state.offsets = nil;
+  if (str)
+  {
+    _state.agenda = [Morse morseFromString:str length:&_state.agendaCount offsets:&(_state.offsets)];
+    [_state.offsets retain];
+  }
 }
 
 -(void)setMode:(MorseRendererMode)mode
@@ -364,6 +617,8 @@ static void local_SendNote(void)
   if (!_state.play)
   {
     OSStatus err = AUGraphStart(_ag);
+    //CAShow(_ag);
+    local_SendRange(&_state);
     if (err) printf ("AUGraphStart=%ld\n", (long)err);
     else _state.play = YES;
   }
@@ -371,8 +626,7 @@ static void local_SendNote(void)
 
 -(void)stop
 {
-  OSStatus err = AUGraphStop(_ag);
-  if (err) NSLog(@"AUGraphStop=%ld\n", err);
+  (void)AUGraphStop(_ag);
   if (_state.agenda) free(_state.agenda);
   _state.agenda = NULL;
   _state.agendaCount = 0;
@@ -405,12 +659,16 @@ static void local_SendNote(void)
 
 -(void)setState:(MorseRenderState*)s
 {
+  NSDictionary* oldOffsets = _state.offsets;
+  if (oldOffsets) [oldOffsets release];
   memcpy(&_state, s, sizeof(_state));
+  _state.offsets = [_state.offsets copy];
 }
 
 #define BUFF_SIZE 0x20000L
 -(void)exportAIFFToURL:(NSURL*)url
 {
+  _state.noNote = YES;
   float* buff1 = NULL;
   float* buff2 = NULL;
   buff1 = malloc(BUFF_SIZE);
