@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3204AEB91284B9A800EAE00E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3204AEB81284B9A800EAE00E /* IOKit.framework */; };
-		3213560A11EE2AD800EBC97E /* iMorse.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3213560911EE2AD800EBC97E /* iMorse.icns */; };
+		3213560A11EE2AD800EBC97E /* CWStation.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3213560911EE2AD800EBC97E /* CWStation.icns */; };
 		32190E851222CB81008B4E80 /* mktrusted.c in Sources */ = {isa = PBXBuildFile; fileRef = 32190E841222CB81008B4E80 /* mktrusted.c */; };
 		32190F491222CD96008B4E80 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D7F92690099588A7F000001 /* CoreFoundation.framework */; };
 		32190F8A1222CFA0008B4E80 /* mktrusted in CopyFiles */ = {isa = PBXBuildFile; fileRef = 32190E6B1222C75D008B4E80 /* mktrusted */; };
@@ -107,7 +107,7 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		3204AEB81284B9A800EAE00E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
-		3213560911EE2AD800EBC97E /* iMorse.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = iMorse.icns; sourceTree = "<group>"; };
+		3213560911EE2AD800EBC97E /* CWStation.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = CWStation.icns; sourceTree = "<group>"; };
 		32190E6B1222C75D008B4E80 /* mktrusted */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mktrusted; sourceTree = BUILT_PRODUCTS_DIR; };
 		32190E841222CB81008B4E80 /* mktrusted.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mktrusted.c; sourceTree = "<group>"; };
 		32264F8B131EC7A8006D4698 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ja; path = ja.lproj/Credits.rtf; sourceTree = "<group>"; };
@@ -156,13 +156,14 @@
 		325B409911DAAA8500F39F0D /* Morse.strings */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; path = Morse.strings; sourceTree = "<group>"; };
 		3279A43F1215F614007180F1 /* SecurityInterface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityInterface.framework; path = /System/Library/Frameworks/SecurityInterface.framework; sourceTree = "<absolute>"; };
 		3279A4761215FE90007180F1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		327A3EC8133CF11A008EE70A /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		32859CD711E6245A003319E7 /* Morse.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Morse.plist; sourceTree = "<group>"; };
 		32859E2E11E66FE1003319E7 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		3292CEDB123ECE5E009B0B9C /* Levenshtein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Levenshtein.h; sourceTree = "<group>"; };
 		3292CEDC123ECE5E009B0B9C /* Levenshtein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Levenshtein.m; sourceTree = "<group>"; };
 		A63F8E420C518612006781E2 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
-		A64D2B6E09211FE900BA6154 /* iMorse-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iMorse-Info.plist"; sourceTree = "<group>"; };
-		A64D2B6F09211FE900BA6154 /* iMorse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iMorse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A64D2B6E09211FE900BA6154 /* CWStation-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CWStation-Info.plist"; sourceTree = "<group>"; };
+		A64D2B6F09211FE900BA6154 /* CW Station.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CW Station.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -219,7 +220,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A64D2B6F09211FE900BA6154 /* iMorse.app */,
+				A64D2B6F09211FE900BA6154 /* CW Station.app */,
 				32190E6B1222C75D008B4E80 /* mktrusted */,
 			);
 			name = Products;
@@ -234,12 +235,12 @@
 				325B407011DAA44D00F39F0D /* Morse.m */,
 				1F64E20B00996E677F000001 /* MorseRenderer.h */,
 				1F64E20C00996E677F000001 /* MorseRenderer.m */,
-				3256063F121C410700656629 /* Wordlist.h */,
-				32560640121C410700656629 /* Wordlist.m */,
 				1F64E20D00996E677F000001 /* MorseController.h */,
 				1F64E20E00996E677F000001 /* MorseController.m */,
 				323183B911E781C500E9FFA0 /* BigLetterView.h */,
 				323183BA11E781C500E9FFA0 /* BigLetterView.m */,
+				3256063F121C410700656629 /* Wordlist.h */,
+				32560640121C410700656629 /* Wordlist.m */,
 				3292CEDB123ECE5E009B0B9C /* Levenshtein.h */,
 				3292CEDC123ECE5E009B0B9C /* Levenshtein.m */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
@@ -251,10 +252,11 @@
 				3237A41C131D91EC00824AD4 /* Onizuka */,
 				29B97319FDCFA39411CA2CEA /* MainMenu.nib */,
 				32264F8A131EC7A8006D4698 /* Credits.rtf */,
+				327A3EC8133CF11A008EE70A /* README.txt */,
 				32264F8D131EC7A8006D4698 /* Localizable.strings */,
 				322E285611E4FCBA00B9241E /* Graphics */,
-				3213560911EE2AD800EBC97E /* iMorse.icns */,
-				A64D2B6E09211FE900BA6154 /* iMorse-Info.plist */,
+				3213560911EE2AD800EBC97E /* CWStation.icns */,
+				A64D2B6E09211FE900BA6154 /* CWStation-Info.plist */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
@@ -378,9 +380,9 @@
 			productReference = 32190E6B1222C75D008B4E80 /* mktrusted */;
 			productType = "com.apple.product-type.tool";
 		};
-		A64D2B5D09211FE800BA6154 /* iMorse */ = {
+		A64D2B5D09211FE800BA6154 /* CW Station */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "iMorse" */;
+			buildConfigurationList = A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "CW Station" */;
 			buildPhases = (
 				A64D2B5E09211FE800BA6154 /* Headers */,
 				A64D2B6109211FE800BA6154 /* Resources */,
@@ -393,10 +395,10 @@
 			dependencies = (
 				32190F891222CF8A008B4E80 /* PBXTargetDependency */,
 			);
-			name = iMorse;
+			name = "CW Station";
 			productInstallPath = "$(HOME)/Applications";
 			productName = Sawtooth;
-			productReference = A64D2B6F09211FE900BA6154 /* iMorse.app */;
+			productReference = A64D2B6F09211FE900BA6154 /* CW Station.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -404,7 +406,7 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "iMorse" */;
+			buildConfigurationList = A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "CWStation" */;
 			compatibilityVersion = "Xcode 3.0";
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -419,7 +421,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A64D2B5D09211FE800BA6154 /* iMorse */,
+				A64D2B5D09211FE800BA6154 /* CW Station */,
 				32190E6A1222C75D008B4E80 /* mktrusted */,
 			);
 		};
@@ -443,7 +445,7 @@
 				323183D011E7841700E9FFA0 /* PlayPressed.tiff in Resources */,
 				323183D111E7841700E9FFA0 /* PlayEnabled.tiff in Resources */,
 				323183D211E7841700E9FFA0 /* PlayDisabled.tiff in Resources */,
-				3213560A11EE2AD800EBC97E /* iMorse.icns in Resources */,
+				3213560A11EE2AD800EBC97E /* CWStation.icns in Resources */,
 				3237A419131D91CC00824AD4 /* Onizuka.strings in Resources */,
 				32264F92131EC7A8006D4698 /* Credits.rtf in Resources */,
 				32264F93131EC7A8006D4698 /* Localizable.strings in Resources */,
@@ -604,12 +606,12 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "iMorse-Info.plist";
+				INFOPLIST_FILE = "CWStation-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = iMorse;
+				PRODUCT_NAME = "CW Station";
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				SECTORDER_FLAGS = "";
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
@@ -637,12 +639,12 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "iMorse-Info.plist";
+				INFOPLIST_FILE = "CWStation-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = iMorse;
+				PRODUCT_NAME = "CW Station";
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				SECTORDER_FLAGS = "";
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
@@ -668,12 +670,12 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "iMorse-Info.plist";
+				INFOPLIST_FILE = "CWStation-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = iMorse;
+				PRODUCT_NAME = "CW Station";
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				SECTORDER_FLAGS = "";
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
@@ -754,7 +756,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "iMorse" */ = {
+		A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "CW Station" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A6E430BF0C5184DE00BA6C4B /* Development */,
@@ -764,7 +766,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "iMorse" */ = {
+		A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "CWStation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A6E430C70C5184DE00BA6C4B /* Development */,

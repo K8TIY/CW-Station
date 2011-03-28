@@ -5,21 +5,21 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>iMorse</string>
+	<string>CW Station</string>
 	<key>CFBundleIconFile</key>
-	<string>iMorse.icns</string>
+	<string>CWStation.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.blugs.iMorse</string>
+	<string>com.blugs.CWStation</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1</string>
+	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>2011.03.04</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2010-2011 Brian "Moses" Hall</string>
+	<string>Copyright © 2010-2011 Brian &quot;Moses&quot; Hall K8TIY</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
