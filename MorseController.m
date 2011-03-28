@@ -368,6 +368,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     [d setObject:[NSNumber numberWithUnsignedInteger:of] forKey:@"of"];
     [s3 release];
   }
+  [lev release];
   //NSLog(@"Score is now %@", score);
 }
 
