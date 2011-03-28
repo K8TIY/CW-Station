@@ -67,18 +67,18 @@
   </array>
   <key>Prosigns</key>
   <array>
-    <string>AC</string>
-    <string>AR</string>
-    <string>AS</string>
-    <string>BK</string>
-    <string>BT</string>
-    <string>CL</string>
-    <string>DO</string>
-    <string>HH</string>
-    <string>KN</string>
-    <string>SK</string>
-    <string>SOS</string>
-    <string>VA</string>
+    <string>A̅C̅</string>
+    <string>A̅R̅</string>
+    <string>A̅S̅</string>
+    <string>B̅K̅</string>
+    <string>B̅T̅</string>
+    <string>C̅L̅</string>
+    <string>D̅O̅</string>
+    <string>H̅H̅</string>
+    <string>K̅N̅</string>
+    <string>S̅K̅</string>
+    <string>S̅O̅S̅</string>
+    <string>V̅A̅</string>
   </array>
 	<key>Code</key>
 	<dict>
