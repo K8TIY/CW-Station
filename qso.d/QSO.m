@@ -698,12 +698,7 @@ static BOOL is_vowel(unichar first)
 
 int Roll(int Number)
 {
-  int new_tmp;
-  double tmp_val;
-  //double drand48 ();
-  tmp_val = (int) (drand48 () * (Number /*-1*/ ));
-  new_tmp = (int) tmp_val % INT_MAX;
-  return new_tmp;
+  return arc4random() % Number;
 }
 
 enum
