@@ -111,85 +111,13 @@
 #include <time.h>
 #include "QSO.h"
 
-//char *A_Or_An (char *);
-//char *Choose (char *Words[], int Number);
+static NSString* Choose(NSString* name);
+static NSString* A_Or_An(NSString* string);
+static BOOL is_vowel(unichar first);
 
-
-
-extern char *Transceiver[];
-extern char *Antenna[];
-extern char *UpFeet[];
-extern char *Weather1[];
-extern char *Weather2[];
-extern char *Power[];
-extern char *Job[];
-extern char *Name[];
-extern char *CallSign[];
-extern char *License[];
-extern char *City[];
-extern char *NewCity[];
-extern char *CityHeights[];
-extern char *New[];
-extern char *Heights[];
-extern char *State[];
-extern NSString* Frqmisc[];
-extern NSString* Callmisc[];
-extern NSString* FrqCallmisc[];
-extern NSString* NumMisc[];
-extern char *Miscellaneous[];
-extern char *RST[];
-
-int NXCVR;
-int NANTENNA;
-int NUPFEET;
-int NWX1;
-int NWX2;
-int NPOWER;
-int NJOB;
-int NNAME;
-int NCALLSIGN;
-int NLICENSE;
-int NCITY;
-int NNEWCITY;
-int NCITYHTS;
-int NNEW;
-int NHEIGHTS;
-int NSTATE;
-int NFRQMISC;
-int NFRQCALLMISC;
-int NCALLMISC;
-int NNUMMISC;
-int NMISC;
-int NRST;
+NSDictionary* gDict = nil;
 
 @implementation QSO
-+(void)load
-{
-  NXCVR = CountStrings (Transceiver);
-  NANTENNA = CountStrings (Antenna);
-  NUPFEET = CountStrings (UpFeet);
-  NPOWER = CountStrings (Power);
-  NRST = CountStrings (RST);
-  NWX1 = CountStrings (Weather1);
-  NWX2 = CountStrings (Weather2);
-  NJOB = CountStrings (Job);
-  NNAME = CountStrings (Name);
-  NSTATE = CountStrings (State);
-  NCITY = CountStrings (City);
-  NCITYHTS = CountStrings (CityHeights);
-  NNEW = CountStrings (New);
-  NHEIGHTS = CountStrings (Heights);
-  NNEWCITY = CountStrings (NewCity);
-  NLICENSE = CountStrings (License);
-  NMISC = CountStrings (Miscellaneous);
-  NCALLSIGN = CountStrings (CallSign);
-  NFRQMISC = CountNSStrings (Frqmisc);
-  NFRQCALLMISC = CountNSStrings (FrqCallmisc);
-  NCALLMISC = CountNSStrings (Callmisc);
-  NNUMMISC = CountNSStrings (NumMisc);
-  srand48 ((long) time (0));
-}
-
 -(id)init
 {
   self = [super init];
@@ -219,7 +147,7 @@ int NRST;
 @implementation QSO (Private)
 -(void)putMisc
 {
-  [_qso appendFormat:@"%s\n", Choose (Miscellaneous, NMISC)];
+  [_qso appendFormat:@"%@\n", Choose(@"Misc")];
 }
 
 -(void)putThanks
@@ -243,7 +171,7 @@ int NRST;
     break;
 
     default:
-    [_qso appendFormat:@"thanks %s for the call.\n", Choose (Name, NNAME)];
+    [_qso appendFormat:@"thanks %@ for the call.\n", Choose(@"Name")];
     break;
   }
 }
@@ -253,19 +181,19 @@ int NRST;
   switch (Roll (6))
   {
     case 2:
-    [_qso appendFormat:@"name is %s.\n", Choose (Name, NNAME)];
+    [_qso appendFormat:@"name is %@.\n", Choose(@"Name")];
     break;
 
     case 4:
-    [_qso appendFormat:@"this is %s.\n", Choose (Name, NNAME)];
+    [_qso appendFormat:@"this is %@.\n", Choose(@"Name")];
     break;
 
     case 5:
-    [_qso appendFormat:@"%s here.\n", Choose (Name, NNAME)];
+    [_qso appendFormat:@"%@ here.\n", Choose(@"Name")];
     break;
 
     default:
-    [_qso appendFormat:@"my name is %s.\n", Choose (Name, NNAME)];
+    [_qso appendFormat:@"my name is %@.\n", Choose(@"Name")];
     break;
   }
 }
@@ -278,25 +206,25 @@ int NRST;
     {
       case 2:
       case 3:
-      [_qso appendFormat:@"my occupation is %s.\n", Choose (Job, NJOB)];
+      [_qso appendFormat:@"my occupation is %@.\n", Choose(@"Job")];
       break;
 
       case 4:
       case 5:
-      [_qso appendFormat:@"i work as %s.\n", A_Or_An (Choose (Job, NJOB))];
+      [_qso appendFormat:@"i work as %@.\n", A_Or_An(Choose(@"Job"))];
       break;
 
       case 6:
-      [_qso appendFormat:@"i was %s, now unemployed.\n", A_Or_An (Choose (Job, NJOB))];
+      [_qso appendFormat:@"i was %@, now unemployed.\n", A_Or_An(Choose(@"Job"))];
       break;
 
       case 11:
       case 12:
-      [_qso appendFormat:@"occupation is %s.\n", Choose (Job, NJOB)];
+      [_qso appendFormat:@"occupation is %@.\n", Choose(@"Job")];
       break;
 
       default:
-      [_qso appendFormat:@"i am %s.\n", A_Or_An (Choose (Job, NJOB))];
+      [_qso appendFormat:@"i am %@.\n", A_Or_An(Choose(@"Job"))];
       break;
     }
   }
@@ -326,48 +254,48 @@ int NRST;
   switch (Roll (13))
   {
     case 1:
-    [_qso appendFormat:@"i have %s class licence.\n",
-      A_Or_An (Choose (License, NLICENSE))];
+    [_qso appendFormat:@"i have %@ class licence.\n",
+      A_Or_An(Choose(@"License"))];
     break;
 
     case 2:
-    [_qso appendFormat:@"i am %s license ham.\n",
-      A_Or_An (Choose (License, NLICENSE))];
+    [_qso appendFormat:@"i am %@ license ham.\n",
+      A_Or_An(Choose(@"License"))];
     break;
 
     case 3:
-    [_qso appendFormat:@"i am %s licence ham.\n",
-      A_Or_An (Choose (License, NLICENSE))];
+    [_qso appendFormat:@"i am %@ licence ham.\n",
+      A_Or_An(Choose(@"License"))];
     break;
 
     case 4:
-    [_qso appendFormat:@"i have been licenced %d year%s as %s class.\n",
-      years, (years==1)? "":"s", Choose (License, NLICENSE)];
+    [_qso appendFormat:@"i have been licenced %d year%s as %@ class.\n",
+      years, (years==1)? "":"s", Choose(@"License")];
     break;
 
     case 5:
-    [_qso appendFormat:@"i have %s class license.\n",
-      A_Or_An (Choose (License, NLICENSE))];
+    [_qso appendFormat:@"i have %@ class license.\n",
+      A_Or_An(Choose(@"License"))];
     break;
 
     case 6:
-    [_qso appendFormat:@"i am %s class ham.\n",
-      A_Or_An (Choose (License, NLICENSE))];
+    [_qso appendFormat:@"i am %@ class ham.\n",
+      A_Or_An(Choose(@"License"))];
     break;
 
     case 7:
-    [_qso appendFormat:@"i have been licensed %d year%s as %s class.\n",
-      years, (years==1)? "":"s", Choose (License, NLICENSE)];
+    [_qso appendFormat:@"i have been licensed %d year%s as %@ class.\n",
+      years, (years==1)? "":"s", Choose(@"License")];
     break;
     
     case 8:
-    [_qso appendFormat:@"just got my %s license.\n",
-      Choose (License, NLICENSE)];
+    [_qso appendFormat:@"just got my %@ license.\n",
+      Choose(@"License")];
     break;
 
     default:
-    [_qso appendFormat:@"i have been %s class ham for %d year%s.\n",
-      A_Or_An (Choose (License, NLICENSE)), years, (years==1)? "":"s"];
+    [_qso appendFormat:@"i have been %@ class ham for %d year%s.\n",
+      A_Or_An(Choose(@"License")), years, (years==1)? "":"s"];
     break;
   }
 }
@@ -382,70 +310,70 @@ int NRST;
   switch (Roll (17))
   {
     case 2:
-    [_qso appendFormat:@"wx is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"wx is %@.\n", Choose(@"Weather1")];
     [self putTemperature];
     break;
 
     case 3:
-    [_qso appendFormat:@"weather here is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"weather here is %@.\n", Choose(@"Weather1")];
     break;
 
     case 4:
-    [_qso appendFormat:@"weather is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"weather is %@.\n", Choose(@"Weather1")];
     break;
 
     case 5:
-    [_qso appendFormat:@"wx is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"wx is %@.\n", Choose(@"Weather1")];
     break;
 
     case 6:
     [self putTemperature];
-    [_qso appendFormat:@"weather here is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"weather here is %@.\n", Choose(@"Weather1")];
     break;
 
     case 7:
     [self putTemperature];
-    [_qso appendFormat:@"weather is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"weather is %@.\n", Choose(@"Weather1")];
     break;
 
     case 8:
     [self putTemperature];
-    [_qso appendFormat:@"wx is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"wx is %@.\n", Choose(@"Weather1")];
     break;
 
     case 9:
-    [_qso appendFormat:@"weather here is %s and temperature is %d.\n",
-      Choose(Weather1, NWX1), Roll (80) + 10];
+    [_qso appendFormat:@"weather here is %@ and temperature is %d.\n",
+      Choose(@"Weather1"), Roll (80) + 10];
     break;
 
     case 10:
-    [_qso appendFormat:@"weather is %s, temperature %d.\n",
-      Choose(Weather1, NWX1), Roll (80) + 10];
+    [_qso appendFormat:@"weather is %@, temperature %d.\n",
+      Choose(@"Weather1"), Roll (80) + 10];
     break;
 
     case 11:
-    [_qso appendFormat:@"wx is %d degrees and %s.\n",
-      Roll(80) + 10, Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"wx is %d degrees and %@.\n",
+      Roll(80) + 10, Choose(@"Weather1")];
     break;
 
     case 12:
-    [_qso appendFormat:@"The wx is %s and the temp is %d degrees.\n",
-      Choose (Weather1, NWX1), Roll (80) + 10];
+    [_qso appendFormat:@"The wx is %@ and the temp is %d degrees.\n",
+      Choose(@"Weather1"), Roll (80) + 10];
     break;
 
     case 14:
-    [_qso appendFormat:@"weather is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"weather is %@.\n", Choose(@"Weather1")];
     [self putTemperature];
     break;
 
     case 15:
-    [_qso appendFormat:@"weather here is %s.\n", Choose (Weather1, NWX1)];
+    [_qso appendFormat:@"weather here is %@.\n", Choose(@"Weather1")];
     [self putTemperature];
     break;
 
     default:
-    [_qso appendFormat:@"wx is %s and %d degrees.\n",
-      Choose (Weather1, NWX1), Roll (80) + 10];
+    [_qso appendFormat:@"wx is %@ and %d degrees.\n",
+      Choose(@"Weather1"), Roll (80) + 10];
   }
 }
 
@@ -454,45 +382,45 @@ int NRST;
   switch (Roll (10))
   {
     case 0:
-    [_qso appendFormat:@"it is %s.\n", Choose (Weather2, NWX2)];
+    [_qso appendFormat:@"it is %@.\n", Choose(@"Weather2")];
     break;
 
     case 1:
-    [_qso appendFormat:@"it is %s and %d degrees.\n",
-      Choose (Weather2, NWX2), Roll (80) + 10];
+    [_qso appendFormat:@"it is %@ and %d degrees.\n",
+      Choose(@"Weather2"), Roll (80) + 10];
     break;
 
     case 2:
-    [_qso appendFormat:@"the WX is %s and the temp is %d degrees.\n",
-      Choose (Weather2, NWX2), Roll (80) + 10];
+    [_qso appendFormat:@"the WX is %@ and the temp is %d degrees.\n",
+      Choose(@"Weather2"), Roll (80) + 10];
     break;
 
     case 3:
-    [_qso appendFormat:@"wx is %s and the temp is %d degrees.\n",
-      Choose (Weather2, NWX2), Roll (80) + 10];
+    [_qso appendFormat:@"wx is %@ and the temp is %d degrees.\n",
+      Choose(@"Weather2"), Roll (80) + 10];
     break;
 
     case 4:
-    [_qso appendFormat:@"it is %s today.\n", Choose (Weather2, NWX2)];
+    [_qso appendFormat:@"it is %@ today.\n", Choose(@"Weather2")];
     break;
 
     case 5:
-    [_qso appendFormat:@"it is %s and %d degrees.\n",
-      Choose (Weather2, NWX2), Roll (100) + 3];
+    [_qso appendFormat:@"it is %@ and %d degrees.\n",
+      Choose(@"Weather2"), Roll (100) + 3];
     break;
 
     case 6:
-    [_qso appendFormat:@"the wx is %s and the temp is %d degrees.\n",
-      Choose (Weather2, NWX2), Roll (90) + 10];
+    [_qso appendFormat:@"the wx is %@ and the temp is %d degrees.\n",
+      Choose(@"Weather2"), Roll (90) + 10];
     break;
 
     case 7:
-    [_qso appendFormat:@"wx is %s and the temp is %d degrees.\n",
-      Choose (Weather2, NWX2), Roll (80) + 10];
+    [_qso appendFormat:@"wx is %@ and the temp is %d degrees.\n",
+      Choose(@"Weather2"), Roll (80) + 10];
     break;
 
     default:
-    [_qso appendFormat:@"it is %s here.\n", Choose (Weather2, NWX2)];
+    [_qso appendFormat:@"it is %@ here.\n", Choose(@"Weather2")];
     break;
   }
 }
@@ -516,19 +444,19 @@ int NRST;
   switch (Roll (6))
   {
     case 4:
-    [_qso appendFormat:@"%s %s, ",
-      Choose (CityHeights, NCITYHTS), Choose (Heights, NHEIGHTS)];
+    [_qso appendFormat:@"%@ %@, ",
+      Choose(@"Cityh"), Choose(@"Heights")];
     break;
 
     case 5:
-    [_qso appendFormat:@"%s %s, ", Choose (New, NNEW), Choose (NewCity, NNEWCITY)];
+    [_qso appendFormat:@"%@ %@, ", Choose(@"New"), Choose(@"Newcity")];
     break;
 
     default:
-    [_qso appendFormat:@"%s, ", Choose (City, NCITY)];
+    [_qso appendFormat:@"%@, ", Choose(@"City")];
     break;
   }
-  [_qso appendFormat:@"%s.\n", Choose (State, NSTATE)];
+  [_qso appendFormat:@"%@.\n", Choose(@"State")];
 }
 
 -(void)putLocation
@@ -557,130 +485,130 @@ int NRST;
   {
     case 0:
     case 1:
-    [_qso appendFormat:@"my rig runs %s watts into %s up %s feet.\n",
-      Choose (Power, NPOWER), A_Or_An (Choose (Antenna, NANTENNA)),
-      Choose (UpFeet, NUPFEET)];
+    [_qso appendFormat:@"my rig runs %@ watts into %@ up %@ feet.\n",
+      Choose(@"Power"), A_Or_An(Choose(@"Antenna")),
+      Choose(@"Upfeet")];
     break;
 
     case 2:
     case 3:
-    [_qso appendFormat:@"rig is a %s watt %s and antenna is %s.\n",
-      Choose (Power, NPOWER), Choose (Transceiver, NXCVR),
-      A_Or_An (Choose (Antenna, NANTENNA))];
+    [_qso appendFormat:@"rig is a %@ watt %@ and antenna is %@.\n",
+      Choose(@"Power"), Choose(@"Rig"),
+      A_Or_An(Choose(@"Antenna"))];
     break;
 
     case 4:
     case 5:
-    [_qso appendFormat:@"my transceiver is %s.\n", A_Or_An (Choose (Transceiver, NXCVR))];
-    [_qso appendFormat:@"it runs %s watts into %s.\n",
-      Choose (Power, NPOWER), A_Or_An (Choose (Antenna, NANTENNA))];
+    [_qso appendFormat:@"my transceiver is %@.\n", A_Or_An(Choose(@"Rig"))];
+    [_qso appendFormat:@"it runs %@ watts into %@.\n",
+      Choose(@"Power"), A_Or_An(Choose(@"Antenna"))];
     break;
 
     case 6:
     case 7:
-    [_qso appendFormat:@"the rig is %s running %s watts.\n",
-      A_Or_An (Choose (Transceiver, NXCVR)), Choose (Power, NPOWER)];
-    [_qso appendFormat:@"antenna is %s up %s m.\n",
-      A_Or_An (Choose (Antenna, NANTENNA)), Choose (UpFeet, NUPFEET)];
+    [_qso appendFormat:@"the rig is %@ running %@ watts.\n",
+      A_Or_An(Choose(@"Rig")), Choose(@"Power")];
+    [_qso appendFormat:@"antenna is %@ up %@ m.\n",
+      A_Or_An(Choose(@"Antenna")), Choose(@"Upfeet")];
     break;
 
     case 8:
     case 9:
     case 10:
     case 11:
-    [_qso appendFormat:@"my rig runs %s watts into %s up %s meters.\n",
-      Choose (Power, NPOWER), A_Or_An (Choose (Antenna, NANTENNA)),
-      Choose (UpFeet, NUPFEET)];
+    [_qso appendFormat:@"my rig runs %@ watts into %@ up %@ meters.\n",
+      Choose(@"Power"), A_Or_An(Choose(@"Antenna")),
+      Choose(@"Upfeet")];
     break;
 
     case 12:
-    [_qso appendFormat:@"my rig runs %s watts into %s up %s feet, but\nthe antenna has partly fallen.\n",
-      Choose (Power, NPOWER), A_Or_An (Choose (Antenna, NANTENNA)),
-      Choose (UpFeet, NUPFEET)];
+    [_qso appendFormat:@"my rig runs %@ watts into %@ up %@ feet, but the antenna has partly fallen.\n",
+      Choose(@"Power"), A_Or_An(Choose(@"Antenna")),
+      Choose(@"Upfeet")];
     break;
 
     case 13:
-    [_qso appendFormat:@"rig is %s running %s watts into %s up %s ft.\n",
-      A_Or_An (Choose (Transceiver, NXCVR)), Choose (Power, NPOWER),
-      A_Or_An (Choose (Antenna, NANTENNA)), Choose (UpFeet, NUPFEET)];
+    [_qso appendFormat:@"rig is %@ running %@ watts ",
+      A_Or_An(Choose(@"Rig")), Choose(@"Power")];
+    [_qso appendFormat:@"into %@ up %@ ft.\n",
+      A_Or_An(Choose(@"Antenna")), Choose(@"Upfeet")];
     break;
 
     case 14:
-    [_qso appendFormat:@"my rig runs %s watts into %s up %s feet.\n",
-      Choose (Power, NPOWER), A_Or_An (Choose (Antenna, NANTENNA)),
-      Choose (UpFeet, NUPFEET)];
+    [_qso appendFormat:@"my rig runs %@ watts into %@ up %@ feet.\n",
+      Choose(@"Power"), A_Or_An(Choose(@"Antenna")),
+      Choose(@"Upfeet")];
     break;
 
     case 15:
-    [_qso appendFormat:@"rig is %s watt %s and antenna is %s.\n",
-      A_Or_An(Choose(Power, NPOWER)),
-      Choose(Transceiver, NXCVR),
-      Choose(Antenna, NANTENNA)];
+    [_qso appendFormat:@"rig is %@ watt %@ and antenna is %@.\n",
+      A_Or_An(Choose(@"Power")),
+      Choose(@"Rig"),
+      Choose(@"Antenna")];
     break;
 
     case 16:
-    [_qso appendFormat:@"my transceiver is %s.\n",
-      A_Or_An(Choose (Transceiver, NXCVR))];
-    [_qso appendFormat:@"it runs %s watts into %s.\n",
-      Choose(Power, NPOWER),
-      A_Or_An(Choose (Antenna, NANTENNA))];
+    [_qso appendFormat:@"my transceiver is %@.\n",
+      A_Or_An(Choose(@"Rig"))];
+    [_qso appendFormat:@"it runs %@ watts into %@.\n",
+      Choose(@"Power"),
+      A_Or_An(Choose(@"Antenna"))];
     break;
 
     case 17:
-    [_qso appendFormat:@"the rig is %s running %s watts.\n",
-      A_Or_An(Choose (Transceiver, NXCVR)),
-      Choose(Power, NPOWER)];
-    [_qso appendFormat:@"antenna is %s up %s feet.\n",
-      A_Or_An(Choose (Antenna, NANTENNA)),
-      Choose(UpFeet, NUPFEET)];
+    [_qso appendFormat:@"the rig is %@ running %@ watts.\n",
+      A_Or_An(Choose(@"Rig")),
+      Choose(@"Power")];
+    [_qso appendFormat:@"antenna is %@ up %@ feet.\n",
+      A_Or_An(Choose(@"Antenna")),
+      Choose(@"Upfeet")];
     break;
 
     default:
-    [_qso appendFormat:@"rig is %s ", A_Or_An(Choose(Transceiver, NXCVR))];
-    [_qso appendFormat:@"running %s watts into %s up %s feet.\n",
-      Choose (Power, NPOWER),
-      A_Or_An (Choose (Antenna, NANTENNA)),
-      Choose (UpFeet, NUPFEET)];
+    [_qso appendFormat:@"rig is %@ ", A_Or_An(Choose(@"Rig"))];
+    [_qso appendFormat:@"running %@ watts into %@ up %@ feet.\n",
+      Choose(@"Power"),
+      A_Or_An(Choose(@"Antenna")),
+      Choose(@"Upfeet")];
     break;
   }
 }
 
 -(void)putRST
 {
-  register char *TheRST = Choose(RST, NRST);
-
+  NSString* rst = Choose(@"RST");
   switch (Roll (8))
   {
     case 0:
-    [_qso appendFormat:@"ur rst %s=%s.\n", TheRST, TheRST];
+    [_qso appendFormat:@"ur rst %@=%@.\n", rst, rst];
     break;
 
     case 1:
-    [_qso appendFormat:@"rst is %s=%s.\n", TheRST, TheRST];
+    [_qso appendFormat:@"rst is %@=%@.\n", rst, rst];
     break;
 
     case 2:
-    [_qso appendFormat:@"rst %s=%s.\n", TheRST, TheRST];
+    [_qso appendFormat:@"rst %@=%@.\n", rst, rst];
     break;
 
     case 3:
-    [_qso appendFormat:@"your rst %s=%s.\n", TheRST, TheRST];
+    [_qso appendFormat:@"your rst %@=%@.\n", rst, rst];
     break;
 
     case 4:
-    [_qso appendFormat:@"your RST is %s=%s.\n", TheRST, TheRST];
+    [_qso appendFormat:@"your RST is %@=%@.\n", rst, rst];
     break;
 
     case 5:
-    [_qso appendFormat:@"your signal is rst %s/%s.\n", TheRST, TheRST];
+    [_qso appendFormat:@"your signal is rst %@/%@.\n", rst, rst];
     break;
 
     case 6:
-    [_qso appendFormat:@"ur signal is rst %s,%s.\n", TheRST, TheRST];
+    [_qso appendFormat:@"ur signal is rst %@,%@.\n", rst, rst];
     break;
 
     default:
-    [_qso appendFormat:@"your rst is %s/%s.\n", TheRST, TheRST];
+    [_qso appendFormat:@"your rst is %@/%@.\n", rst, rst];
     break;
   }
 }
@@ -691,20 +619,19 @@ int NRST;
   switch (Roll (8))
   {
     case 2:
-    [_qso appendFormat:Frqmisc[Roll (NFRQMISC)], make_freq()];
+    [_qso appendFormat:Choose(@"Frqmisc"), make_freq()];
     break;
 
     case 3:
-    [_qso appendFormat:Callmisc[Roll (NFRQMISC)], Choose(CallSign, NCALLSIGN)];
+    [_qso appendFormat:Choose(@"Callmisc"), Choose(@"Call")];
     break;
 
     case 4:
-    [_qso appendFormat:FrqCallmisc[Roll (NFRQCALLMISC)], Choose(CallSign, NCALLSIGN), make_freq()];
+    [_qso appendFormat:Choose(@"Frqcallmisc"), Choose(@"Call"), make_freq()];
     break;
 
     case 5:
-    [_qso appendFormat:NumMisc[Roll (NNUMMISC)],
-      Roll (3) + Roll (2) + 1];
+    [_qso appendFormat:Choose(@"Nummisc"), Roll(3) + Roll(2) + 1];
     break;
 
     default:
@@ -715,14 +642,14 @@ int NRST;
 
 -(void)putFirstCallsign
 {
-  _sender = Choose(CallSign, NCALLSIGN);
-  _receiver = Choose(CallSign, NCALLSIGN);
-  [_qso appendFormat:@"%s de %s\n", _receiver, _sender];
+  _sender = Choose(@"Call");
+  _receiver = Choose(@"Call");
+  [_qso appendFormat:@"%@ de %@\n", _receiver, _sender];
 }
 
 -(void)putLastCallsign
 {
-  [_qso appendFormat:@"%s de %s", _receiver, _sender];
+  [_qso appendFormat:@"%@ de %@", _receiver, _sender];
 }
 
 -(int)licenseSeed
@@ -731,6 +658,107 @@ int NRST;
   if (_age < 10) return 10;
   return _age - 8;
 }
-
 @end
+
+static NSString* Choose(NSString* name)
+{
+  if (!gDict)
+  {
+    NSString* path = [[NSBundle mainBundle] pathForResource:@"QSO" ofType:@"plist"];
+    gDict = [[NSDictionary alloc] initWithContentsOfFile:path];
+  }
+  NSArray* a = [gDict objectForKey:name];
+  if (!a) NSLog(@"No array for %@", name);
+  return [a objectAtIndex:Roll([a count])];
+}
+
+static NSString* A_Or_An(NSString* string)
+{
+  return [NSString stringWithFormat:@"%s %@",
+         (is_vowel([string characterAtIndex:0]))? "an":"a", string];
+}
+
+static BOOL is_vowel(unichar first)
+{
+  return (
+  first == 'A' ||
+  first == 'E' ||
+  first == 'I' ||
+  first == 'O' ||
+  first == 'U' ||
+  first == 'a' ||
+  first == 'e' ||
+  first == 'i' ||
+  first == 'o' ||
+  first == 'u'
+  );
+}
+
+#import "QSO.h"
+
+int Roll(int Number)
+{
+  int new_tmp;
+  double tmp_val;
+  //double drand48 ();
+  tmp_val = (int) (drand48 () * (Number /*-1*/ ));
+  new_tmp = (int) tmp_val % INT_MAX;
+  return new_tmp;
+}
+
+enum
+{
+  M160,
+  M80,
+  M40,
+  M30,
+  M20,
+  M17,
+  M15,
+  M12,
+  M10,
+  M6,
+  NUM_BAND
+};
+
+int make_freq(void)
+{
+  switch (Roll(NUM_BAND))
+  {
+    case M160:
+    return (1800 + Roll(100));
+    break;
+    case M80:
+    return (3500 + Roll(100));
+    break;
+    case M40:
+    return (7000 + Roll(125));
+    break;
+    case M30:
+    return (10100 + Roll(50));
+    break;
+    case M20:
+    return (14000 + Roll(150));
+    break;
+    case M17:
+    return (18068 + Roll(42));
+    break;
+    case M15:
+    return (21000 + Roll(200));
+    break;
+    case M12:
+    return (24890 + Roll(40));
+    break;
+    case M10:
+    return (28000 + Roll(300));
+    break;
+    case M6:
+    return (50000 + Roll(100));
+    break;
+    default:
+    return (7000 + Roll(125));
+    break;
+  }
+}
+
 

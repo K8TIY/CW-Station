@@ -4,8 +4,8 @@
 {
   NSMutableString* _qso;
   int _age; /* PERSON'S AGE, SO THEY AREN'T LICENSED MORE THAN THEIR AGE */
-  char* _receiver;
-  char* _sender;
+  NSString* _receiver;
+  NSString* _sender;
 }
 -(NSString*)QSO;
 @end
@@ -41,10 +41,8 @@
 -(void)PutQSO;
 @end
 
-char* A_Or_An (char* string);
+
 int make_freq(void);
-int CountStrings(char* StringVector[]);
-int CountNSStrings(NSString* StringVector[]);
-int Roll (int Number);
-char* Choose (char *Words[], int Number);
+int Roll(int Number);
+
 
