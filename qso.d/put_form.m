@@ -3,63 +3,63 @@
 @implementation QSO (Form)
 -(void)putForm0
 {
-    [self putRST];
-    [self putName];
-    [self putLocation];
-    [self putMisc];
-    [self putRig];
-    [self putWeather];
-    [self putJob];
-    [self putAge];
-    [self putMisc];
-    [self putQFreq];
-    [self putLicense];
+  [self putRST];
+  [self putName];
+  [self putLocation];
+  [self putMisc];
+  [self putRig];
+  [self putWeather];
+  [self putJob];
+  [self putAge];
+  [self putMisc];
+  [self putQFreq];
+  [self putLicense];
 }
 
 -(void)putForm1
 {
-    [self putLocation];
-    [self putRST];
-    [self putRig];
-    [self putWeather];
-    [self putMisc];
-    [self putName];
-    [self putLicense];
-    [self putMisc];
-    [self putQFreq];
-    [self putAge];
-    [self putJob];
+  [self putLocation];
+  [self putRST];
+  [self putRig];
+  [self putWeather];
+  [self putMisc];
+  [self putName];
+  [self putLicense];
+  [self putMisc];
+  [self putQFreq];
+  [self putAge];
+  [self putJob];
 }
 
 -(void)putForm2
 {
-    [self putThanks];
-    [self putRST];
-    [self putName];
-    [self putWeather];
-    [self putLocation];
-    [self putJob];
-    [self putLicense];
-    [self putRig];
-    [self putAge];
-    [self putQFreq];
+  [self putThanks];
+  [self putRST];
+  [self putName];
+  [self putWeather];
+  [self putLocation];
+  [self putJob];
+  [self putLicense];
+  [self putRig];
+  [self putAge];
+  [self putQFreq];
 }
 
 -(void)putForm3
 {
-    [self putLocation];
-    [self putRST];
-    [self putRig];
-    [self putMisc];
-    [self putName];
-    [self putMisc];
-    [self putAge];
-    [self putJob];
-    [self putLicense];
-    [self putMisc];
-    [self putWeather];
-    [self putMisc];
-    [self putQFreq];
+  [self putLocation];
+  [self putRST];
+  [self putRig];
+  [self putMisc];
+  [self putName];
+  [self putMisc];
+  [self putAge];
+  [self putJob];
+  [self putLicense];
+  [self putMisc];
+  [self putWeather];
+  [self putMisc];
+  [self putQFreq];
 }
 
 -(void)putForm4
@@ -80,24 +80,26 @@
 
 -(void)putForm5
 {
-    [self putLocation];
-    [self putRST];
-    [self putRig];
-    [self putName];
-    [self putJob];
-    [self putAge];
-    [self putMisc];
-    [self putLicense];
-    [self putWeather];
-    [self putMisc];
-    [self putQFreq];
+  [self putLocation];
+  [self putRST];
+  [self putRig];
+  [self putName];
+  [self putJob];
+  [self putAge];
+  [self putMisc];
+  [self putLicense];
+  [self putWeather];
+  [self putMisc];
+  [self putQFreq];
 }
 
 -(void)PutQSO
 {
     
   [self putFirstCallsign];
-  switch (Roll (6))
+  unsigned roll = Roll(6);
+  //[_qso appendFormat:@"Roll %d\n", roll];
+  switch (roll)
   {
     case 0:
     [self putForm0];
