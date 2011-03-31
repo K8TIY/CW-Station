@@ -67,9 +67,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   [super dealloc];
 }
 
--(NSString*)randomStringOfLength:(NSUInteger)length
+-(NSString*)randomStringOfLength:(unsigned)length
 {
-  NSArray* a = [offsets objectForKey:[NSNumber numberWithUnsignedInt:(unsigned)length]];
+  NSArray* a = [offsets objectForKey:[NSNumber numberWithUnsignedInt:length]];
   //NSLog(@"Array 0x%8X of %d items from length %d", a, [a count], length);
   NSString* str = [[self getEntryAtOffset:[a objectAtIndex:arc4random() % [a count]]] uppercaseString];
   return str;

@@ -9,8 +9,6 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 @end
 
 @implementation BigLetterView
-@synthesize canBecomeFirstResponder;
-@synthesize prosignFormat;
 -(id)initWithFrame:(NSRect)rect
 {
   if (![super initWithFrame:rect]) return nil;
@@ -50,7 +48,7 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
   return bgColor;
 }
 
--(void)setString:(NSMutableString*)s
+-(void)setString:(NSString*)s
 {
   if (nil == s) s = @"";
   [string setString:s];
@@ -60,7 +58,16 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 -(NSString*)string { return string; }
 -(BOOL)isOpaque { return YES; }
 -(BOOL)acceptsFirstResponder { return canBecomeFirstResponder; }
--(BOOL)becomeFirstResponder { return YES; }
+-(BOOL)becomeFirstResponder { return canBecomeFirstResponder; }
+-(void)setCanBecomeFirstResponder:(BOOL)flag { canBecomeFirstResponder = flag; }
+-(void)setBGColor:(NSColor*)col
+{
+  col = [col retain];
+  if (bgColor) [bgColor release];
+  bgColor = col;
+  [self setNeedsDisplay:YES];
+}
+-(void)setFormatProsign:(BOOL)flag { formatProsign = flag; }
 
 -(void)keyDown:(NSEvent*)event
 {
@@ -103,9 +110,9 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
   if ([string length])
   {
     NSString* toDraw = string;
-    if (prosignFormat) toDraw = [Morse formatString:string];
+    if (formatProsign) toDraw = [Morse formatString:string];
     //NSLog(@"%@ from %@", string, strings);
-    //CGFloat descent = [[attributes objectForKey:NSFontAttributeName] descender];
+    //float descent = [[attributes objectForKey:NSFontAttributeName] descender];
     NSSize strSize = [toDraw sizeWithAttributes:attributes];
     //NSLog(@"str height %f, rect height %f", strSize.height, r.size.height);
     NSPoint strOrigin;

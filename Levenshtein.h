@@ -5,10 +5,10 @@
   NSString*  _s1;
   NSString*  _s2;
   void*      _d;
-  NSUInteger _distance;
+  unsigned   _distance;
 }
 -(id)initWithString:(NSString*)string1 andString:(NSString*)string2;
--(NSUInteger)distance;
+-(unsigned)distance;
 -(NSArray*)alignmentWithPlaceholder:(NSString*)p;
 @end
 

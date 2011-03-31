@@ -4,5 +4,5 @@
 {
   NSMutableDictionary* offsets; // NSNumber (number of words) -> NSArray of NSNumber (offset in file)
 }
--(NSString*)randomStringOfLength:(NSUInteger)length;
+-(NSString*)randomStringOfLength:(unsigned)length;
 @end

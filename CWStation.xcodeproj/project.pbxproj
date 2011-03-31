@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,7 +15,7 @@
 		32264F92131EC7A8006D4698 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 32264F8A131EC7A8006D4698 /* Credits.rtf */; };
 		32264F93131EC7A8006D4698 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 32264F8D131EC7A8006D4698 /* Localizable.strings */; };
 		322B68A81339296600632232 /* LED.h in Headers */ = {isa = PBXBuildFile; fileRef = 322B68A61339296600632232 /* LED.h */; };
-		322B68A91339296600632232 /* LED.c in Sources */ = {isa = PBXBuildFile; fileRef = 322B68A71339296600632232 /* LED.c */; };
+		322B68A91339296600632232 /* LED.m in Sources */ = {isa = PBXBuildFile; fileRef = 322B68A71339296600632232 /* LED.m */; };
 		322E274F11E4DE8400B9241E /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 322E274E11E4DE8400B9241E /* defaults.plist */; };
 		322E284511E4FC5000B9241E /* repeat_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = 322E284311E4FC5000B9241E /* repeat_embedded.png */; };
 		322E284611E4FC5000B9241E /* repeat_embedded_graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 322E284411E4FC5000B9241E /* repeat_embedded_graphite.png */; };
@@ -32,23 +32,10 @@
 		3237A417131D91CC00824AD4 /* Onizuka.h in Headers */ = {isa = PBXBuildFile; fileRef = 3237A411131D91CC00824AD4 /* Onizuka.h */; };
 		3237A418131D91CC00824AD4 /* Onizuka.m in Sources */ = {isa = PBXBuildFile; fileRef = 3237A412131D91CC00824AD4 /* Onizuka.m */; };
 		3237A419131D91CC00824AD4 /* Onizuka.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3237A414131D91CC00824AD4 /* Onizuka.strings */; };
-		324305CD13256B3A00A01CFC /* antenna.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305BB13256B3A00A01CFC /* antenna.h */; };
-		324305CE13256B3A00A01CFC /* callsign.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305BC13256B3A00A01CFC /* callsign.h */; };
-		324305CF13256B3A00A01CFC /* city.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305BD13256B3A00A01CFC /* city.h */; };
-		324305D013256B3A00A01CFC /* cityh.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305BE13256B3A00A01CFC /* cityh.h */; };
-		324305D113256B3A00A01CFC /* grammar.c in Sources */ = {isa = PBXBuildFile; fileRef = 324305BF13256B3A00A01CFC /* grammar.c */; };
-		324305D213256B3A00A01CFC /* heights.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C013256B3A00A01CFC /* heights.h */; };
-		324305D313256B3A00A01CFC /* init_str.m in Sources */ = {isa = PBXBuildFile; fileRef = 324305C113256B3A00A01CFC /* init_str.m */; };
-		324305D413256B3A00A01CFC /* jobs.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C213256B3A00A01CFC /* jobs.h */; };
-		324305D613256B3A00A01CFC /* misc.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C413256B3A00A01CFC /* misc.h */; };
-		324305D713256B3A00A01CFC /* names.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C513256B3A00A01CFC /* names.h */; };
-		324305D813256B3A00A01CFC /* newcity.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305C613256B3A00A01CFC /* newcity.h */; };
 		324305D913256B3A00A01CFC /* put_form.m in Sources */ = {isa = PBXBuildFile; fileRef = 324305C713256B3A00A01CFC /* put_form.m */; };
 		324305DB13256B3A00A01CFC /* QSO.m in Sources */ = {isa = PBXBuildFile; fileRef = 324305C913256B3A00A01CFC /* QSO.m */; };
-		324305DC13256B3A00A01CFC /* rig.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305CA13256B3A00A01CFC /* rig.h */; };
-		324305DD13256B3A00A01CFC /* util.m in Sources */ = {isa = PBXBuildFile; fileRef = 324305CB13256B3A00A01CFC /* util.m */; };
-		324305DE13256B3A00A01CFC /* weather.h in Headers */ = {isa = PBXBuildFile; fileRef = 324305CC13256B3A00A01CFC /* weather.h */; };
 		3243060613256DD300A01CFC /* QSO.h in Headers */ = {isa = PBXBuildFile; fileRef = 3243060513256DD300A01CFC /* QSO.h */; };
+		32442D141342A02F00DAFDF1 /* QSO.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32442D131342A02F00DAFDF1 /* QSO.plist */; };
 		32560641121C410700656629 /* Wordlist.h in Headers */ = {isa = PBXBuildFile; fileRef = 3256063F121C410700656629 /* Wordlist.h */; };
 		32560642121C410700656629 /* Wordlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 32560640121C410700656629 /* Wordlist.m */; };
 		325B407111DAA44D00F39F0D /* Morse.h in Headers */ = {isa = PBXBuildFile; fileRef = 325B406F11DAA44D00F39F0D /* Morse.h */; };
@@ -115,7 +102,7 @@
 		32264F90131EC7A8006D4698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		32264F91131EC7A8006D4698 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		322B68A61339296600632232 /* LED.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LED.h; sourceTree = "<group>"; };
-		322B68A71339296600632232 /* LED.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LED.c; sourceTree = "<group>"; };
+		322B68A71339296600632232 /* LED.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 4; path = LED.m; sourceTree = "<group>"; };
 		322E274E11E4DE8400B9241E /* defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = "<group>"; };
 		322E284311E4FC5000B9241E /* repeat_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_embedded.png; sourceTree = "<group>"; };
 		322E284411E4FC5000B9241E /* repeat_embedded_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_embedded_graphite.png; sourceTree = "<group>"; };
@@ -132,23 +119,10 @@
 		3237A412131D91CC00824AD4 /* Onizuka.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Onizuka.m; path = ../Onizuka/Onizuka.m; sourceTree = SOURCE_ROOT; };
 		3237A415131D91CC00824AD4 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Onizuka.strings; sourceTree = "<group>"; };
 		3237A416131D91CC00824AD4 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Onizuka.strings; sourceTree = "<group>"; };
-		324305BB13256B3A00A01CFC /* antenna.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antenna.h; sourceTree = "<group>"; };
-		324305BC13256B3A00A01CFC /* callsign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = callsign.h; sourceTree = "<group>"; };
-		324305BD13256B3A00A01CFC /* city.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = city.h; sourceTree = "<group>"; };
-		324305BE13256B3A00A01CFC /* cityh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cityh.h; sourceTree = "<group>"; };
-		324305BF13256B3A00A01CFC /* grammar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = grammar.c; sourceTree = "<group>"; };
-		324305C013256B3A00A01CFC /* heights.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = heights.h; sourceTree = "<group>"; };
-		324305C113256B3A00A01CFC /* init_str.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = init_str.m; sourceTree = "<group>"; };
-		324305C213256B3A00A01CFC /* jobs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jobs.h; sourceTree = "<group>"; };
-		324305C413256B3A00A01CFC /* misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = misc.h; sourceTree = "<group>"; };
-		324305C513256B3A00A01CFC /* names.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = names.h; sourceTree = "<group>"; };
-		324305C613256B3A00A01CFC /* newcity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = newcity.h; sourceTree = "<group>"; };
 		324305C713256B3A00A01CFC /* put_form.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = put_form.m; sourceTree = "<group>"; };
 		324305C913256B3A00A01CFC /* QSO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSO.m; sourceTree = "<group>"; };
-		324305CA13256B3A00A01CFC /* rig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rig.h; sourceTree = "<group>"; };
-		324305CB13256B3A00A01CFC /* util.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = util.m; sourceTree = "<group>"; };
-		324305CC13256B3A00A01CFC /* weather.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = weather.h; sourceTree = "<group>"; };
 		3243060513256DD300A01CFC /* QSO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSO.h; sourceTree = "<group>"; };
+		32442D131342A02F00DAFDF1 /* QSO.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = QSO.plist; sourceTree = "<group>"; };
 		3256063F121C410700656629 /* Wordlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wordlist.h; sourceTree = "<group>"; };
 		32560640121C410700656629 /* Wordlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wordlist.m; sourceTree = "<group>"; };
 		325B406F11DAA44D00F39F0D /* Morse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Morse.h; sourceTree = "<group>"; };
@@ -230,7 +204,7 @@
 			isa = PBXGroup;
 			children = (
 				322B68A61339296600632232 /* LED.h */,
-				322B68A71339296600632232 /* LED.c */,
+				322B68A71339296600632232 /* LED.m */,
 				325B406F11DAA44D00F39F0D /* Morse.h */,
 				325B407011DAA44D00F39F0D /* Morse.m */,
 				1F64E20B00996E677F000001 /* MorseRenderer.h */,
@@ -310,23 +284,10 @@
 		324305BA13256B3A00A01CFC /* qso.d */ = {
 			isa = PBXGroup;
 			children = (
-				324305BB13256B3A00A01CFC /* antenna.h */,
-				324305BC13256B3A00A01CFC /* callsign.h */,
-				324305BD13256B3A00A01CFC /* city.h */,
-				324305BE13256B3A00A01CFC /* cityh.h */,
-				324305BF13256B3A00A01CFC /* grammar.c */,
-				324305C013256B3A00A01CFC /* heights.h */,
-				324305C113256B3A00A01CFC /* init_str.m */,
-				324305C213256B3A00A01CFC /* jobs.h */,
-				324305C413256B3A00A01CFC /* misc.h */,
-				324305C513256B3A00A01CFC /* names.h */,
-				324305C613256B3A00A01CFC /* newcity.h */,
+				32442D131342A02F00DAFDF1 /* QSO.plist */,
 				324305C713256B3A00A01CFC /* put_form.m */,
 				3243060513256DD300A01CFC /* QSO.h */,
 				324305C913256B3A00A01CFC /* QSO.m */,
-				324305CA13256B3A00A01CFC /* rig.h */,
-				324305CB13256B3A00A01CFC /* util.m */,
-				324305CC13256B3A00A01CFC /* weather.h */,
 			);
 			path = qso.d;
 			sourceTree = "<group>";
@@ -345,17 +306,6 @@
 				32560641121C410700656629 /* Wordlist.h in Headers */,
 				3292CEDD123ECE5E009B0B9C /* Levenshtein.h in Headers */,
 				3237A417131D91CC00824AD4 /* Onizuka.h in Headers */,
-				324305CD13256B3A00A01CFC /* antenna.h in Headers */,
-				324305CE13256B3A00A01CFC /* callsign.h in Headers */,
-				324305CF13256B3A00A01CFC /* city.h in Headers */,
-				324305D013256B3A00A01CFC /* cityh.h in Headers */,
-				324305D213256B3A00A01CFC /* heights.h in Headers */,
-				324305D413256B3A00A01CFC /* jobs.h in Headers */,
-				324305D613256B3A00A01CFC /* misc.h in Headers */,
-				324305D713256B3A00A01CFC /* names.h in Headers */,
-				324305D813256B3A00A01CFC /* newcity.h in Headers */,
-				324305DC13256B3A00A01CFC /* rig.h in Headers */,
-				324305DE13256B3A00A01CFC /* weather.h in Headers */,
 				3243060613256DD300A01CFC /* QSO.h in Headers */,
 				322B68A81339296600632232 /* LED.h in Headers */,
 			);
@@ -407,7 +357,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "CWStation" */;
-			compatibilityVersion = "Xcode 3.0";
+			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				English,
@@ -449,6 +399,7 @@
 				3237A419131D91CC00824AD4 /* Onizuka.strings in Resources */,
 				32264F92131EC7A8006D4698 /* Credits.rtf in Resources */,
 				32264F93131EC7A8006D4698 /* Localizable.strings in Resources */,
+				32442D141342A02F00DAFDF1 /* QSO.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,12 +426,9 @@
 				32560642121C410700656629 /* Wordlist.m in Sources */,
 				3292CEDE123ECE5E009B0B9C /* Levenshtein.m in Sources */,
 				3237A418131D91CC00824AD4 /* Onizuka.m in Sources */,
-				324305D113256B3A00A01CFC /* grammar.c in Sources */,
-				324305D313256B3A00A01CFC /* init_str.m in Sources */,
 				324305D913256B3A00A01CFC /* put_form.m in Sources */,
 				324305DB13256B3A00A01CFC /* QSO.m in Sources */,
-				324305DD13256B3A00A01CFC /* util.m in Sources */,
-				322B68A91339296600632232 /* LED.c in Sources */,
+				322B68A91339296600632232 /* LED.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,18 +477,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					i386,
-					x86_64,
-					ppc,
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/bin;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -555,12 +500,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_VERSION = "";
 				INSTALL_PATH = /usr/local/bin;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -571,24 +518,6 @@
 				ZERO_LINK = NO;
 			};
 			name = Release;
-		};
-		32190E6F1222C75E008B4E80 /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Carbon,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = mktrusted;
-			};
-			name = Default;
 		};
 		A6E430BF0C5184DE00BA6C4B /* Development */ = {
 			isa = XCBuildConfiguration;
@@ -604,6 +533,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "CWStation-Info.plist";
@@ -612,7 +542,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "CW Station";
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx10.5;
 				SECTORDER_FLAGS = "";
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 				WARNING_CFLAGS = (
@@ -637,6 +567,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "CWStation-Info.plist";
@@ -645,7 +576,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "CW Station";
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx10.5;
 				SECTORDER_FLAGS = "";
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 				WARNING_CFLAGS = (
@@ -657,37 +588,6 @@
 				ZERO_LINK = NO;
 			};
 			name = Release;
-		};
-		A6E430C10C5184DE00BA6C4B /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-					x86_64,
-				);
-				FRAMEWORK_SEARCH_PATHS = "";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "CWStation-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "CW Station";
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				SECTORDER_FLAGS = "";
-				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
-			};
-			name = Default;
 		};
 		A6E430C70C5184DE00BA6C4B /* Development */ = {
 			isa = XCBuildConfiguration;
@@ -703,7 +603,7 @@
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx10.4;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 			};
 			name = Development;
@@ -722,26 +622,10 @@
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = macosx10.4;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 			};
 			name = Release;
-		};
-		A6E430C90C5184DE00BA6C4B /* Default */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
-				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
-			};
-			name = Default;
 		};
 /* End XCBuildConfiguration section */
 
@@ -751,30 +635,27 @@
 			buildConfigurations = (
 				32190E6D1222C75E008B4E80 /* Development */,
 				32190E6E1222C75E008B4E80 /* Release */,
-				32190E6F1222C75E008B4E80 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
+			defaultConfigurationName = Development;
 		};
 		A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "CW Station" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A6E430BF0C5184DE00BA6C4B /* Development */,
 				A6E430C00C5184DE00BA6C4B /* Release */,
-				A6E430C10C5184DE00BA6C4B /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
+			defaultConfigurationName = Development;
 		};
 		A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "CWStation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A6E430C70C5184DE00BA6C4B /* Development */,
 				A6E430C80C5184DE00BA6C4B /* Release */,
-				A6E430C90C5184DE00BA6C4B /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Default;
+			defaultConfigurationName = Development;
 		};
 /* End XCConfigurationList section */
 	};

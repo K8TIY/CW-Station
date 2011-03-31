@@ -15,19 +15,19 @@ extern uint8_t  MorseInterwordUnits;
 
 typedef struct
 {
-  CGFloat intercharacterMilliseconds;
-  CGFloat interwordMilliseconds;
+  float intercharacterMilliseconds;
+  float interwordMilliseconds;
 } MorseSpacing;
 
 @interface Morse : NSObject
 {}
-+(CGFloat)millisecondsPerUnitAtWPM:(CGFloat)wpm;
-+(CGFloat)WPMPerUnitMilliseconds:(CGFloat)time;
-+(MorseSpacing)spacingForWPM:(CGFloat)wpm CWPM:(CGFloat)cwpm;
++(float)millisecondsPerUnitAtWPM:(float)wpm;
++(float)WPMPerUnitMilliseconds:(float)time;
++(MorseSpacing)spacingForWPM:(float)wpm CWPM:(float)cwpm;
 +(NSDictionary*)dictionary;
 +(NSDictionary*)reverseDictionary;
 +(NSString*)stringFromMorse:(uint16_t)morse;
-+(uint16_t*)morseFromString:(NSString*)string length:(NSUInteger*)outLength offsets:(NSDictionary**)offsets;
++(uint16_t*)morseFromString:(NSString*)string length:(unsigned*)outLength offsets:(NSDictionary**)offsets;
 +(NSArray*)letters;
 +(NSArray*)numbers;
 +(NSArray*)lettersAndNumbers;
@@ -49,11 +49,11 @@ typedef struct
   double _buffer[MorseBufferSize];
   unsigned _bufferCount; 
   unsigned _bufferStart;
-  CGFloat _wpm;
+  float _wpm;
 }
--(id)initWithWPM:(CGFloat)wpm;
+-(id)initWithWPM:(float)wpm;
 -(uint16_t)feed:(double*)duration;
 -(MorseRecognizerQuality)quality;
--(CGFloat)WPM;
--(void)setWPM:(CGFloat)wpm;
+-(float)WPM;
+-(void)setWPM:(float)wpm;
 @end

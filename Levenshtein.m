@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #import "Levenshtein.h"
 
-static NSUInteger SmallestOf(NSUInteger a, NSUInteger b, NSUInteger c);
+static unsigned SmallestOf(unsigned a, unsigned b, unsigned c);
 #define LEV_DEBUG 0
 
 @interface Levenshtein (Private)
@@ -33,8 +33,8 @@ enum
 
 typedef struct
 {
-  NSUInteger d;
-  NSUInteger p;
+  unsigned d;
+  unsigned p;
 } LevCell;
 
 @implementation Levenshtein
@@ -53,9 +53,9 @@ typedef struct
   if (_d)
   {
     [desc appendFormat:@"\n\n<table border='1'>\n"];
-    NSInteger n = [_s1 length] + 1;
-    NSInteger m = [_s2 length] + 1;
-    NSInteger i, j;
+    unsigned n = [_s1 length] + 1;
+    unsigned m = [_s2 length] + 1;
+    unsigned i, j;
     if (n && m)
     {
       LevCell* d = _d;
@@ -84,10 +84,10 @@ typedef struct
 {
   NSMutableString* desc1 = [NSMutableString string];
   NSMutableString* desc2 = [NSMutableString string];
-  NSUInteger n = [_s1 length] + 1;
-  NSUInteger m = [_s2 length] + 1;
-  NSUInteger i = n - 1;
-  NSUInteger j = m - 1;
+  unsigned n = [_s1 length] + 1;
+  unsigned m = [_s2 length] + 1;
+  unsigned i = n - 1;
+  unsigned j = m - 1;
   LevCell* d = _d;
   while (YES)
   {
@@ -97,7 +97,7 @@ typedef struct
   #if LEV_DEBUG
     NSLog(@"0x%X", dp);
   #endif
-    NSUInteger ptr = dp->p;
+    unsigned ptr = dp->p;
     if (ptr & levPtrUpLeft)
     {
       [desc1 setString:[NSString stringWithFormat:@"%C%@", c1, desc1]];
@@ -139,7 +139,7 @@ typedef struct
   [super dealloc];
 }
 
--(NSUInteger)distance
+-(unsigned)distance
 {
   return _distance;
 }
@@ -147,11 +147,11 @@ typedef struct
 -(void)_updateDistance
 {
   // Step 1
-  NSUInteger k, i, j;
+  unsigned k, i, j;
   if (_d) free(_d);
   _distance = 0;
-  NSUInteger n = [_s1 length] + 1;
-  NSUInteger m = [_s2 length] + 1;
+  unsigned n = [_s1 length] + 1;
+  unsigned m = [_s2 length] + 1;
   _d = calloc( sizeof(LevCell), m * n );
   LevCell* d = _d;
   // Step 2
@@ -175,11 +175,11 @@ typedef struct
       // Step 5
       if (c1 == [_s2 characterAtIndex:j-1]) cost = 0;
       // Step 6
-      NSUInteger ptr = 0;
-      NSUInteger up = d[j * n + i - 1].d;
-      NSUInteger left = d[(j - 1) * n + i].d;
-      NSUInteger upLeft = d[(j - 1) * n + i - 1].d;
-      NSUInteger score = SmallestOf(up + 1, left + 1, upLeft + cost);
+      unsigned ptr = 0;
+      unsigned up = d[j * n + i - 1].d;
+      unsigned left = d[(j - 1) * n + i].d;
+      unsigned upLeft = d[(j - 1) * n + i - 1].d;
+      unsigned score = SmallestOf(up + 1, left + 1, upLeft + cost);
       d[j * n + i].d = score;
       if (score == left + 1) ptr |= levPtrLeft;
       if (score == up + 1) ptr |= levPtrUp;
@@ -192,9 +192,9 @@ typedef struct
 }
 @end
 
-static NSUInteger SmallestOf(NSUInteger a, NSUInteger b, NSUInteger c)
+static unsigned SmallestOf(unsigned a, unsigned b, unsigned c)
 {
-  NSUInteger min = a;
+  unsigned min = a;
   if (b < min) min = b;
   if (c < min) min = c;
   return min;

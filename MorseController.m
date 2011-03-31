@@ -17,7 +17,51 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #import "Levenshtein.h"
 #import "Onizuka.h"
 #import "QSO.h"
+#import <Security/Security.h>
+#import <unistd.h>
+#import <CoreFoundation/CoreFoundation.h>
 
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
+@interface NSString (SPStringAdditions)
+-(NSArray*)componentsSeparatedByCharactersInSet:(NSCharacterSet*)set;
+@end
+
+@implementation NSString (SPStringAdditions)
+/*
+ * componentsSeparatedByCharactersInSet:
+ * Credit - Greg Hulands <ghulands@mac.com>
+ * Needed for 10.4+ compatibility
+ */
+-(NSArray*)componentsSeparatedByCharactersInSet:(NSCharacterSet *)set // 10.5 adds this to NSString, but we are 10.4+
+{
+    NSMutableArray *result = [NSMutableArray array];
+    NSScanner *scanner = [NSScanner scannerWithString:self];
+    NSString *chunk = nil;
+   
+    [scanner setCharactersToBeSkipped:nil];
+    BOOL sepFound = [scanner scanCharactersFromSet:set intoString:(NSString **)nil]; // skip any preceding separators
+   
+    if (sepFound) { // if initial separator, start with empty component
+        [result addObject:@""];
+    }
+   
+    while ([scanner scanUpToCharactersFromSet:set intoString:&chunk]) {
+        [result addObject:chunk];
+        sepFound = [scanner scanCharactersFromSet: set intoString: (NSString **) nil];
+    }
+   
+    if (sepFound) { // if final separator, end with empty component
+        [result addObject: @""];
+    }
+   
+    result = [result copy];
+    return [result autorelease];
+}
+@end
+#endif
+
+CFRunLoopRef CFRunLoopGetMain();
 enum
 {
   CWSNotTestingState,
@@ -35,7 +79,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(void)startNewTest;
 -(BOOL)checkTestResponseWithFeedback:(BOOL)fb;
 -(void)updateScore;
--(NSString*)randomStringFromArray:(NSArray*)array ofLength:(NSUInteger)length;
+-(NSString*)randomStringFromArray:(NSArray*)array ofLength:(unsigned)length;
 -(void)shiftKey:(BOOL)isdown atTime:(CGEventTimestamp)time fromTimer:(BOOL)flag;
 -(void)keycheck:(CGEventRef)event;
 -(void)timer:(NSTimer*)t;
@@ -53,7 +97,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [[Onizuka sharedOnizuka] localizeWindow:window];
   [[Onizuka sharedOnizuka] localizeWindow:prefsWindow];
   [topBLV setCanBecomeFirstResponder:NO];
-  [bottomBLV setProsignFormat:YES];
+  [bottomBLV setFormatProsign:YES];
   NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
   [defs addObserver:self forKeyPath:@"freq" options:NSKeyValueObservingOptionNew context:NULL];
   [defs addObserver:self forKeyPath:@"amp" options:NSKeyValueObservingOptionNew context:NULL];
@@ -75,7 +119,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [tabs selectTabViewItemWithIdentifier:[[NSUserDefaults standardUserDefaults] objectForKey:@"tab"]];
   score = [[NSMutableDictionary alloc] init];
   NSDictionary* scoredic = [[NSUserDefaults standardUserDefaults] objectForKey:@"score"];
-  for (NSString* key in [scoredic allKeys])
+  NSEnumerator* en = [scoredic keyEnumerator];
+  NSString* key;
+  while ((key = [en nextObject])) 
   {
     NSDictionary* dic = [scoredic objectForKey:key];
     NSMutableDictionary* sdic = [dic mutableCopy];
@@ -209,7 +255,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [timer invalidate];
   timer = nil;
   double when;
-  CGFloat wpm = [[NSUserDefaults standardUserDefaults] floatForKey:@"wpm"];
+  float wpm = [[NSUserDefaults standardUserDefaults] floatForKey:@"wpm"];
   id tabID = [[tabs selectedTabViewItem] identifier];
   switch (s)
   {
@@ -226,7 +272,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     }
     [topBLV setString:nil];
     [bottomBLV setString:nil];
-    [bottomBLV setBgColor:[NSColor grayColor]];
+    [bottomBLV setBGColor:[NSColor grayColor]];
     [bottomBLV setCanBecomeFirstResponder:NO];
     if (_tap) CGEventTapEnable(_tap, false);
     lastKey = 0.0;
@@ -268,10 +314,10 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 {
   [topBLV setString:nil];
   [bottomBLV setString:nil];
-  [bottomBLV setBgColor:[NSColor grayColor]];
-  NSUInteger min = [[NSUserDefaults standardUserDefaults] integerForKey:@"min"];
-  NSUInteger max = [[NSUserDefaults standardUserDefaults] integerForKey:@"max"];
-  NSUInteger n = min;
+  [bottomBLV setBGColor:[NSColor grayColor]];
+  unsigned min = [[NSUserDefaults standardUserDefaults] integerForKey:@"min"];
+  unsigned max = [[NSUserDefaults standardUserDefaults] integerForKey:@"max"];
+  unsigned n = min;
   if (min != max)
   {
     if (min > max)
@@ -284,12 +330,12 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     n = min + (arc4random() % (max-min+1));
   }
   //NSLog(@"%d characters", n);
-  NSUInteger which = [[[NSUserDefaults standardUserDefaults] objectForKey:@"source"] unsignedIntegerValue];
+  unsigned which = [[[NSUserDefaults standardUserDefaults] objectForKey:@"source"] unsignedIntValue];
   NSString* s = nil;
   if (which == 1)
   {
     NSArray* whichArray;
-    NSInteger set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
+    unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
     switch (set)
     {
       case 2: whichArray = [Morse numbers]; break;
@@ -337,7 +383,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   if (fb)
   {
     NSColor* col = good? [NSColor greenColor]:[NSColor redColor];
-    [bottomBLV setBgColor:col];
+    [bottomBLV setBGColor:col];
     [topBLV setString:[renderer string]];
     [self updateScore];
   }
@@ -348,7 +394,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 #define kPlaceholderCh '`'
 -(void)updateScore
 {
-  NSUInteger i;
+  unsigned i;
   NSString* s1 = [Morse formatString:[renderer string]];
   NSString* s2 = [Morse formatString:[bottomBLV string]];
   Levenshtein* lev = [[Levenshtein alloc] initWithString:s1 andString:s2];
@@ -370,21 +416,21 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
       [score setObject:d forKey:s3];
       [d release];
     }
-    NSUInteger n = [[d objectForKey:@"n"] unsignedIntegerValue] + (correct)? 1:0;
-    NSUInteger of = [[d objectForKey:@"of"] unsignedIntegerValue] + 1;
-    [d setObject:[NSNumber numberWithUnsignedInteger:n] forKey:@"n"];
-    [d setObject:[NSNumber numberWithUnsignedInteger:of] forKey:@"of"];
+    unsigned n = [[d objectForKey:@"n"] unsignedIntValue] + (correct)? 1:0;
+    unsigned of = [[d objectForKey:@"of"] unsignedIntValue] + 1;
+    [d setObject:[NSNumber numberWithUnsignedInt:n] forKey:@"n"];
+    [d setObject:[NSNumber numberWithUnsignedInt:of] forKey:@"of"];
     [s3 release];
   }
   [lev release];
   //NSLog(@"Score is now %@", score);
 }
 
--(NSString*)randomStringFromArray:(NSArray*)array ofLength:(NSUInteger)length
+-(NSString*)randomStringFromArray:(NSArray*)array ofLength:(unsigned)length
 {
   NSMutableString* ms = [[NSMutableString alloc] init];
-  NSUInteger i;
-  NSUInteger n = [array count];
+  unsigned i;
+  unsigned n = [array count];
   for (i = 0; i < length; i++)
   {
     NSString* str1 = [array objectAtIndex:arc4random() % n];
@@ -657,31 +703,30 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   #pragma unused (contextInfo)
   if (code == NSOKButton)
   {
-    NSURL* url = [sheet URL];
     [sheet orderOut:nil];
     MorseRenderer* mr = [renderer copy];
     [mr setMode:MorseRendererAgendaMode];
     [mr setString:[inputField string]];
-    [mr exportAIFFToURL:url];
+    [mr exportAIFF:[sheet filename]];
     [mr release];
   }
 }
 
 #pragma mark Score Table
--(NSInteger)numberOfRowsInTableView:(NSTableView*)tv
+-(unsigned)numberOfRowsInTableView:(NSTableView*)tv
 {
   return [score count];
 }
 
--(id)tableView:(NSTableView*)tv objectValueForTableColumn:(NSTableColumn*)col row:(NSInteger)row
+-(id)tableView:(NSTableView*)tv objectValueForTableColumn:(NSTableColumn*)col row:(unsigned)row
 {
   NSArray* keys = [[score allKeys] sortedArrayUsingSelector:@selector(compare:)];
   id key = [keys objectAtIndex:row];
   if ([[col identifier] isEqual:@"Correct"])
   {
     NSDictionary* d = [score objectForKey:key];
-    NSUInteger n = [[d objectForKey:@"n"] unsignedIntegerValue];
-    NSUInteger of = [[d objectForKey:@"of"] unsignedIntegerValue];
+    unsigned n = [[d objectForKey:@"n"] unsignedIntValue];
+    unsigned of = [[d objectForKey:@"of"] unsignedIntValue];
     float pct = 100.0f*(float)n/(float)of;
     key = [NSString stringWithFormat:@"%d/%d (%.2f%%)", n, of, pct];
     if (pct >= 95.0f)

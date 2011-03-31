@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {
   if (self == other) return YES;
   if ([self count] != [other count]) return NO;
-  NSUInteger i;
+  unsigned i;
   for (i = 0; i < [self count]; i++)
   {
     if (![[self objectAtIndex:i] isEqual:[other objectAtIndex:i]]) return NO;
@@ -34,29 +34,29 @@ uint8_t  MorseDahUnits = 3;
 uint8_t  MorseInterwordUnits = 7;
 
 @implementation Morse
-+(CGFloat)millisecondsPerUnitAtWPM:(CGFloat)wpm
++(float)millisecondsPerUnitAtWPM:(float)wpm
 {
   return 1200.0L / wpm;
 }
 
-+(CGFloat)WPMPerUnitMilliseconds:(CGFloat)time
++(float)WPMPerUnitMilliseconds:(float)time
 {
   return 1200.0L / time;
 }
 
-+(MorseSpacing)spacingForWPM:(CGFloat)wpm CWPM:(CGFloat)cwpm
++(MorseSpacing)spacingForWPM:(float)wpm CWPM:(float)cwpm
 {
-  CGFloat tc = 0.0L;
-  CGFloat tw = 0.0L;
+  float tc = 0.0L;
+  float tw = 0.0L;
   if (cwpm != wpm)
   {
-    CGFloat ta = ((60.0L * cwpm)-(37.2L * wpm)) / (cwpm * wpm);
+    float ta = ((60.0L * cwpm)-(37.2L * wpm)) / (cwpm * wpm);
     tc = 1000.0L * (3.0L * ta) / 19.0L;
     tw = 1000.0L * (7.0L * ta) / 19.0L;
   }
   else
   {
-    CGFloat unit = [Morse millisecondsPerUnitAtWPM:wpm];
+    float unit = [Morse millisecondsPerUnitAtWPM:wpm];
     tc = unit * MorseDahUnits;
     tw = unit * MorseInterwordUnits;
   }
@@ -86,7 +86,9 @@ uint8_t  MorseInterwordUnits = 7;
     NSDictionary* d = [Morse dictionary];
     rd = [[NSMutableDictionary alloc] init];
     NSDictionary* sub = [d objectForKey:@"Code"];
-    for (NSString* key in [sub allKeys])
+    NSEnumerator* enu = [sub keyEnumerator];
+    NSString* key;
+    while ((key = [enu nextObject]))
     {
       [rd setObject:key forKey:[sub objectForKey:key]];
     }
@@ -138,12 +140,12 @@ uint16_t MorseInterwordSpace = 0x0018;
   return [rd objectForKey:[NSNumber numberWithUnsignedShort:morse]];
 }
 
-+(uint16_t*)morseFromString:(NSString*)string length:(NSUInteger*)outLength offsets:(NSDictionary**)offsets
++(uint16_t*)morseFromString:(NSString*)string length:(unsigned*)outLength offsets:(NSDictionary**)offsets
 {
   NSMutableArray* symbols = [[NSMutableArray alloc] init];
   NSMutableDictionary* offs = (offsets)? [[NSMutableDictionary alloc] init] : nil;
   NSDictionary* d = [[Morse dictionary] objectForKey:@"Code"];
-  NSUInteger i, length = [string length];
+  unsigned i, length = [string length];
   BOOL wasSpace = YES;
   BOOL didPro = NO;
   int wordStart = -1;
@@ -202,7 +204,7 @@ uint16_t MorseInterwordSpace = 0x0018;
     [offs setObject:NSStringFromRange(NSMakeRange(wordStart,i-wordStart))
           forKey:[NSNumber numberWithUnsignedShort:wordStartElem]];
   }
-  NSUInteger count = [symbols count];
+  unsigned count = [symbols count];
   *outLength = count;
   uint16_t* a = malloc(sizeof(uint16_t) * count);
   uint16_t* ap = a;
@@ -249,7 +251,7 @@ uint16_t MorseInterwordSpace = 0x0018;
 +(NSString*)formatString:(NSString*)string
 {
   NSMutableString* ms = [[NSMutableString alloc] init];
-  NSUInteger i, n = [string length];
+  unsigned i, n = [string length];
   NSCharacterSet* set = [NSCharacterSet uppercaseLetterCharacterSet];
   for (i = 0; i < n; i++)
   {
@@ -269,7 +271,7 @@ uint16_t MorseInterwordSpace = 0x0018;
 @end
 
 @implementation MorseRecognizer
--(id)initWithWPM:(CGFloat)wpm
+-(id)initWithWPM:(float)wpm
 {
   self = [super init];
   [self setWPM:wpm];
@@ -307,11 +309,11 @@ uint16_t MorseInterwordSpace = 0x0018;
   unsigned n = 0;
   unsigned nt = 0;
   unsigned ns = 0;
-  CGFloat dev = 0.0;
-  CGFloat tone = [Morse millisecondsPerUnitAtWPM:_wpm];
+  float dev = 0.0;
+  float tone = [Morse millisecondsPerUnitAtWPM:_wpm];
   MorseSpacing spacing = [Morse spacingForWPM:_wpm CWPM:_wpm];
-  CGFloat intercharacterCutoff = (tone + spacing.intercharacterMilliseconds)/2.0L;
-  CGFloat interwordCutoff = (spacing.intercharacterMilliseconds + spacing.interwordMilliseconds)/2.0L;
+  float intercharacterCutoff = (tone + spacing.intercharacterMilliseconds)/2.0L;
+  float interwordCutoff = (spacing.intercharacterMilliseconds + spacing.interwordMilliseconds)/2.0L;
   while (YES)
   {
     double unit = _buffer[i];
@@ -340,9 +342,9 @@ uint16_t MorseInterwordSpace = 0x0018;
     if (seen >= MorseBufferSize) break;
   }
   MorseRecognizerQuality mrq = {0.0,0.0,0.0};
-  if (n) mrq.quality = (1.0L - (dev/(CGFloat)n));
-  if (nt) mrq.toneWPM = twpm/(CGFloat)nt;
-  if (ns) mrq.spaceWPM = swpm/(CGFloat)ns;
+  if (n) mrq.quality = (1.0L - (dev/(float)n));
+  if (nt) mrq.toneWPM = twpm/(float)nt;
+  if (ns) mrq.spaceWPM = swpm/(float)ns;
   //NSLog(@"q %f from dev %f for %d units", mrq.quality, dev, n);
   return mrq;
 }
@@ -354,10 +356,10 @@ uint16_t MorseInterwordSpace = 0x0018;
   unsigned seen = 0;
   int i = _bufferStart;
   //NSLog(@"Start while loop");
-  CGFloat tone = [Morse millisecondsPerUnitAtWPM:_wpm];
+  float tone = [Morse millisecondsPerUnitAtWPM:_wpm];
   MorseSpacing spacing = [Morse spacingForWPM:_wpm CWPM:_wpm];
-  CGFloat intercharacterCutoff = (tone + spacing.intercharacterMilliseconds)/2.0L;
-  CGFloat interwordCutoff = (spacing.intercharacterMilliseconds + spacing.interwordMilliseconds)/2.0L;
+  float intercharacterCutoff = (tone + spacing.intercharacterMilliseconds)/2.0L;
+  float interwordCutoff = (spacing.intercharacterMilliseconds + spacing.interwordMilliseconds)/2.0L;
   while (YES)
   {
     BOOL isTone = (i % 2 == 0);
@@ -399,6 +401,6 @@ uint16_t MorseInterwordSpace = 0x0018;
   return chr;
 }
 
--(CGFloat)WPM { return _wpm; }
--(void)setWPM:(CGFloat)wpm { _wpm = wpm; }
+-(float)WPM { return _wpm; }
+-(void)setWPM:(float)wpm { _wpm = wpm; }
 @end

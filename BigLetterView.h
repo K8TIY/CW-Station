@@ -7,13 +7,13 @@ extern NSString* BigLetterViewTextNotification;
   NSColor* bgColor;
   NSMutableString* string;
   NSMutableDictionary* attributes;
-  NSUInteger modifiers;
+  unsigned modifiers;
   BOOL canBecomeFirstResponder;
-  BOOL prosignFormat;
+  BOOL formatProsign;
 }
-@property (retain, readwrite) NSColor* bgColor;
-@property (assign, readwrite) BOOL canBecomeFirstResponder;
-@property (assign, readwrite) BOOL prosignFormat;
 -(NSString*)string;
 -(void)setString:(NSString*)s;
+-(void)setBGColor:(NSColor*)col;
+-(void)setFormatProsign:(BOOL)flag;
+-(void)setCanBecomeFirstResponder:(BOOL)flag;
 @end

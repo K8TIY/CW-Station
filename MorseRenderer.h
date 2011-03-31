@@ -7,6 +7,7 @@
 #import <CoreServices/CoreServices.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import "Morse.h"
+#import "LED.h"
 
 extern NSString* MorseRendererFinishedNotification;
 extern NSString* MorseRendererStartedWordNotification;
@@ -25,23 +26,24 @@ typedef enum
 
 typedef struct
 {
+  LED* led;
   uint16_t* agenda;
   NSDictionary* offsets;
-  CGFloat freq;
-  CGFloat amp;
-  CGFloat pan;
-	CGFloat freqz;    // for dezipper filter
-  CGFloat ampz;	    // for dezipper filter
-	CGFloat phase;		// oscillator phase in radians
-  CGFloat wpm;
-  CGFloat cwpm;
-  CGFloat samplesPerDit;
-  CGFloat intercharacter;
-  CGFloat interword;
-  NSUInteger agendaCount;
-  NSUInteger agendaDone;
-	NSUInteger agendaItemElementsDone;
-	NSUInteger agendaItemElementSamplesDone;
+  float freq;
+  float amp;
+  float pan;
+	float freqz;    // for dezipper filter
+  float ampz;	    // for dezipper filter
+	float phase;		// oscillator phase in radians
+  float wpm;
+  float cwpm;
+  float samplesPerDit;
+  float intercharacter;
+  float interword;
+  unsigned agendaCount;
+  unsigned agendaDone;
+	unsigned agendaItemElementsDone;
+	unsigned agendaItemElementSamplesDone;
   MorseRendererMode mode;
   MorseRendererMode lastMode;
   BOOL doingInterelementSpace;
@@ -52,7 +54,7 @@ typedef struct
   BOOL flash;
   BOOL noNote;
   // Noise stuff
-  CGFloat qrn;
+  float qrn;
   long pinkRows[kPinkMaxRandomRows];
   long pinkRunningSum;    // Used to optimize summing of generators
   int  pinkIndex;         // Incremented each sample
@@ -69,8 +71,6 @@ typedef struct
   NSMutableString*  _string;
 }
 
-//@property (copy, readwrite) NSString* string;
-@property (readwrite) BOOL flash;
 -(BOOL)isPlaying;
 -(void)setMode:(MorseRendererMode)mode;
 -(void)start:(NSString*)string;
@@ -83,8 +83,10 @@ typedef struct
 -(void)setQRN:(float)val;
 -(void)setQRNWhite:(BOOL)flag;
 -(void)setLoop:(BOOL)flag;
+-(BOOL)flash;
+-(void)setFlash:(BOOL)flag;
 -(NSString*)string;
 -(void)setString:(NSString*)s;
 -(void)setState:(MorseRenderState*)s;
--(void)exportAIFFToURL:(NSURL*)url;
+-(void)exportAIFF:(NSString*)path;
 @end

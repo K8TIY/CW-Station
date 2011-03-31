@@ -128,12 +128,12 @@ static unsigned  Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioB
 {
   unsigned samples = 0;
   float fadeSamples = gSampleRate * 0.004f;
-  CGFloat phase = state->phase;
-  CGFloat amp = state->amp;
-  CGFloat freq = state->freq;
-  CGFloat ampz = state->ampz;
-  CGFloat freqz = state->freqz;
-  CGFloat decay = 1.0;
+  float phase = state->phase;
+  float amp = state->amp;
+  float freq = state->freq;
+  float ampz = state->ampz;
+  float freqz = state->freqz;
+  float decay = 1.0;
   float* lBuffer = ioData->mBuffers[0].mData;
   float* rBuffer = ioData->mBuffers[1].mData;
   uint16_t* item = NULL;
@@ -151,7 +151,7 @@ static unsigned  Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioB
   uint16_t elements = lengthBits? lengthBits:1;
   BOOL on = NO;
   unsigned dits = 1;
-  NSUInteger i;
+  unsigned i;
   for (i = 0; i < inNumberFrames; i++)
   {
     float lsample = 0.0f;
@@ -194,7 +194,7 @@ static unsigned  Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioB
         }
         else if (state->mode != MorseRendererOnMode)
         {
-          NSUInteger remaining = (dits * state->samplesPerDit) - state->agendaItemElementSamplesDone;
+          unsigned remaining = (dits * state->samplesPerDit) - state->agendaItemElementSamplesDone;
           if (remaining < fadeSamples)
           {
             decay = remaining * (1.0/fadeSamples);
@@ -231,11 +231,12 @@ static unsigned  Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioB
     if (state->wasOn != on)
     {
       state->wasOn = on;
-      if (state->flash) manipulate_led(on);
+      //if (state->flash) manipulate_led(on);
+      if (state->flash) [state->led setValue:on];
     }
     if (item)
     {
-      CGFloat needed = dits * state->samplesPerDit;
+      float needed = dits * state->samplesPerDit;
       if (!on)
       {
         if (dits == MorseDahUnits && state->intercharacter > 0.0L) needed = state->intercharacter;
@@ -334,6 +335,7 @@ static void local_SendRange(MorseRenderState* state)
   self = [super init];
   _string = [[NSMutableString alloc] init];
   OSStatus err = noErr;
+  _state.led = [[LED alloc] init];
 #if 1
   if (![self _initAUGraph]) err = 1;
   [self _initRandomEnv:5];
@@ -445,7 +447,11 @@ static void local_SendRange(MorseRenderState* state)
   AudioStreamBasicDescription desc;
   desc.mSampleRate = gSampleRate;
   desc.mFormatID = kAudioFormatLinearPCM;
-  desc.mFormatFlags = kAudioFormatFlagsCanonical | kAudioFormatFlagIsNonInterleaved;
+#if TARGET_RT_BIG_ENDIAN
+    desc.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsBigEndian | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved;
+#else
+    desc.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked | kAudioFormatFlagIsNonInterleaved;
+#endif
   desc.mBytesPerPacket = 4;
   desc.mFramesPerPacket = 1;
   desc.mBytesPerFrame = 4;
@@ -465,7 +471,10 @@ static void local_SendRange(MorseRenderState* state)
     rcbs.inputProc = cbs[i];
     rcbs.inputProcRefCon = rcs[i];
     // Set a callback for the specified node's specified input
-    result = AUGraphSetNodeInputCallback(_ag, mixerNode, i, &rcbs);
+    result = AudioUnitSetProperty(_mixer, kAudioUnitProperty_SetRenderCallback,
+                                  kAudioUnitScope_Input, i, &rcbs,
+                                  sizeof(AURenderCallbackStruct)); 
+    //result = AUGraphSetNodeInputCallback(_ag, mixerNode, i, &rcbs);
     if (result) return NO;
     // Apply the modified CAStreamBasicDescription to the mixer input bus
     result = AudioUnitSetProperty(_mixer, kAudioUnitProperty_StreamFormat,
@@ -565,7 +574,12 @@ static void local_SendRange(MorseRenderState* state)
 -(void)setQRN:(float)val { _state.qrn = val; }
 -(void)setQRNWhite:(BOOL)flag { _state.goWhite = flag; }
 -(BOOL)flash { return _state.flash; }
--(void)setFlash:(BOOL)flag { _state.flash = flag; }
+
+-(void)setFlash:(BOOL)flag
+{
+  [_state.led setValue:0];
+  _state.flash = flag;
+}
 
 -(void)_updatePadding
 {
@@ -625,7 +639,7 @@ static void local_SendRange(MorseRenderState* state)
   _state.doingLoopSpace = NO;
   _state.play = NO;
   _state.wasOn = NO;
-  manipulate_led(0);
+  [_state.led setValue:0];
 }
 
 -(BOOL)isPlaying {return _state.play;}
@@ -654,8 +668,30 @@ static void local_SendRange(MorseRenderState* state)
 }
 
 #define BUFF_SIZE 0x20000L
--(void)exportAIFFToURL:(NSURL*)url
+-(void)exportAIFF:(NSString*)path
 {
+  NSString * parentDir = [path stringByDeletingLastPathComponent];
+  NSString* fileName = [path lastPathComponent];
+  const char *filePath = [path fileSystemRepresentation];
+  const char *fileSystemPath;
+  FSRef parentDirRef, existingFileRef, newFileRef;
+  AudioStreamBasicDescription destFormat;
+  
+  if ( [parentDir length] == 0 )
+  {
+    // Must be working in the current directory
+    parentDir = @"./";
+  }
+  fileSystemPath = [parentDir fileSystemRepresentation];
+  // If the file already exists, blow it away first.  That way, AudioFileCreate won't fail.
+  if (noErr == FSPathMakeRef((UInt8*)filePath, &existingFileRef, NULL))
+  {
+    FSDeleteObject( &existingFileRef );
+  }
+  if (FSPathMakeRef((UInt8*)fileSystemPath, &parentDirRef, NULL))
+  {
+    [NSException raise:@"AudioConverterFailure" format:@"FSPathMakeRef failed"];
+  }
   _state.noNote = YES;
   float* buff1 = NULL;
   float* buff2 = NULL;
@@ -685,10 +721,12 @@ static void local_SendRange(MorseRenderState* state)
     streamFormat.mBytesPerPacket = 4;
     SInt64 packetidx = 0;
     AudioFileID fileID;
-    OSStatus err = AudioFileCreateWithURL((CFURLRef)url, kAudioFileAIFFType, &streamFormat, kAudioFileFlags_EraseFile, &fileID);
+    //OSStatus err = AudioFileCreateWithURL((CFURLRef)url, kAudioFileAIFFType, &streamFormat, kAudioFileFlags_EraseFile, &fileID);
+    OSStatus err = AudioFileCreate( &parentDirRef, (CFStringRef)fileName, kAudioFileAIFFType, &destFormat, 0, &newFileRef, &fileID);
     if (err)
     {
-      NSLog(@"AudioFileCreateWithURL: err %d");
+      NSLog(@"AudioFileCreateWithURL: err %d", err);
+      return;
     }
     else
     {
@@ -711,7 +749,7 @@ static void local_SendRange(MorseRenderState* state)
         }
         //hexdump(buff3, 1000);
         err = AudioFileWritePackets(fileID, false, samples, NULL, packetidx, &ioNumPackets, buff3);
-        if (err) NSLog(@"AudioFileWritePackets: err %d");
+        if (err) NSLog(@"AudioFileWritePackets: err %d", err);
         packetidx += ioNumPackets;
         free(buff3);
       }
@@ -779,3 +817,100 @@ static void hexdump(void *data, int size)
   }
 }
 #endif
+
+/*static int writeAIFF( NSString *fullPath, Float64 sampleRate, NSData *sourceData )
+{
+    NSString                    *parentDir = [fullPath stringByDeletingLastPathComponent];
+    NSString                    *fileName = [fullPath lastPathComponent];
+    const char                  *filePath = [fullPath fileSystemRepresentation];
+    const char                  *fileSystemPath;
+    FSRef                       parentDirRef;
+    FSRef                       existingFileRef;
+    FSRef                       newFileRef;
+    OSStatus                    status;
+    AudioFileID                 newFileID;
+    AudioStreamBasicDescription sourceFormat;
+    AudioStreamBasicDescription destFormat;
+    AudioConverterRef           audioConverter;
+    
+    if ( [parentDir length] == 0 ) {
+        // Must be working in the current directory
+        parentDir = @"./";
+    }
+    
+    fileSystemPath = [parentDir fileSystemRepresentation];
+    
+    // If the file already exists, blow it away first.  That way, AudioFileCreate won't fail.
+    if ( noErr == FSPathMakeRef( (UInt8*)filePath, &existingFileRef, NULL ) ) {
+        FSDeleteObject( &existingFileRef );
+    }
+    
+    if ( FSPathMakeRef( (UInt8*)fileSystemPath, &parentDirRef, NULL ) ) {
+        [NSException raise:@"AudioConverterFailure" format:@"FSPathMakeRef failed"];
+    }
+    
+    memset( &sourceFormat, 0, sizeof(AudioStreamBasicDescription) );
+    memset( &destFormat, 0, sizeof(AudioStreamBasicDescription) );
+    
+    sourceFormat.mSampleRate = sampleRate;
+    sourceFormat.mFormatID = kAudioFormatLinearPCM;
+    sourceFormat.mFormatFlags = ( kAudioFormatFlagIsFloat );
+    if ( CFByteOrderGetCurrent() == CFByteOrderBigEndian ) {
+        sourceFormat.mFormatFlags |= kAudioFormatFlagIsBigEndian;
+    }
+    sourceFormat.mBytesPerFrame = sizeof(float);
+    sourceFormat.mFramesPerPacket = 1;
+    sourceFormat.mBytesPerPacket = sizeof(float) * sourceFormat.mFramesPerPacket;
+    sourceFormat.mChannelsPerFrame = 1;
+    sourceFormat.mBitsPerChannel = 32;
+    
+    destFormat.mSampleRate = sampleRate;
+    destFormat.mFormatID = kAudioFormatLinearPCM;
+    destFormat.mFormatFlags = ( kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked | kAudioFormatFlagIsBigEndian );
+    destFormat.mBytesPerPacket = 2;
+    destFormat.mFramesPerPacket = 1;
+    destFormat.mBytesPerFrame = 2;
+    destFormat.mChannelsPerFrame = 1;
+    destFormat.mBitsPerChannel = 16;
+    
+        status = AudioFileCreate( &parentDirRef, (CFStringRef)fileName, kAudioFileAIFFType, &destFormat, 0, &newFileRef, &newFileID);
+    if ( noErr != status ) {
+        [NSException raise:@"AudioConverterFailure" format:@"AudioFileCreate failed (status=%d)", status];
+    }
+    
+    status = AudioConverterNew( &sourceFormat, &destFormat, &audioConverter );
+    if ( noErr != status ) {
+        [NSException raise:@"AudioConverterFailure" format:@"AudioConverterNew failed (status=%d)", status];
+    }
+    
+    unsigned int        length = [sourceData length] / sizeof( float );
+    NSMutableData   *outData = [NSMutableData dataWithLength:(length * destFormat.mBytesPerFrame)];
+    void            *outBytes = [outData mutableBytes];
+    UInt32          outBytesLength = [outData length];
+    const void      *inBytes = [sourceData bytes];
+    UInt32          inBytesLength = length * sourceFormat.mBytesPerFrame;
+    
+    status = AudioConverterConvertBuffer( audioConverter, inBytesLength, (void*)inBytes, &outBytesLength, outBytes );
+    if ( noErr != status ) {
+        [NSException raise:@"AudioConverterFailure" format:@"AudioConverterConvertBuffer failed (status=%d)", status];
+    }
+    
+    status = AudioFileWriteBytes( newFileID, 0, 0, &outBytesLength, outBytes );
+    if ( noErr != status ) {
+        [NSException raise:@"AudioConverterFailure" format:@"AudioFileWriteBytes failed (status=%d)", status];
+    }
+    
+    status = AudioConverterDispose( audioConverter );
+    if ( noErr != status ) {
+        [NSException raise:@"AudioConverterFailure" format:@"AudioConverterDispose failed (status=%d)", status];
+    }            
+    
+    status = AudioFileClose( newFileID );
+    if ( noErr != status ) {
+        [NSException raise:@"AudioConverterFailure" format:@"AudioFileClose failed (status=%d)", status];
+    }
+        
+        return 0;
+    
+}*/
+
