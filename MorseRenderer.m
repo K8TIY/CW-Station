@@ -23,7 +23,7 @@ NSString* MorseRendererStartedWordNotification = @"MorseRendererStartedWordNotif
 static const float gSampleRate = 22050.0f;
 
 @interface MorseRenderer (Private)
--(BOOL)_initAUGraph;
+-(OSStatus)_initAUGraph;
 -(void)_initRandomEnv:(long)numRows;
 -(void)_updatePadding;
 -(void)setAgenda:(NSString*)string;
@@ -31,12 +31,12 @@ static const float gSampleRate = 22050.0f;
 
 
 
-static OSStatus  RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
+static OSStatus RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
                            const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
                            UInt32 inNumberFrames, AudioBufferList* ioData);
-static OSStatus  NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
-                           const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
-                           UInt32 inNumberFrames, AudioBufferList* ioData);
+static OSStatus NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
+                        const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
+                        UInt32 inNumberFrames, AudioBufferList* ioData);
 static unsigned  Renderer(MorseRenderState* inState, UInt32 inNumberFrames, AudioBufferList* ioData);
 static void local_SendNote(void);
 static void local_SendRange(MorseRenderState* state);
@@ -124,7 +124,7 @@ static OSStatus  NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFla
   return noErr;
 }
 
-static unsigned  Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBufferList* ioData)
+static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBufferList* ioData)
 {
   unsigned samples = 0;
   float fadeSamples = gSampleRate * 0.004f;
@@ -336,55 +336,8 @@ static void local_SendRange(MorseRenderState* state)
   _string = [[NSMutableString alloc] init];
   OSStatus err = noErr;
   _state.led = [[LED alloc] init];
-#if 1
-  if (![self _initAUGraph]) err = 1;
   [self _initRandomEnv:5];
-#else
-  AUNode node;
-  AudioUnit unit;
-  ComponentDescription desc;
-  desc.componentType = kAudioUnitType_Output;
-  desc.componentSubType = kAudioUnitSubType_DefaultOutput;
-  desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-  desc.componentFlags = 0;
-  desc.componentFlagsMask = 0;
-  err = NewAUGraph(&_ag);
-  if (err) printf("NewAUGraph=%ld\n", (long)err);
-  else
-  {
-    err = AUGraphOpen(_ag);
-    if (!err) err = AUGraphAddNode(_ag, &desc, &node);
-    if (!err) err = AUGraphNodeInfo(_ag, node, 0, &unit);
-    if (err) printf("AUGraphOpen/AUGraphAddNode/AUGraphNodeInfo=%ld\n", (long)err);
-    else
-    {
-      AudioStreamBasicDescription desc;
-      desc.mSampleRate = gSampleRate;
-      desc.mFormatID = kAudioFormatLinearPCM;
-      desc.mFormatFlags = kAudioFormatFlagsCanonical | kAudioFormatFlagIsNonInterleaved;
-      desc.mBytesPerPacket = 4;
-      desc.mFramesPerPacket = 1;
-      desc.mBytesPerFrame = 4;
-      desc.mChannelsPerFrame = 2;
-      desc.mBitsPerChannel = 32;
-      err = AudioUnitSetProperty(unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input,
-                                 0, &desc, sizeof(AudioStreamBasicDescription));
-      if (err) printf ("AudioUnitSetProperty-SF=%4.4s, %ld\n", (char*)&err, (long)err);
-      else
-      {
-        err = AUGraphInitialize(_ag);
-        if (err) printf ("AUGraphInitialize=%ld\n", (long)err);
-        AURenderCallbackStruct input;
-        input.inputProc = RendererCB;
-        input.inputProcRefCon = &_state;
-        err = AudioUnitSetProperty(unit, kAudioUnitProperty_SetRenderCallback, 
-                                   kAudioUnitScope_Input, 0, &input, sizeof(input));
-        if (err) printf ("AudioUnitSetProperty-CB=%ld\n", (long)err);
-        err = AUGraphInitialize(_ag);
-      }
-    }
-  }
-#endif
+  err = [self _initAUGraph];
   if (err)
   {
     [self dealloc];
@@ -394,7 +347,7 @@ static void local_SendRange(MorseRenderState* state)
   return self;
 }
 
--(BOOL)_initAUGraph
+-(OSStatus)_initAUGraph
 {
   OSStatus result = NewAUGraph(&_ag);
   if (result) return NO;
@@ -421,19 +374,19 @@ static void local_SendRange(MorseRenderState* state)
   // You pass in a reference to the  AudioComponentDescription
   // and get back an  AudioUnit
   result = AUGraphAddNode(_ag, &output_desc, &outputNode);
-  if (result) return NO;
+  if (result) return result;
   result = AUGraphAddNode(_ag, &mixer_desc, &mixerNode );
-  if (result) return NO;
+  if (result) return result;
   // Now we can manage connections using nodes in the graph.
   // Connect the mixer node's output to the output node's input
   result = AUGraphConnectNodeInput(_ag, mixerNode, 0, outputNode, 0);
-  if (result) return NO;
+  if (result) return result;
   // open the graph AudioUnits are open but not initialized (no resource allocation occurs here)
   result = AUGraphOpen(_ag);
-  if (result) return NO;
+  if (result) return result;
   // Get a link to the mixer AU so we can talk to it later
   result = AUGraphNodeInfo(_ag, mixerNode, NULL, &_mixer);
-  if (result) return NO;
+  if (result) return result;
   //************************************************************
   //*** Make connections to the mixer unit's inputs ***
   //************************************************************
@@ -442,7 +395,7 @@ static void local_SendRange(MorseRenderState* state)
   UInt32 size = sizeof(numbuses);
   result = AudioUnitSetProperty(_mixer, kAudioUnitProperty_ElementCount,
                                 kAudioUnitScope_Input, 0, &numbuses, size);
-  if (result) return NO;
+  if (result) return result;
   numbuses = 2; // Clang analyzer assumes the pass by ref may have changed it.
   AudioStreamBasicDescription desc;
   desc.mSampleRate = gSampleRate;
@@ -475,18 +428,18 @@ static void local_SendRange(MorseRenderState* state)
                                   kAudioUnitScope_Input, i, &rcbs,
                                   sizeof(AURenderCallbackStruct)); 
     //result = AUGraphSetNodeInputCallback(_ag, mixerNode, i, &rcbs);
-    if (result) return NO;
+    if (result) return result;
     // Apply the modified CAStreamBasicDescription to the mixer input bus
     result = AudioUnitSetProperty(_mixer, kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Input, i,
                                   &desc, sizeof(desc));
-    if (result) return NO;
+    if (result) return result;
   }
   // Apply the Description to the mixer output bus
   result = AudioUnitSetProperty(_mixer, kAudioUnitProperty_StreamFormat,
                                 kAudioUnitScope_Output, 0,
                                 &desc, sizeof(desc));
-  if (result) return NO;
+  if (result) return result;
   //************************************************************
   //*** Setup the audio output stream ***
   //************************************************************
@@ -494,10 +447,9 @@ static void local_SendRange(MorseRenderState* state)
   result = AudioUnitSetProperty(_mixer, kAudioUnitProperty_StreamFormat,
                                 kAudioUnitScope_Output, 0,
                                 &desc, sizeof(desc));
-  if (result) return NO;
+  if (result) return result;
   // Once everything is set up call initialize to validate connections
-  result = AUGraphInitialize(_ag);
-  return (result == noErr);
+  return AUGraphInitialize(_ag);
 }
 
 -(void)_initRandomEnv:(long)numRows
