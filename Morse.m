@@ -86,12 +86,8 @@ uint8_t  MorseInterwordUnits = 7;
     NSDictionary* d = [Morse dictionary];
     rd = [[NSMutableDictionary alloc] init];
     NSDictionary* sub = [d objectForKey:@"Code"];
-    NSEnumerator* enu = [sub keyEnumerator];
-    NSString* key;
-    while ((key = [enu nextObject]))
-    {
+    for (NSString* key in sub)
       [rd setObject:key forKey:[sub objectForKey:key]];
-    }
     //NSLog(@"%@", rd);
   }
   return rd;
