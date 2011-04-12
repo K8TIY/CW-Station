@@ -1,3 +1,8 @@
+/*
+Based on code by Apple, heavily modified by Brian "Moses" Hall (me).
+I hereby place this code in the public domain.
+*/
+
 #include <mach/mach_error.h>
 #include <IOKit/hid/IOHIDUsageTables.h>
 #include "LED.h";
