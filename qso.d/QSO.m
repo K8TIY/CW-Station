@@ -219,6 +219,9 @@ NSDictionary* gDict = nil;
       break;
 
       case 11:
+      [_qso appendFormat:@"occupation %@.\n", Choose(@"Job")];
+      break;
+      
       case 12:
       [_qso appendFormat:@"occupation is %@.\n", Choose(@"Job")];
       break;
