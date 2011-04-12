@@ -115,10 +115,10 @@
 		323183CD11E7841700E9FFA0 /* PlayPressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlayPressed.tiff; sourceTree = "<group>"; };
 		323183CE11E7841700E9FFA0 /* PlayEnabled.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlayEnabled.tiff; sourceTree = "<group>"; };
 		323183CF11E7841700E9FFA0 /* PlayDisabled.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PlayDisabled.tiff; sourceTree = "<group>"; };
-		3237A411131D91CC00824AD4 /* Onizuka.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Onizuka.h; path = ../Onizuka/Onizuka.h; sourceTree = SOURCE_ROOT; };
-		3237A412131D91CC00824AD4 /* Onizuka.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Onizuka.m; path = ../Onizuka/Onizuka.m; sourceTree = SOURCE_ROOT; };
-		3237A415131D91CC00824AD4 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Onizuka.strings; sourceTree = "<group>"; };
-		3237A416131D91CC00824AD4 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Onizuka.strings; sourceTree = "<group>"; };
+		3237A411131D91CC00824AD4 /* Onizuka.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Onizuka.h; path = Onizuka/Onizuka.h; sourceTree = SOURCE_ROOT; };
+		3237A412131D91CC00824AD4 /* Onizuka.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Onizuka.m; path = Onizuka/Onizuka.m; sourceTree = SOURCE_ROOT; };
+		3237A415131D91CC00824AD4 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = Onizuka/StandardUI/en.lproj/Onizuka.strings; sourceTree = SOURCE_ROOT; };
+		3237A416131D91CC00824AD4 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = Onizuka/StandardUI/ja.lproj/Onizuka.strings; sourceTree = SOURCE_ROOT; };
 		324305C713256B3A00A01CFC /* put_form.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = put_form.m; sourceTree = "<group>"; };
 		324305C913256B3A00A01CFC /* QSO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QSO.m; sourceTree = "<group>"; };
 		3243060513256DD300A01CFC /* QSO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSO.h; sourceTree = "<group>"; };
@@ -268,7 +268,7 @@
 				3237A414131D91CC00824AD4 /* Onizuka.strings */,
 			);
 			name = StandardUI;
-			path = ../Onizuka/StandardUI;
+			path = Onizuka/StandardUI;
 			sourceTree = SOURCE_ROOT;
 		};
 		3237A41C131D91EC00824AD4 /* Onizuka */ = {
@@ -278,8 +278,8 @@
 				3237A412131D91CC00824AD4 /* Onizuka.m */,
 				3237A413131D91CC00824AD4 /* StandardUI */,
 			);
-			name = Onizuka;
-			sourceTree = "<group>";
+			path = Onizuka;
+			sourceTree = SOURCE_ROOT;
 		};
 		324305BA13256B3A00A01CFC /* qso.d */ = {
 			isa = PBXGroup;
@@ -468,7 +468,8 @@
 				3237A416131D91CC00824AD4 /* ja */,
 			);
 			name = Onizuka.strings;
-			sourceTree = "<group>";
+			path = Onizuka/StandardUI;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXVariantGroup section */
 
