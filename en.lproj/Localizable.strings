@@ -42,4 +42,6 @@
 
 // Prefs
 "__LOWERCASE_QSO__" = "Lowercase QSO";
-"__QRN_WHITE__" = "QRN is White noise";
+"__QRN_WHITE__" = "QRN is white noise";
+"__CORRECT_RESP__" = "Correct response";
+"__INCORRECT_RESP__" = "Incorrect response";

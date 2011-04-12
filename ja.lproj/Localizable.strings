@@ -43,3 +43,5 @@
 // Prefs
 "__LOWERCASE_QSO__" = "小文字のQSO";
 "__QRN_WHITE__" = "ホワイトノイズのQRM";
+"__CORRECT_RESP__" = "正しい応答";
+"__INCORRECT_RESP__" = "不正な応答";

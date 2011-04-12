@@ -100,7 +100,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [bottomBLV setFormatProsign:YES];
   NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
   NSString* where = [[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"];
-  NSDictionary* d = [NSDictionary dictionaryWithContentsOfFile:where];
+  NSMutableDictionary* d = [NSMutableDictionary dictionaryWithContentsOfFile:where];
+  [d setValue:[NSArchiver archivedDataWithRootObject:[NSColor greenColor]] forKey:@"correctColor"];
+  [d setValue:[NSArchiver archivedDataWithRootObject:[NSColor redColor]] forKey:@"incorrectColor"];
   for (NSString* key in d)
     [defs addObserver:self forKeyPath:key options:NSKeyValueObservingOptionNew context:NULL];
   [[NSUserDefaults standardUserDefaults] registerDefaults:d];
@@ -373,8 +375,13 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   BOOL good = [[Morse formatString:[bottomBLV string]] isEqual:[renderer string]];
   if (fb)
   {
-    NSColor* col = good? [NSColor greenColor]:[NSColor redColor];
-    [bottomBLV setBGColor:col];
+    NSString* key = (good)? @"correctColor":@"incorrectColor";
+    NSData* data = [[NSUserDefaults standardUserDefaults] dataForKey:key];
+    if (data)
+    {
+      NSColor* col = (NSColor*)[NSUnarchiver unarchiveObjectWithData:data];
+      [bottomBLV setBGColor:col];
+    }
     [topBLV setString:[renderer string]];
     [self updateScore];
   }
