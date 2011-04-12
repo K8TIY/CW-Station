@@ -2,7 +2,7 @@
 "__AUTH_SUCCESS__" = "Operation was successful. You must quit and relaunch __APPNAME__ to use the new settings.";
 "__AUTH_FAILURE__" = "Operation was unsuccessful (error code %d). You may not have sufficient privileges.";
 
-"__EXPORT_AIFF__" = "Export as AIFF Audio...";
+"__EXPORT_AIFF__" = "Export as AIFF Audio…";
 "__CONTROLS__" = "Controls";
 "__PLAY__" = "Play";
 "__PAUSE__" = "Pause";
