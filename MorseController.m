@@ -99,17 +99,10 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [topBLV setCanBecomeFirstResponder:NO];
   [bottomBLV setFormatProsign:YES];
   NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
-  [defs addObserver:self forKeyPath:@"freq" options:NSKeyValueObservingOptionNew context:NULL];
-  [defs addObserver:self forKeyPath:@"amp" options:NSKeyValueObservingOptionNew context:NULL];
-  [defs addObserver:self forKeyPath:@"wpm" options:NSKeyValueObservingOptionNew context:NULL];
-  [defs addObserver:self forKeyPath:@"cwpm" options:NSKeyValueObservingOptionNew context:NULL];
-  [defs addObserver:self forKeyPath:@"loop" options:NSKeyValueObservingOptionNew context:NULL];
-  [defs addObserver:self forKeyPath:@"flash" options:NSKeyValueObservingOptionNew context:NULL];
-  [defs addObserver:self forKeyPath:@"pan" options:NSKeyValueObservingOptionNew context:NULL];
-  [defs addObserver:self forKeyPath:@"qrn" options:NSKeyValueObservingOptionNew context:NULL];
-  [defs addObserver:self forKeyPath:@"qrnWhite" options:NSKeyValueObservingOptionNew context:NULL];
   NSString* where = [[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"];
   NSDictionary* d = [NSDictionary dictionaryWithContentsOfFile:where];
+  for (NSString* key in d)
+    [defs addObserver:self forKeyPath:key options:NSKeyValueObservingOptionNew context:NULL];
   [[NSUserDefaults standardUserDefaults] registerDefaults:d];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(renderDone:) name:MorseRendererFinishedNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wordStarted:) name:MorseRendererStartedWordNotification object:nil];
@@ -119,9 +112,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [tabs selectTabViewItemWithIdentifier:[[NSUserDefaults standardUserDefaults] objectForKey:@"tab"]];
   score = [[NSMutableDictionary alloc] init];
   NSDictionary* scoredic = [[NSUserDefaults standardUserDefaults] objectForKey:@"score"];
-  NSEnumerator* en = [scoredic keyEnumerator];
-  NSString* key;
-  while ((key = [en nextObject])) 
+  for (NSString* key in scoredic) 
   {
     NSDictionary* dic = [scoredic objectForKey:key];
     NSMutableDictionary* sdic = [dic mutableCopy];
@@ -565,6 +556,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(BOOL)validateMenuItem:(NSMenuItem*)item
 {
   id tabID = [[tabs selectedTabViewItem] identifier];
+  SEL action = [item action];
   /*if ([item action] == @selector(startStop:))
   {
     NSString* ti = [[Onizuka sharedOnizuka] copyLocalizedTitle:(state == CWSNotTestingState)? @"__PLAY__":@"__PAUSE__"];
@@ -572,11 +564,11 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     [ti release];
     if ([tabID isEqual:@"3"]) return NO;
   }
-  else*/ if ([item action] == @selector(genQSO:))
+  else*/ if (action == @selector(genQSO:))
   {
-    if (![tabID isEqual:@"1"] && ![tabID isEqual:@"3"]) return NO;
+    if (![tabID isEqual:@"1"]) return NO;
   }
-  else if ([item action] == @selector(makeProsign:))
+  else if (action == @selector(makeProsign:))
   {
     if (![tabID isEqual:@"1"]) return NO;
   }
