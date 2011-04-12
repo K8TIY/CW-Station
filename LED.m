@@ -8,14 +8,14 @@ I hereby place this code in the public domain.
 #include "LED.h";
 
 static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement,
-																		uint32_t inUsagePage,
-																		uint32_t inUsage);
+                                    uint32_t inUsagePage,
+                                    uint32_t inUsage);
 
 static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement,
-																		uint32_t inUsagePage,
-																		uint32_t inUsage)
+                                    uint32_t inUsagePage,
+                                    uint32_t inUsage)
 {
-	NSMutableDictionary* dic = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+  NSMutableDictionary* dic = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                [NSNumber numberWithUnsignedInt:inUsagePage],
                                (isDeviceNotElement)?
                                  CFSTR(kIOHIDDeviceUsagePageKey):
@@ -33,38 +33,38 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
 {
   self = [super init];
   // create a IO HID Manager reference
-	IOHIDManagerRef mgr = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
-	require(mgr, Oops);
-	// Create a device matching dictionary
-	NSDictionary* dic = _CreateMatchingDictionary(true, kHIDPage_GenericDesktop,
-																				        kHIDUsage_GD_Keyboard);
+  IOHIDManagerRef mgr = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+  require(mgr, Oops);
+  // Create a device matching dictionary
+  NSDictionary* dic = _CreateMatchingDictionary(true, kHIDPage_GenericDesktop,
+                                                kHIDUsage_GD_Keyboard);
   require(dic, Oops);
-	// set the HID device matching dictionary
-	IOHIDManagerSetDeviceMatching(mgr, (CFDictionaryRef)dic);
-	[dic release];
-	// Now open the IO HID Manager reference
-	IOReturn err = IOHIDManagerOpen(mgr, kIOHIDOptionsTypeNone);
-	require_noerr(err, Oops);
-	// and copy out its devices
-	CFSetRef deviceCFSetRef = IOHIDManagerCopyDevices(mgr);
-	require(deviceCFSetRef, Oops);
-	// how many devices in the set?
-	CFIndex deviceIndex, deviceCount = CFSetGetCount(deviceCFSetRef);
-	// allocate a block of memory to extact the device refs from the set into
-	IOHIDDeviceRef* refs = malloc(sizeof(IOHIDDeviceRef) * deviceCount);
-	require(refs, Oops);
-	// now extract the device refs from the set
-	CFSetGetValues(deviceCFSetRef, (const void**)refs);
-	// before we get into the device loop we'll setup our element matching dictionary
-	dic = _CreateMatchingDictionary(false, kHIDPage_LEDs, 0);
-	require(dic, Oops);
+  // set the HID device matching dictionary
+  IOHIDManagerSetDeviceMatching(mgr, (CFDictionaryRef)dic);
+  [dic release];
+  // Now open the IO HID Manager reference
+  IOReturn err = IOHIDManagerOpen(mgr, kIOHIDOptionsTypeNone);
+  require_noerr(err, Oops);
+  // and copy out its devices
+  CFSetRef deviceCFSetRef = IOHIDManagerCopyDevices(mgr);
+  require(deviceCFSetRef, Oops);
+  // how many devices in the set?
+  CFIndex deviceIndex, deviceCount = CFSetGetCount(deviceCFSetRef);
+  // allocate a block of memory to extact the device refs from the set into
+  IOHIDDeviceRef* refs = malloc(sizeof(IOHIDDeviceRef) * deviceCount);
+  require(refs, Oops);
+  // now extract the device refs from the set
+  CFSetGetValues(deviceCFSetRef, (const void**)refs);
+  // before we get into the device loop we'll setup our element matching dictionary
+  dic = _CreateMatchingDictionary(false, kHIDPage_LEDs, 0);
+  require(dic, Oops);
   for (deviceIndex = 0; deviceIndex < deviceCount; deviceIndex++)
   {
     // if this isn't a keyboard device...
     if (!IOHIDDeviceConformsTo(refs[deviceIndex], kHIDPage_GenericDesktop, kHIDUsage_GD_Keyboard))
     {
       //printf("skipping nonconforming device at %d\n", deviceIndex);
-      continue;	// ...skip it
+      continue;  // ...skip it
     }
     // copy all the elements
     CFArrayRef elements = IOHIDDeviceCopyMatchingElements(refs[deviceIndex],
@@ -87,17 +87,17 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
         ledElement = (IOHIDElementRef)CFRetain(element);
         break;
       }
-    next_element:	;
+    next_element:  ;
       continue;
     }
   next_device: ;
     CFRelease(elements);
     continue;
   }
-	if (mgr) CFRelease(mgr);
-	if (dic) [dic release];
+  if (mgr) CFRelease(mgr);
+  if (dic) [dic release];
   free(refs);
-Oops:	;
+Oops:  ;
   return self;
 }
 

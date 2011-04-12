@@ -18,18 +18,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 int main(int argc, const char *argv[])
 {
-	// Is this process running as root?
-	if (geteuid() != 0)
+  // Is this process running as root?
+  if (geteuid() != 0)
   {
-		fprintf(stderr, "Not running as root\n");
-		exit(-1);
-	}
-	// Was there one argument?
-	if (argc != 2)
+    fprintf(stderr, "Not running as root\n");
+    exit(-1);
+  }
+  // Was there one argument?
+  if (argc != 2)
   {
-		fprintf(stderr, "Usage: mktrusted <dir>\n");
-		exit(-1);
-	}
+    fprintf(stderr, "Usage: mktrusted <dir>\n");
+    exit(-1);
+  }
   CFStringRef path = CFStringCreateWithCString(kCFAllocatorDefault, argv[1], kCFStringEncodingUTF8); 
   AXError err = AXMakeProcessTrusted(path);
   CFRelease(path);

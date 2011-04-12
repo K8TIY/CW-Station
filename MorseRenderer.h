@@ -32,9 +32,9 @@ typedef struct
   float freq;
   float amp;
   float pan;
-	float freqz;    // for dezipper filter
-  float ampz;	    // for dezipper filter
-	float phase;		// oscillator phase in radians
+  float freqz;    // for dezipper filter
+  float ampz;     // for dezipper filter
+  float phase;    // oscillator phase in radians
   float wpm;
   float cwpm;
   float samplesPerDit;
@@ -42,8 +42,8 @@ typedef struct
   float interword;
   unsigned agendaCount;
   unsigned agendaDone;
-	unsigned agendaItemElementsDone;
-	unsigned agendaItemElementSamplesDone;
+  unsigned agendaItemElementsDone;
+  unsigned agendaItemElementSamplesDone;
   MorseRendererMode mode;
   MorseRendererMode lastMode;
   BOOL doingInterelementSpace;

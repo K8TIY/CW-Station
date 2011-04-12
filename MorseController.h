@@ -9,7 +9,7 @@
   IBOutlet NSWindow* window;
   IBOutlet NSWindow* prefsWindow;
   IBOutlet NSTabView* tabs;
-	IBOutlet NSTextView* inputField;
+  IBOutlet NSTextView* inputField;
   IBOutlet NSButton* repeatButton;
   IBOutlet NSButton* startStopButton;
   IBOutlet NSSlider* panSlider;
@@ -23,7 +23,7 @@
   IBOutlet NSWindow* authWindow;
   IBOutlet SFAuthorizationView* authView;
   IBOutlet NSTextField* authField;
-	IBOutlet MorseRenderer* renderer;
+  IBOutlet MorseRenderer* renderer;
   IBOutlet NSMenuItem* playPauseMenuItem;
   Wordlist* words;
   NSMutableArray* qso;
