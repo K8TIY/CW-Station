@@ -2,21 +2,33 @@ This is CW Station version 1.0.
 
 What can you do with this thing?
 
-- In the first pane, "Generate", type in text to play as Morse code.
---- You can "Generate QSO" to randomly generate one side of a possibly funny QSO.
---- Turn a group of characters into a prosign (like S̅K̅) by selecting them and pressing the "Make Prosign" button.
---- Instead of playing the Morse code, you can save it as audio using "File -> Export AIFF Audio".
------ Use GarageBand to turn this file into a custom ringtone. Amaze your friends; terrify your enemies!
+- In the first pane, "Generate", type or paste text to play as Morse code.
+  CW Station will highlight each word when it begins to play it.
+--- "Generate QSO" (menu) to randomly generate one side of a possibly funny QSO.
+--- Turn a group of characters into a prosign (like S̅K̅) by selecting them and
+    pressing the "Make Prosign" button or menu item.
+--- Instead of playing the Morse code, you can save it as audio using
+    "File -> Export AIFF Audio".
+----- Use GarageBand to turn this file into a custom ringtone.
+      Amaze your friends; terrify your enemies!
 --- For Farnsworth spacing, set (for example) CWPM to 20 and WPM to 5.
-- In the "Test" pane, you can have CW Station quiz you on random symbols, or dictionary words.
---- Check the "Practice Mode" box for practice; it will show the words as it sends CW.
---- If not in "Practice Mode" it will keep track of your score and show it in the next tab.
+--- Simulate noisy conditions by turning on QRN as white/pink noise.
+- In the "Test" pane, you can have CW Station quiz you on random symbols,
+  words from a simulated QSO, or dictionary words.
+--- Check "Practice Mode" for practice; it will show the words as it sends CW.
+--- If not in "Practice Mode" it will keep track of your score and show it in
+    the next tab.
 --- To enter a prosign here, hold down the shift key.
-- You can "Send" CW using your shift key as a Morse keyer. CW Station will try to recognize what you're sending.
---- It will use your deviation from the calculated tone/space timings to try to rate your fist "Quality".
---- Hint: you have to click the "Play" button before it will go into "keyer" mode.
---- Hint: it your WPM setting to distinguish dots from dashes, but ignores CWPM.
---- Note: this does not work all that well, and is probably inferior to more specialized practice setups.
+- You can "Send" CW using your shift key as a Morse keyer.
+  CW Station will try to recognize what you're sending.
+--- It will use your deviation from the calculated tone/space timings to try to
+    rate your fist "Quality".
+--- Hint: click the "Play" button to go into keyer mode.
+--- Hint: it uses your WPM setting to distinguish dots from dashes,
+          but ignores CWPM.
+--- Note: this does not work all that well, and is probably inferior to more
+          specialized practice setups. In fact, if no one tells me this is a 
+          useful feature, I may remove it. I would make the code a lot cleaner.
 --- Note: in order for this to work, CW Station will prompt you to enter
           your password to authorize CW Station as a "trusted" application.
           The other option is to check "Enable access for assistive devices" in
@@ -43,20 +55,22 @@ audio.
 *** TO COMPILE THE CODE ***
 
 Requires my Onizuka localizer from https://github.com/K8TIY/Onizuka.
-Needs to be in the same directory as the CW Station directory, or you can tell
-XCode where to find the Onizuka files if they are elsewhere.
+It's set up as a git submodule, so just do the usual git submodule
+magic to get it set up. (Don't ask me about it -- I'm new to git and submodules
+make my head hurt.)
 
 *** TODO ***
 
+Do I need to give users more time for their panicky typing in Test mode?
 Koch method?
-QRM/QRN synthesis?
-Make the QSO library more up to date and/or more realistic?
+Make the QSO library more up to date and/or more realistic
+  (in progress; comments welcome).
 Simulate contest QSOs?
 Option to flash num lock LED (if it exists) instead of caps lock.
-Weight random character selection by score.
+Weight random character selection by score (done now rather crudely).
 
 *** NOT TODO ***
 
 Rig control/interface. CW Station is not an operating aid.
 Other digital methods. (For me, when the radio goes on the computer goes off.)
-Stuff other Mac developers have done right.
+Stuff other Mac developers have done right (in open source, that is).
