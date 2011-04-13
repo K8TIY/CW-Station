@@ -21,14 +21,17 @@ What can you do with this thing?
 --- To enter a prosign here, hold down the shift key.
 - You can "Send" CW using your shift key as a Morse keyer.
   CW Station will try to recognize what you're sending.
+--- Note: this does not work all that well, and is probably inferior to more
+          specialized practice setups. In fact, if no one tells me this is a 
+          useful feature, I may remove it. It would make the code a lot cleaner.
+          I ended up building a picokeyer and getting a straight key, so to
+          rate my sending I just "play along" with a QSO and try to match the
+          spacing.
 --- It will use your deviation from the calculated tone/space timings to try to
     rate your fist "Quality".
 --- Hint: click the "Play" button to go into keyer mode.
 --- Hint: it uses your WPM setting to distinguish dots from dashes,
           but ignores CWPM.
---- Note: this does not work all that well, and is probably inferior to more
-          specialized practice setups. In fact, if no one tells me this is a 
-          useful feature, I may remove it. I would make the code a lot cleaner.
 --- Note: in order for this to work, CW Station will prompt you to enter
           your password to authorize CW Station as a "trusted" application.
           The other option is to check "Enable access for assistive devices" in
@@ -74,3 +77,9 @@ Weight random character selection by score (done now rather crudely).
 Rig control/interface. CW Station is not an operating aid.
 Other digital methods. (For me, when the radio goes on the computer goes off.)
 Stuff other Mac developers have done right (in open source, that is).
+
+*** PLEASE CONTRIBUTE ***
+
+If you contribute to the project, I'll be sure to add your callsign to the QSO
+library! If you're a native speaker of Japanese, please check my translations.
+They're about Google-quality; some are Google-derived!
