@@ -4,6 +4,7 @@
 #import <SecurityInterface/SFAuthorizationView.h>
 #import "Wordlist.h";
 
+
 @interface MorseController : NSObject
 {
   IBOutlet NSWindow* window;
@@ -13,9 +14,16 @@
   IBOutlet NSButton* repeatButton;
   IBOutlet NSButton* startStopButton;
   IBOutlet NSSlider* panSlider;
+  // Test pane
   IBOutlet BigLetterView* topBLV;
   IBOutlet BigLetterView* bottomBLV;
+  IBOutlet NSPopUpButton* minButton;
+  IBOutlet NSPopUpButton* maxButton;
+  IBOutlet NSPopUpButton* sourceButton;
+  IBOutlet NSPopUpButton* setButton;
+  // Score pane
   IBOutlet NSTableView* scoreTable;
+  // Send pane
   IBOutlet NSTextField* sentField;
   IBOutlet NSLevelIndicator* qualityIndicator;
   IBOutlet NSTextField* tWPMField;

@@ -40,6 +40,10 @@
 				<string>BigLetterView</string>
 				<key>inputField</key>
 				<string>NSTextView</string>
+				<key>maxButton</key>
+				<string>NSPopUpButton</string>
+				<key>minButton</key>
+				<string>NSPopUpButton</string>
 				<key>panSlider</key>
 				<string>NSSlider</string>
 				<key>playPauseMenuItem</key>
@@ -58,6 +62,10 @@
 				<string>NSTableView</string>
 				<key>sentField</key>
 				<string>NSTextField</string>
+				<key>setButton</key>
+				<string>NSPopUpButton</string>
+				<key>sourceButton</key>
+				<string>NSPopUpButton</string>
 				<key>startStopButton</key>
 				<string>NSButton</string>
 				<key>tWPMField</key>

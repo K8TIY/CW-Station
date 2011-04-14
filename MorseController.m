@@ -642,59 +642,58 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 {
   #pragma unused (object,ctx)
   //NSLog(@"observeValueForKeyPath:%@ ofObject:%@ change:%@", path, object, change);
+  id newval = [change objectForKey:NSKeyValueChangeNewKey];
   if ([path isEqual:@"freq"])
   {
-    id newval = [change objectForKey:NSKeyValueChangeNewKey];
     [renderer setFreq:[newval floatValue]];
   }
   else if ([path isEqual:@"amp"])
   {
-    id newval = [change objectForKey:NSKeyValueChangeNewKey];
     [renderer setAmp:[newval floatValue]];
   }
   else if ([path isEqual:@"wpm"])
   {
-    float newval = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
-    //NSLog(@"wpm %f", newval);
-    [renderer setWPM:newval];
-    [recognizer setWPM:newval];
+    float newvalf = [newval floatValue];
+    //NSLog(@"wpm %f", newvalf);
+    [renderer setWPM:newvalf];
+    [recognizer setWPM:newvalf];
     float cwpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"cwpm"] floatValue];
-    if (cwpm < newval) [[NSUserDefaults standardUserDefaults] setFloat:newval forKey:@"cwpm"];
+    if (cwpm < newvalf) [[NSUserDefaults standardUserDefaults] setFloat:newvalf forKey:@"cwpm"];
   }
   else if ([path isEqual:@"cwpm"])
   {
-    float newval = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
-    //NSLog(@"cwpm %f", newval);
-    [renderer setCWPM:newval];
-    //[recognizer setCWPM:newval];
+    float newvalf = [newval floatValue];
+    //NSLog(@"cwpm %f", newvalf);
+    [renderer setCWPM:newvalf];
+    //[recognizer setCWPM:newvalf];
     float wpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"wpm"] floatValue];
-    if (wpm > newval) [[NSUserDefaults standardUserDefaults] setFloat:newval forKey:@"wpm"];
+    if (wpm > newvalf) [[NSUserDefaults standardUserDefaults] setFloat:newvalf forKey:@"wpm"];
   }
   else if ([path isEqual:@"loop"])
   {
-    id newval = [change objectForKey:NSKeyValueChangeNewKey];
     [renderer setLoop:[newval boolValue]];
   }
   else if ([path isEqual:@"flash"])
   {
-    id newval = [change objectForKey:NSKeyValueChangeNewKey];
     [renderer setFlash:[newval boolValue]];
   }
   else if ([path isEqual:@"pan"])
   {
-    id newval = [change objectForKey:NSKeyValueChangeNewKey];
     [renderer setPan:[newval floatValue]];
   }
   else if ([path isEqual:@"qrn"])
   {
-    id newval = [change objectForKey:NSKeyValueChangeNewKey];
     [renderer setQRN:[newval floatValue]];
   }
   else if ([path isEqual:@"qrnWhite"])
   {
-    id newval = [change objectForKey:NSKeyValueChangeNewKey];
     [renderer setQRNWhite:[newval boolValue]];
   }
+  unsigned src = [[NSUserDefaults standardUserDefaults] integerForKey:@"source"];
+  unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
+  [minButton setEnabled:(src<3&&set<5)];
+  [maxButton setEnabled:(src<3&&set<5)];
+  
 }
 
 -(void)aiffExportDidEnd:(NSSavePanel*)sheet returnCode:(int)code contextInfo:(void*)contextInfo
@@ -776,3 +775,4 @@ static CGEventTimestamp UpTimeInNanoseconds(void)
   timeNano = time * sTimebaseInfo.numer / sTimebaseInfo.denom;
   return timeNano;
 }
+
