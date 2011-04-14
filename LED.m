@@ -95,7 +95,7 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
     continue;
   }
   if (mgr) CFRelease(mgr);
-  if (dic) [dic release];
+  [dic release];
   free(refs);
 Oops:  ;
   return self;
