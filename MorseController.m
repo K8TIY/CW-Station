@@ -21,47 +21,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #import <unistd.h>
 #import <CoreFoundation/CoreFoundation.h>
 
-
-#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
-@interface NSString (SPStringAdditions)
--(NSArray*)componentsSeparatedByCharactersInSet:(NSCharacterSet*)set;
-@end
-
-@implementation NSString (SPStringAdditions)
-/*
- * componentsSeparatedByCharactersInSet:
- * Credit - Greg Hulands <ghulands@mac.com>
- * Needed for 10.4+ compatibility
- */
--(NSArray*)componentsSeparatedByCharactersInSet:(NSCharacterSet *)set // 10.5 adds this to NSString, but we are 10.4+
-{
-    NSMutableArray *result = [NSMutableArray array];
-    NSScanner *scanner = [NSScanner scannerWithString:self];
-    NSString *chunk = nil;
-   
-    [scanner setCharactersToBeSkipped:nil];
-    BOOL sepFound = [scanner scanCharactersFromSet:set intoString:(NSString **)nil]; // skip any preceding separators
-   
-    if (sepFound) { // if initial separator, start with empty component
-        [result addObject:@""];
-    }
-   
-    while ([scanner scanUpToCharactersFromSet:set intoString:&chunk]) {
-        [result addObject:chunk];
-        sepFound = [scanner scanCharactersFromSet: set intoString: (NSString **) nil];
-    }
-   
-    if (sepFound) { // if final separator, end with empty component
-        [result addObject: @""];
-    }
-   
-    result = [result copy];
-    return [result autorelease];
-}
-@end
-#endif
-
-CFRunLoopRef CFRunLoopGetMain();
 enum
 {
   CWSNotTestingState,
@@ -79,6 +38,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(void)startNewTest;
 -(BOOL)checkTestResponseWithFeedback:(BOOL)fb;
 -(void)updateScore;
+-(void)updateScoreForString:(NSString*)s correct:(BOOL)correct;
 -(NSString*)randomStringFromArray:(NSArray*)array ofLength:(unsigned)length;
 -(void)shiftKey:(BOOL)isdown atTime:(CGEventTimestamp)time fromTimer:(BOOL)flag;
 -(void)keycheck:(CGEventRef)event;
@@ -323,12 +283,12 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     n = min + (arc4random() % (max-min+1));
   }
   //NSLog(@"%d characters", n);
-  unsigned which = [[[NSUserDefaults standardUserDefaults] objectForKey:@"source"] unsignedIntValue];
+  unsigned src = [[NSUserDefaults standardUserDefaults] integerForKey:@"source"];
+  unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
   NSString* s = nil;
-  if (which == 1)
+  if (src == 1)
   {
     NSArray* whichArray;
-    unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
     switch (set)
     {
       case 2: whichArray = [Morse numbers]; break;
@@ -339,7 +299,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     }
     s = [self randomStringFromArray:whichArray ofLength:n];
   }
-  else if (which == 2)
+  else if (src == 2)
   {
     s = [words randomStringOfLength:n];
   }
@@ -393,8 +353,15 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(void)updateScore
 {
   unsigned i;
-  NSString* s1 = [Morse formatString:[renderer string]];
+  NSString* s1 = [renderer string];
   NSString* s2 = [Morse formatString:[bottomBLV string]];
+  // Remove the overline from prosigns.
+  // I'd prefer to treat them as full entities, but that will require mods
+  // to levenshtein, so this is a stopgap.
+  NSCharacterSet* cs = [NSCharacterSet characterSetWithCharactersInString:@"\xCC\x85"];
+  s1 = [[s1 componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
+  s2 = [[s2 componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
+  NSLog(@"s1: '%@' s2: '%@'", s1, s2);
   Levenshtein* lev = [[Levenshtein alloc] initWithString:s1 andString:s2];
   NSArray* a = [lev alignmentWithPlaceholder:kPlaceholder];
   s1 = [a objectAtIndex:0];
@@ -407,21 +374,26 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     if (c1 == kPlaceholderCh) continue;
     NSString* s3 = [[NSString alloc] initWithFormat:@"%C", c1];
     BOOL correct = (c1 == c2 && c2 != kPlaceholderCh);
-    NSMutableDictionary* d = [score objectForKey:s3];
-    if (!d)
-    {
-      d = [[NSMutableDictionary alloc] init];
-      [score setObject:d forKey:s3];
-      [d release];
-    }
-    unsigned n = [[d objectForKey:@"n"] unsignedIntValue] + (correct)? 1:0;
-    unsigned of = [[d objectForKey:@"of"] unsignedIntValue] + 1;
-    [d setObject:[NSNumber numberWithUnsignedInt:n] forKey:@"n"];
-    [d setObject:[NSNumber numberWithUnsignedInt:of] forKey:@"of"];
+    [self updateScoreForString:s3 correct:correct];
     [s3 release];
   }
   [lev release];
   //NSLog(@"Score is now %@", score);
+}
+
+-(void)updateScoreForString:(NSString*)s correct:(BOOL)correct
+{
+  NSMutableDictionary* d = [score objectForKey:s];
+  if (!d)
+  {
+    d = [[NSMutableDictionary alloc] init];
+    [score setObject:d forKey:s];
+    [d release];
+  }
+  unsigned n = [[d objectForKey:@"n"] unsignedIntValue] + (correct)? 1:0;
+  unsigned of = [[d objectForKey:@"of"] unsignedIntValue] + 1;
+  [d setObject:[NSNumber numberWithUnsignedInt:n] forKey:@"n"];
+  [d setObject:[NSNumber numberWithUnsignedInt:of] forKey:@"of"];
 }
 
 -(NSString*)randomStringFromArray:(NSArray*)array ofLength:(unsigned)length
@@ -693,7 +665,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
   [minButton setEnabled:(src<3&&set<5)];
   [maxButton setEnabled:(src<3&&set<5)];
-  
+  [setButton setEnabled:(src==1)];
 }
 
 -(void)aiffExportDidEnd:(NSSavePanel*)sheet returnCode:(int)code contextInfo:(void*)contextInfo
