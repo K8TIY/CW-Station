@@ -276,7 +276,6 @@ uint16_t MorseInterwordSpace = 0x0018;
 
 -(uint16_t)feed:(double*)duration
 {
-  uint16_t chr = MorseNoCharacter;
   // Put the event in the buffer
   if (duration)
   {
@@ -292,8 +291,7 @@ uint16_t MorseInterwordSpace = 0x0018;
     if (_bufferCount < MorseBufferSize) _bufferCount++;
     _buffer[where] = *duration;
   }
-  chr = [self _recognize];
-  return chr;
+  return [self _recognize];
 }
 
 -(MorseRecognizerQuality)quality

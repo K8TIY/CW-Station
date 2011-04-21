@@ -11,7 +11,8 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 @implementation BigLetterView
 -(id)initWithFrame:(NSRect)rect
 {
-  if (![super initWithFrame:rect]) return nil;
+  self = [super initWithFrame:rect];
+  if (!self) return nil;
   [self prepareAttributes];
   bgColor = [[NSColor grayColor] retain];
   string = [[NSMutableString alloc] init];
@@ -62,7 +63,7 @@ NSString* BigLetterViewTextNotification = @"BigLetterViewTextNotification";
 -(void)setCanBecomeFirstResponder:(BOOL)flag { canBecomeFirstResponder = flag; }
 -(void)setBGColor:(NSColor*)col
 {
-  col = [col retain];
+  [col retain];
   if (bgColor) [bgColor release];
   bgColor = col;
   [self setNeedsDisplay:YES];

@@ -32,6 +32,8 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
 -(id)init
 {
   self = [super init];
+  CFSetRef deviceCFSetRef = NULL;
+  IOHIDDeviceRef* refs = NULL;
   // create a IO HID Manager reference
   IOHIDManagerRef mgr = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
   require(mgr, Oops);
@@ -46,12 +48,12 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
   IOReturn err = IOHIDManagerOpen(mgr, kIOHIDOptionsTypeNone);
   require_noerr(err, Oops);
   // and copy out its devices
-  CFSetRef deviceCFSetRef = IOHIDManagerCopyDevices(mgr);
+  deviceCFSetRef = IOHIDManagerCopyDevices(mgr);
   require(deviceCFSetRef, Oops);
   // how many devices in the set?
   CFIndex deviceIndex, deviceCount = CFSetGetCount(deviceCFSetRef);
   // allocate a block of memory to extact the device refs from the set into
-  IOHIDDeviceRef* refs = malloc(sizeof(IOHIDDeviceRef) * deviceCount);
+  refs = malloc(sizeof(IOHIDDeviceRef) * deviceCount);
   require(refs, Oops);
   // now extract the device refs from the set
   CFSetGetValues(deviceCFSetRef, (const void**)refs);
@@ -91,13 +93,14 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
       continue;
     }
   next_device: ;
-    CFRelease(elements);
+    if (elements) CFRelease(elements);
     continue;
   }
   if (mgr) CFRelease(mgr);
   [dic release];
-  free(refs);
 Oops:  ;
+  if (deviceCFSetRef) CFRelease(deviceCFSetRef);
+  if (refs) free(refs);
   return self;
 }
 
