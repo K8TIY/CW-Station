@@ -474,11 +474,15 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		32190E6D1222C75E008B4E80 /* Development */ = {
+		32190E6D1222C75E008B4E80 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					ppc,
+					i386,
+					x86_64,
+				);
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -486,7 +490,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				GCC_VERSION = "";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INSTALL_PATH = /usr/local/bin;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -494,21 +498,26 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = mktrusted;
+				SDKROOT = macosx10.5;
 			};
-			name = Development;
+			name = Debug;
 		};
 		32190E6E1222C75E008B4E80 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					ppc,
+					i386,
+					x86_64,
+				);
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				GCC_VERSION = "";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				INSTALL_PATH = /usr/local/bin;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -516,11 +525,12 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = mktrusted;
+				SDKROOT = macosx10.5;
 				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
-		A6E430BF0C5184DE00BA6C4B /* Development */ = {
+		A6E430BF0C5184DE00BA6C4B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -554,7 +564,7 @@
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
-			name = Development;
+			name = Debug;
 		};
 		A6E430C00C5184DE00BA6C4B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -590,7 +600,7 @@
 			};
 			name = Release;
 		};
-		A6E430C70C5184DE00BA6C4B /* Development */ = {
+		A6E430C70C5184DE00BA6C4B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -607,7 +617,7 @@
 				SDKROOT = macosx10.4;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 			};
-			name = Development;
+			name = Debug;
 		};
 		A6E430C80C5184DE00BA6C4B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -634,29 +644,29 @@
 		32190E771222C7C5008B4E80 /* Build configuration list for PBXNativeTarget "mktrusted" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				32190E6D1222C75E008B4E80 /* Development */,
 				32190E6E1222C75E008B4E80 /* Release */,
+				32190E6D1222C75E008B4E80 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "CW Station" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A6E430BF0C5184DE00BA6C4B /* Development */,
 				A6E430C00C5184DE00BA6C4B /* Release */,
+				A6E430BF0C5184DE00BA6C4B /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 		A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "CWStation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A6E430C70C5184DE00BA6C4B /* Development */,
 				A6E430C80C5184DE00BA6C4B /* Release */,
+				A6E430C70C5184DE00BA6C4B /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
