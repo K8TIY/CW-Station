@@ -332,7 +332,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(BOOL)checkTestResponseWithFeedback:(BOOL)fb
 {
   if ([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"]) return YES;
-  BOOL good = [[Morse formatString:[bottomBLV string]] isEqual:[renderer string]];
+  BOOL good = [[Morse formatString:[bottomBLV string]] isEqualToString:[renderer string]];
   if (fb)
   {
     NSString* key = (good)? @"correctColor":@"incorrectColor";
@@ -615,15 +615,15 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   #pragma unused (object,ctx)
   //NSLog(@"observeValueForKeyPath:%@ ofObject:%@ change:%@", path, object, change);
   id newval = [change objectForKey:NSKeyValueChangeNewKey];
-  if ([path isEqual:@"freq"])
+  if ([path isEqualToString:@"freq"])
   {
     [renderer setFreq:[newval floatValue]];
   }
-  else if ([path isEqual:@"amp"])
+  else if ([path isEqualToString:@"amp"])
   {
     [renderer setAmp:[newval floatValue]];
   }
-  else if ([path isEqual:@"wpm"])
+  else if ([path isEqualToString:@"wpm"])
   {
     float newvalf = [newval floatValue];
     //NSLog(@"wpm %f", newvalf);
@@ -632,7 +632,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     float cwpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"cwpm"] floatValue];
     if (cwpm < newvalf) [[NSUserDefaults standardUserDefaults] setFloat:newvalf forKey:@"cwpm"];
   }
-  else if ([path isEqual:@"cwpm"])
+  else if ([path isEqualToString:@"cwpm"])
   {
     float newvalf = [newval floatValue];
     //NSLog(@"cwpm %f", newvalf);
@@ -641,23 +641,23 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     float wpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"wpm"] floatValue];
     if (wpm > newvalf) [[NSUserDefaults standardUserDefaults] setFloat:newvalf forKey:@"wpm"];
   }
-  else if ([path isEqual:@"loop"])
+  else if ([path isEqualToString:@"loop"])
   {
     [renderer setLoop:[newval boolValue]];
   }
-  else if ([path isEqual:@"flash"])
+  else if ([path isEqualToString:@"flash"])
   {
     [renderer setFlash:[newval boolValue]];
   }
-  else if ([path isEqual:@"pan"])
+  else if ([path isEqualToString:@"pan"])
   {
     [renderer setPan:[newval floatValue]];
   }
-  else if ([path isEqual:@"qrn"])
+  else if ([path isEqualToString:@"qrn"])
   {
     [renderer setQRN:[newval floatValue]];
   }
-  else if ([path isEqual:@"qrnWhite"])
+  else if ([path isEqualToString:@"qrnWhite"])
   {
     [renderer setQRNWhite:[newval boolValue]];
   }
