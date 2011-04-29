@@ -111,7 +111,6 @@
 #include <time.h>
 #include "QSO.h"
 
-static NSString* Choose(NSString* name);
 static NSString* A_Or_An(NSString* string);
 static BOOL is_vowel(unichar first);
 
@@ -622,7 +621,7 @@ NSDictionary* gDict = nil;
   switch (Roll (8))
   {
     case 2:
-    [_qso appendFormat:Choose(@"Frqmisc"), make_freq()];
+    [_qso appendFormat:Choose(@"Frqmisc"), MakeFrequency(0, 0)];
     break;
 
     case 3:
@@ -630,7 +629,7 @@ NSDictionary* gDict = nil;
     break;
 
     case 4:
-    [_qso appendFormat:Choose(@"Frqcallmisc"), Choose(@"Call"), make_freq()];
+    [_qso appendFormat:Choose(@"Frqcallmisc"), Choose(@"Call"), MakeFrequency(0, 0)];
     break;
 
     case 5:
@@ -663,7 +662,7 @@ NSDictionary* gDict = nil;
 }
 @end
 
-static NSString* Choose(NSString* name)
+NSString* Choose(NSString* name)
 {
   if (!gDict)
   {
@@ -697,66 +696,64 @@ static BOOL is_vowel(unichar first)
   );
 }
 
-#import "QSO.h"
-
 int Roll(int Number)
 {
   return arc4random() % Number;
 }
 
-enum
+int MakeFrequency(unsigned band, BOOL voice)
 {
-  M160,
-  M80,
-  M40,
-  M30,
-  M20,
-  M17,
-  M15,
-  M12,
-  M10,
-  M6,
-  NUM_BAND
-};
-
-int make_freq(void)
-{
-  switch (Roll(NUM_BAND))
+  if (!band) band = Roll(M6);
+  unsigned base = (voice)? 7128:7000;
+  unsigned range = (voice)? 172:100;
+  switch (band)
   {
     case M160:
-    return (1800 + Roll(100));
+    base = 1800;
+    range = 200;
     break;
     case M80:
-    return (3500 + Roll(100));
+    base = (voice)? 3604:3500;
+    range = (voice)? 396:100;
     break;
     case M40:
-    return (7000 + Roll(125));
+    base = (voice)? 7129:7000;
+    range = (voice)? 171:125;
     break;
     case M30:
-    return (10100 + Roll(50));
+    base = 10100;
+    range = 50;
     break;
     case M20:
-    return (14000 + Roll(150));
+    base = (voice)? 14150:14000;
+    range = (voice)? 196:150;
     break;
     case M17:
-    return (18068 + Roll(42));
+    base = (voice)? 18110:18068;
+    range = (voice)? 54:42;
     break;
     case M15:
-    return (21000 + Roll(200));
+    base = (voice)? 21200:21000;
+    range = (voice)? 246:200;
     break;
     case M12:
-    return (24890 + Roll(40));
+    base = (voice)? 24930:24890;
+    range = (voice)? 56:40;
     break;
     case M10:
-    return (28000 + Roll(300));
+    base = (voice)? 28300:28000;
+    range = (voice)? 1396:300;
     break;
     case M6:
-    return (50000 + Roll(100));
+    base = (voice)? 50100:50000;
+    range = (voice)? 3896:4000;
     break;
-    default:
-    return (7000 + Roll(125));
+    case M2:
+    base = (voice)? 144100:144000;
+    range = (voice)? 3896:4000;
     break;
   }
+  return (base + Roll(range));
 }
 
 

@@ -41,8 +41,22 @@
 -(void)PutQSO;
 @end
 
+enum
+{
+  M160 = 1,
+  M80,
+  M40,
+  M30,
+  M20,
+  M17,
+  M15,
+  M12,
+  M10,
+  M6,
+  M2
+};
 
-int make_freq(void);
+int MakeFrequency(unsigned band, BOOL voice);
 int Roll(int Number);
-
+NSString* Choose(NSString* name);
 
