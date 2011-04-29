@@ -14,6 +14,14 @@ extern NSString* MorseRendererStartedWordNotification;
 
 typedef enum
 {
+  MorseRendererWaveSine,
+  MorseRendererWaveSaw,
+  MorseRendererWaveSquare,
+  MorseRendererWaveTriangle
+} MorseRendererWaveType;
+
+typedef enum
+{
   MorseRendererAgendaMode,
   MorseRendererOnMode,
   MorseRendererOffMode,
@@ -26,49 +34,50 @@ typedef enum
 
 typedef struct
 {
-  LED* led;
-  uint16_t* agenda;
-  NSDictionary* offsets;
-  float freq;
-  float amp;
-  float pan;
-  float freqz;    // for dezipper filter
-  float ampz;     // for dezipper filter
-  float phase;    // oscillator phase in radians
-  float wpm;
-  float cwpm;
-  float samplesPerDit;
-  float intercharacter;
-  float interword;
-  unsigned agendaCount;
-  unsigned agendaDone;
-  unsigned agendaItemElementsDone;
-  unsigned agendaItemElementSamplesDone;
-  MorseRendererMode mode;
-  MorseRendererMode lastMode;
-  BOOL doingInterelementSpace;
-  BOOL doingLoopSpace;
-  BOOL loop;
-  BOOL play;
-  BOOL wasOn;
-  BOOL flash;
-  BOOL noNote;
+  LED*                  led;
+  uint16_t*             agenda;
+  NSDictionary*         offsets;
+  float                 freq;     // Radians per sample
+  float                 amp;
+  float                 pan;
+  float                 freqz;    // For dezipper filter
+  float                 ampz;     // For dezipper filter
+  float                 phase;    // Oscillator phase in radians
+  float                 wpm;
+  float                 cwpm;
+  float                 samplesPerDit;
+  float                 intercharacter;
+  float                 interword;
+  unsigned              agendaCount;
+  unsigned              agendaDone;
+  unsigned              agendaItemElementsDone;
+  unsigned              agendaItemElementSamplesDone;
+  MorseRendererMode     mode;
+  MorseRendererMode     lastMode;
+  MorseRendererWaveType waveType;
+  BOOL                  doingInterelementSpace;
+  BOOL                  doingLoopSpace;
+  BOOL                  loop;
+  BOOL                  play;
+  BOOL                  wasOn;
+  BOOL                  flash;
+  BOOL                  noNote;
   // Noise stuff
-  float qrn;
-  long pinkRows[kPinkMaxRandomRows];
-  long pinkRunningSum;    // Used to optimize summing of generators
-  int  pinkIndex;         // Incremented each sample
-  int  pinkIndexMask;     // Index wrapped by &ing with this mask
-  float pinkScalar;       // Used to scale within range of -1.0 to 1.0
-  BOOL goWhite;
+  float                 qrn;
+  long                  pinkRows[kPinkMaxRandomRows];
+  long                  pinkRunningSum; // To optimize summing of generators
+  int                   pinkIndex;      // Incremented each sample
+  int                   pinkIndexMask;  // Index wrapped by &ing with this mask
+  float                 pinkScalar;     // Used to scale to range of -1.0 to 1.0
+  BOOL                  goWhite;
 } MorseRenderState;
 
 @interface MorseRenderer : NSObject <NSCopying>
 {
-  AUGraph           _ag;
-  AudioUnit         _mixer;
-  MorseRenderState  _state;
-  NSMutableString*  _string;
+  AUGraph          _ag;
+  AudioUnit        _mixer;
+  MorseRenderState _state;
+  NSMutableString* _string;
 }
 
 -(BOOL)isPlaying;
@@ -82,11 +91,12 @@ typedef struct
 -(void)setPan:(float)val;
 -(void)setQRN:(float)val;
 -(void)setQRNWhite:(BOOL)flag;
+-(void)setWaveType:(MorseRendererWaveType)type;
 -(void)setLoop:(BOOL)flag;
 -(BOOL)flash;
 -(void)setFlash:(BOOL)flag;
 -(NSString*)string;
 -(void)setString:(NSString*)s;
 -(void)setState:(MorseRenderState*)s;
--(void)exportAIFF:(NSString*)path;
+-(void)exportAIFF:(NSURL*)url;
 @end

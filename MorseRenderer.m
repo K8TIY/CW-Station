@@ -138,6 +138,7 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
   float* rBuffer = ioData->mBuffers[1].mData;
   uint16_t* item = NULL;
   uint16_t code = 0;
+  int waveType = state->waveType;
   BOOL atEnd = (state->agendaCount < 1 || state->agendaCount <= state->agendaDone);
   //NSLog(@"atEnd (%d > %d) = %s", state->agendaCount, state->agendaDone, (atEnd)? "yes":"no");
   if (state->agenda && state->play)
@@ -209,9 +210,29 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
         // This sample is on if not doing interelement and this is not a space character.
         if ((lengthBits > 0 && !state->doingInterelementSpace) || state->mode == MorseRendererOnMode || state->mode == MorseRendererDecayMode)
         {
-          lsample = sinf(phase);
-          if (ampz != 1.0f) lsample *= ampz;
-          phase = phase + freqz;
+          if (waveType == MorseRendererWaveSine)
+          {
+            lsample = ampz * sinf(phase);
+          }
+          else if (waveType == MorseRendererWaveSaw)
+          {
+            lsample = ampz - (ampz/M_PI*phase);
+          }
+          else if (waveType == MorseRendererWaveSquare)
+          {
+            lsample = (phase < M_PI)? ampz:-ampz;
+          }
+          else /*if (waveType == MorseRendererWaveTriangle)*/
+          {
+            if (phase < M_PI) lsample = -ampz + (2.0f*ampz/M_PI*phase);
+            else lsample = (3.0f*ampz) - (2.0f*ampz/M_PI*phase);
+          }
+          //if (ampz != 1.0f) lsample *= ampz;
+          // Update phase and wrap around if necessary
+          //phase += ((2.0f * M_PI * freq) / gSampleRate);
+          phase += freq;
+          if (phase > M_PI * 2.0f) phase -= M_PI * 2.0f;
+          //printf("phase %f from %f\n", phase, freqz);
           if (decay != 1.0f) lsample *= decay;
           rsample = lsample;
           if (lsample != 0.0f)
@@ -497,7 +518,7 @@ static void local_SendRange(MorseRenderState* state)
 
 -(void)setFreq:(float)val
 {
-  _state.freq = val * 2.0f * 3.14159265359f / gSampleRate;
+  _state.freq = val * 2.0f * M_PI / gSampleRate;
   _state.freqz = _state.freq;
 }
 
@@ -525,6 +546,7 @@ static void local_SendRange(MorseRenderState* state)
 -(void)setLoop:(BOOL)flag {_state.loop = flag;}
 -(void)setQRN:(float)val { _state.qrn = val; }
 -(void)setQRNWhite:(BOOL)flag { _state.goWhite = flag; }
+-(void)setWaveType:(MorseRendererWaveType)type { _state.waveType = type; }
 -(BOOL)flash { return _state.flash; }
 
 -(void)setFlash:(BOOL)flag
@@ -620,30 +642,9 @@ static void local_SendRange(MorseRenderState* state)
 }
 
 #define BUFF_SIZE 0x20000L
--(void)exportAIFF:(NSString*)path
+-(void)exportAIFF:(NSURL*)url
 {
-  NSString * parentDir = [path stringByDeletingLastPathComponent];
-  NSString* fileName = [path lastPathComponent];
-  const char *filePath = [path fileSystemRepresentation];
-  const char *fileSystemPath;
-  FSRef parentDirRef, existingFileRef, newFileRef;
-  AudioStreamBasicDescription destFormat;
-  
-  if ( [parentDir length] == 0 )
-  {
-    // Must be working in the current directory
-    parentDir = @"./";
-  }
-  fileSystemPath = [parentDir fileSystemRepresentation];
-  // If the file already exists, blow it away first.  That way, AudioFileCreate won't fail.
-  if (noErr == FSPathMakeRef((UInt8*)filePath, &existingFileRef, NULL))
-  {
-    FSDeleteObject( &existingFileRef );
-  }
-  if (FSPathMakeRef((UInt8*)fileSystemPath, &parentDirRef, NULL))
-  {
-    [NSException raise:@"AudioConverterFailure" format:@"FSPathMakeRef failed"];
-  }
+  //AudioStreamBasicDescription destFormat;
   _state.noNote = YES;
   float* buff1 = NULL;
   float* buff2 = NULL;
@@ -673,11 +674,10 @@ static void local_SendRange(MorseRenderState* state)
     streamFormat.mBytesPerPacket = 4;
     SInt64 packetidx = 0;
     AudioFileID fileID;
-    //OSStatus err = AudioFileCreateWithURL((CFURLRef)url, kAudioFileAIFFType, &streamFormat, kAudioFileFlags_EraseFile, &fileID);
-    OSStatus err = AudioFileCreate( &parentDirRef, (CFStringRef)fileName, kAudioFileAIFFType, &destFormat, 0, &newFileRef, &fileID);
+    OSStatus err = AudioFileCreateWithURL((CFURLRef)url, kAudioFileAIFFType, &streamFormat, kAudioFileFlags_EraseFile, &fileID);
     if (err)
     {
-      NSLog(@"AudioFileCreateWithURL: err %d", err);
+      NSLog(@"AudioFileCreateWithURL: err %d %.4s", err, &err);
       return;
     }
     else

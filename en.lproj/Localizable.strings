@@ -45,3 +45,8 @@
 "__QRN_WHITE__" = "QRN is white noise";
 "__CORRECT_RESP__" = "Correct response";
 "__INCORRECT_RESP__" = "Incorrect response";
+"__WAVE_TYPE__" = "Wave Type";
+"__W_SINE__" = "Sine";
+"__W_SAW__" = "Saw";
+"__W_SQUARE__" = "Square";
+"__W_TRIANGLE__" = "Triangle";

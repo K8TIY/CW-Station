@@ -28,7 +28,7 @@
 		323183D011E7841700E9FFA0 /* PlayPressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183CD11E7841700E9FFA0 /* PlayPressed.tiff */; };
 		323183D111E7841700E9FFA0 /* PlayEnabled.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183CE11E7841700E9FFA0 /* PlayEnabled.tiff */; };
 		323183D211E7841700E9FFA0 /* PlayDisabled.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 323183CF11E7841700E9FFA0 /* PlayDisabled.tiff */; };
-		3237A3EF131D8D9800824AD4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97319FDCFA39411CA2CEA /* MainMenu.nib */; };
+		3237A3EF131D8D9800824AD4 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97319FDCFA39411CA2CEA /* MainMenu.xib */; };
 		3237A417131D91CC00824AD4 /* Onizuka.h in Headers */ = {isa = PBXBuildFile; fileRef = 3237A411131D91CC00824AD4 /* Onizuka.h */; };
 		3237A418131D91CC00824AD4 /* Onizuka.m in Sources */ = {isa = PBXBuildFile; fileRef = 3237A412131D91CC00824AD4 /* Onizuka.m */; };
 		3237A419131D91CC00824AD4 /* Onizuka.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3237A414131D91CC00824AD4 /* Onizuka.strings */; };
@@ -90,7 +90,7 @@
 		1F64E20D00996E677F000001 /* MorseController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MorseController.h; sourceTree = "<group>"; };
 		1F64E20E00996E677F000001 /* MorseController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MorseController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		29B97319FDCFA39411CA2CEA /* MainMenu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MainMenu.nib; sourceTree = "<group>"; };
+		29B97319FDCFA39411CA2CEA /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		3204AEB81284B9A800EAE00E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
@@ -224,7 +224,7 @@
 				322E274E11E4DE8400B9241E /* defaults.plist */,
 				324305BA13256B3A00A01CFC /* qso.d */,
 				3237A41C131D91EC00824AD4 /* Onizuka */,
-				29B97319FDCFA39411CA2CEA /* MainMenu.nib */,
+				29B97319FDCFA39411CA2CEA /* MainMenu.xib */,
 				32264F8A131EC7A8006D4698 /* Credits.rtf */,
 				32264F8D131EC7A8006D4698 /* Localizable.strings */,
 				327A3EC8133CF11A008EE70A /* README.txt */,
@@ -382,7 +382,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3237A3EF131D8D9800824AD4 /* MainMenu.nib in Resources */,
+				3237A3EF131D8D9800824AD4 /* MainMenu.xib in Resources */,
 				325B409A11DAAA8500F39F0D /* Morse.strings in Resources */,
 				322E274F11E4DE8400B9241E /* defaults.plist in Resources */,
 				322E284511E4FC5000B9241E /* repeat_embedded.png in Resources */,

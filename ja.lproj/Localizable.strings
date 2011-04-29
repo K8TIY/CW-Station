@@ -45,3 +45,8 @@
 "__QRN_WHITE__" = "ホワイトノイズのQRM";
 "__CORRECT_RESP__" = "正しい応答";
 "__INCORRECT_RESP__" = "不正な応答";
+"__WAVE_TYPE__" = "音波の種類";
+"__W_SINE__" = "正弦波";
+"__W_SAW__" = "鋸波";
+"__W_SQUARE__" = "方形波";
+"__W_TRIANGLE__" = "三角波";

@@ -10,6 +10,8 @@
 	<integer>0</integer>
 	<key>qrnWhite</key>
 	<false/>
+	<key>waveType</key>
+	<integer>0</integer>
 	<key>pan</key>
 	<real>0.5</real>
 	<key>wpm</key>

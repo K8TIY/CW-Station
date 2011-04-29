@@ -332,7 +332,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(BOOL)checkTestResponseWithFeedback:(BOOL)fb
 {
   if ([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"]) return YES;
-  BOOL good = [[Morse formatString:[bottomBLV string]] isEqualToString:[renderer string]];
+  BOOL good = [[Morse formatString:[bottomBLV string]] isEqual:[renderer string]];
   if (fb)
   {
     NSString* key = (good)? @"correctColor":@"incorrectColor";
@@ -615,15 +615,15 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   #pragma unused (object,ctx)
   //NSLog(@"observeValueForKeyPath:%@ ofObject:%@ change:%@", path, object, change);
   id newval = [change objectForKey:NSKeyValueChangeNewKey];
-  if ([path isEqualToString:@"freq"])
+  if ([path isEqual:@"freq"])
   {
     [renderer setFreq:[newval floatValue]];
   }
-  else if ([path isEqualToString:@"amp"])
+  else if ([path isEqual:@"amp"])
   {
     [renderer setAmp:[newval floatValue]];
   }
-  else if ([path isEqualToString:@"wpm"])
+  else if ([path isEqual:@"wpm"])
   {
     float newvalf = [newval floatValue];
     //NSLog(@"wpm %f", newvalf);
@@ -632,7 +632,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     float cwpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"cwpm"] floatValue];
     if (cwpm < newvalf) [[NSUserDefaults standardUserDefaults] setFloat:newvalf forKey:@"cwpm"];
   }
-  else if ([path isEqualToString:@"cwpm"])
+  else if ([path isEqual:@"cwpm"])
   {
     float newvalf = [newval floatValue];
     //NSLog(@"cwpm %f", newvalf);
@@ -641,25 +641,30 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     float wpm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"wpm"] floatValue];
     if (wpm > newvalf) [[NSUserDefaults standardUserDefaults] setFloat:newvalf forKey:@"wpm"];
   }
-  else if ([path isEqualToString:@"loop"])
+  else if ([path isEqual:@"loop"])
   {
     [renderer setLoop:[newval boolValue]];
   }
-  else if ([path isEqualToString:@"flash"])
+  else if ([path isEqual:@"flash"])
   {
     [renderer setFlash:[newval boolValue]];
   }
-  else if ([path isEqualToString:@"pan"])
+  else if ([path isEqual:@"pan"])
   {
     [renderer setPan:[newval floatValue]];
   }
-  else if ([path isEqualToString:@"qrn"])
+  else if ([path isEqual:@"qrn"])
   {
     [renderer setQRN:[newval floatValue]];
   }
-  else if ([path isEqualToString:@"qrnWhite"])
+  else if ([path isEqual:@"qrnWhite"])
   {
     [renderer setQRNWhite:[newval boolValue]];
+  }
+  else if ([path isEqual:@"waveType"])
+  {
+    //NSLog(@"wave type: %@", newval);
+    [renderer setWaveType:[newval intValue]];
   }
   unsigned src = [[NSUserDefaults standardUserDefaults] integerForKey:@"source"];
   unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
@@ -677,18 +682,18 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     MorseRenderer* mr = [renderer copy];
     [mr setMode:MorseRendererAgendaMode];
     [mr setString:[inputField string]];
-    [mr exportAIFF:[sheet filename]];
+    [mr exportAIFF:[sheet URL]];
     [mr release];
   }
 }
 
 #pragma mark Score Table
--(unsigned)numberOfRowsInTableView:(NSTableView*)tv
+-(NSInteger)numberOfRowsInTableView:(NSTableView*)tv
 {
   return [score count];
 }
 
--(id)tableView:(NSTableView*)tv objectValueForTableColumn:(NSTableColumn*)col row:(unsigned)row
+-(id)tableView:(NSTableView*)tv objectValueForTableColumn:(NSTableColumn*)col row:(NSInteger)row
 {
   NSArray* keys = [[score allKeys] sortedArrayUsingSelector:@selector(compare:)];
   id key = [keys objectAtIndex:row];
