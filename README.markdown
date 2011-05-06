@@ -1,4 +1,4 @@
-## This is CW Station version 1.0
+## This is CW Station version 1.1
 
 ### What can you do with this thing?
 
