@@ -21,6 +21,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #import <unistd.h>
 #import <CoreFoundation/CoreFoundation.h>
 
+// Subclass that can detect spacebar and send notification to its delegate.
+@implementation MorseWindow
+-(void)sendEvent:(NSEvent*)event
+{
+  BOOL handled = NO;
+  if ([event type] == NSKeyUp)
+  {
+    //NSLog(@"got '%@'", [event charactersIgnoringModifiers]);
+    if ([[event charactersIgnoringModifiers] isEqualToString:@" "])
+    {
+      id del = [self delegate];
+      if (del && [del respondsToSelector:@selector(windowDidReceiveSpace:)])
+      {
+        [del windowDidReceiveSpace:self];
+        handled = YES;
+      }
+    }
+  }
+  if (!handled) [super sendEvent:event];
+}
+@end
+
 enum
 {
   CWSNotTestingState,
@@ -361,7 +383,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   NSCharacterSet* cs = [NSCharacterSet characterSetWithCharactersInString:@"\xCC\x85"];
   s1 = [[s1 componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
   s2 = [[s2 componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
-  NSLog(@"s1: '%@' s2: '%@'", s1, s2);
+  //NSLog(@"s1: '%@' s2: '%@'", s1, s2);
   Levenshtein* lev = [[Levenshtein alloc] initWithString:s1 andString:s2];
   NSArray* a = [lev alignmentWithPlaceholder:kPlaceholder];
   s1 = [a objectAtIndex:0];
@@ -552,6 +574,17 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     if (![tabID isEqual:@"1"]) return NO;
   }
   return YES;
+}
+
+-(void)windowDidReceiveSpace:(id)sender
+{
+  BOOL doIt = YES;
+  id tabID = [[tabs selectedTabViewItem] identifier];
+  if (![tabID isEqual:@"1"])
+  {
+    if (inputField == [sender firstResponder]) doIt = NO;
+  }
+  if (doIt) [self startStop:sender];
 }
 
 #pragma mark Callbacks

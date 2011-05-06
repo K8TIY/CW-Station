@@ -4,6 +4,8 @@
 #import <SecurityInterface/SFAuthorizationView.h>
 #import "Wordlist.h";
 
+@interface MorseWindow : NSWindow
+@end
 
 @interface MorseController : NSObject
 {
@@ -53,4 +55,5 @@
 -(IBAction)makeProsign:(id)sender;
 -(IBAction)orderFrontPrefsWindow:(id)sender;
 -(IBAction)exportAIFF:(id)sender;
+-(void)windowDidReceiveSpace:(id)sender;
 @end

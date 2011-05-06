@@ -36,7 +36,7 @@
 				<string key="NSWindowRect">{{730, 353}, {482, 515}}</string>
 				<int key="NSWTFlags">1886913536</int>
 				<string key="NSWindowTitle">CW Station</string>
-				<string key="NSWindowClass">NSWindow</string>
+				<string key="NSWindowClass">MorseWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
 				</object>
@@ -3283,14 +3283,6 @@
 					<int key="connectionID">1356</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="469625275"/>
-						<reference key="destination" ref="531189103"/>
-					</object>
-					<int key="connectionID">1357</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: values.lowercaseQSO</string>
 						<reference key="source" ref="505906973"/>
@@ -3497,6 +3489,14 @@
 						</object>
 					</object>
 					<int key="connectionID">1725</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="469625275"/>
+						<reference key="destination" ref="531189103"/>
+					</object>
+					<int key="connectionID">1728</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -5830,7 +5830,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1727</int>
+			<int key="maxID">1728</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5940,7 +5940,7 @@
 							<string>NSWindow</string>
 						</object>
 					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="937209111">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">MorseController.h</string>
 					</object>
@@ -5972,6 +5972,11 @@
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
 					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">MorseWindow</string>
+					<string key="superclassName">NSWindow</string>
+					<reference key="sourceIdentifier" ref="937209111"/>
 				</object>
 			</object>
 		</object>
