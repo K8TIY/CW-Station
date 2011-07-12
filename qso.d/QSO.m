@@ -122,6 +122,8 @@ NSDictionary* gDict = nil;
   self = [super init];
   _qso = [[NSMutableString alloc] init];
   _age = Roll(70) + 16;
+   unichar ol = 0x0305;
+  _bk = [[NSString alloc] initWithFormat:(Roll(2))? @" B%CK%C":@".", ol, ol];
   [self PutQSO];
   return self;
 }
@@ -129,11 +131,15 @@ NSDictionary* gDict = nil;
 -(void)dealloc
 {
   if (_qso) [_qso release];
+  if (_bk) [_bk release];
   [super dealloc];
 }
 
 -(NSString*)QSO
 {
+  NSString* bkStr = [NSString stringWithFormat:@"%@\n", _bk];
+  [_qso replaceOccurrencesOfString:@".\n" withString:bkStr
+        options:NSLiteralSearch range:NSMakeRange(0, [_qso length])];
   return [NSString stringWithString:_qso];
 }
 @end
@@ -146,7 +152,11 @@ NSDictionary* gDict = nil;
 @implementation QSO (Private)
 -(void)putMisc
 {
-  [_qso appendFormat:@"%@\n", Choose(@"Misc")];
+  NSString* misc = Choose(@"Misc");
+  if (misc && [misc length])
+  {
+    [_qso appendFormat:@"%@%s\n", misc, ([misc characterAtIndex:[misc length]-1]=='?')? "":"."];
+  }
 }
 
 -(void)putThanks
@@ -429,7 +439,7 @@ NSDictionary* gDict = nil;
 
 -(void)putWeather
 {
-  switch (Roll (4))
+  switch (Roll(4))
   {
     case 3:
     [self putWeather1];
