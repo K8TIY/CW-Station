@@ -17,6 +17,7 @@
 "__BAL__" = "バランス";
 "__WPM__" = "WPM";
 "__CWPM__" = "字WPM";
+"__WEIGHT__" = "重量";
 "__FLASH__" = "Caps Lock（⇪）キーのLEDを点滅します";
 
 "__GEN_QSO__" = "QSOを生成する";

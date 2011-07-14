@@ -17,6 +17,7 @@
 "__BAL__" = "Balance";
 "__WPM__" = "WPM";
 "__CWPM__" = "CWPM";
+"__WEIGHT__" = "Weight";
 "__FLASH__" = "Flash Caps Lock (⇪) Key";
 
 "__GEN_QSO__" = "Generate QSO";

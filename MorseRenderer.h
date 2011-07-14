@@ -48,6 +48,7 @@ typedef struct
   float                 samplesPerDit;
   float                 intercharacter;
   float                 interword;
+  float                 weight;
   unsigned              agendaCount;
   unsigned              agendaDone;
   unsigned              agendaItemElementsDone;
@@ -90,6 +91,7 @@ typedef struct
 -(void)setCWPM:(float)val;
 -(void)setPan:(float)val;
 -(void)setQRN:(float)val;
+-(void)setWeight:(float)val;
 -(void)setQRNWhite:(BOOL)flag;
 -(void)setWaveType:(MorseRendererWaveType)type;
 -(void)setLoop:(BOOL)flag;

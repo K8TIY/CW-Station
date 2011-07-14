@@ -38,5 +38,7 @@
 	<false/>
 	<key>lowercaseQSO</key>
 	<false/>
+	<key>weight</key>
+	<real>3</real>
 </dict>
 </plist>

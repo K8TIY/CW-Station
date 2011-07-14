@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 NSString* MorseRendererFinishedNotification = @"MorseRendererFinishedNotification";
 NSString* MorseRendererStartedWordNotification = @"MorseRendererStartedWordNotification";
-static const float gSampleRate = 22050.0f;
+static const float gSampleRate = 44100.0f;
 
 @interface MorseRenderer (Private)
 -(OSStatus)_initAUGraph;
@@ -37,7 +37,8 @@ static OSStatus RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionF
 static OSStatus NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
                         const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
                         UInt32 inNumberFrames, AudioBufferList* ioData);
-static unsigned  Renderer(MorseRenderState* inState, UInt32 inNumberFrames, AudioBufferList* ioData);
+static unsigned Renderer(MorseRenderState* inState, UInt32 inNumberFrames,
+                         AudioBufferList* ioData);
 static void local_SendNote(void);
 static void local_SendRange(MorseRenderState* state);
 
@@ -124,7 +125,8 @@ static OSStatus  NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFla
   return noErr;
 }
 
-static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBufferList* ioData)
+static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
+                         AudioBufferList* ioData)
 {
   unsigned samples = 0;
   float fadeSamples = gSampleRate * 0.004f;
@@ -151,13 +153,15 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
   uint16_t lengthBits = code & 0x0007;
   uint16_t elements = lengthBits? lengthBits:1;
   BOOL on = NO;
-  unsigned dits = 1;
+  float dits = 1.0f;
   unsigned i;
   for (i = 0; i < inNumberFrames; i++)
   {
     float lsample = 0.0f;
     float rsample = 0.0f;
-    if ((item && state->agendaDone < state->agendaCount) || state->mode == MorseRendererOnMode || state->mode == MorseRendererDecayMode)
+    if ((item && state->agendaDone < state->agendaCount) ||
+         state->mode == MorseRendererOnMode ||
+         state->mode == MorseRendererDecayMode)
     {
       if (state->mode == MorseRendererDecayMode && state->lastMode != MorseRendererDecayMode)
       {
@@ -176,6 +180,7 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
       {
         BOOL bit = (code >> (3 + state->agendaItemElementsDone)) & 0x0001;
         dits = (bit)? MorseDahUnits:MorseDitUnits;
+        if (dits == MorseDahUnits && state->weight != 3.0) dits = state->weight;
         on = YES;
         if (state->mode == MorseRendererDecayMode)
         {
@@ -205,10 +210,15 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
           //if (decay != 1.0f) NSLog(@"decay %f from remaining (%d) * %f", decay, remaining, (1.0/fadeSamples));
         }
       }
-      if (state->agendaItemElementsDone < elements || state->mode == MorseRendererOnMode || state->mode == MorseRendererDecayMode)
+      if (!state->doingLoopSpace &&
+          (state->agendaItemElementsDone < elements ||
+           state->mode == MorseRendererOnMode ||
+           state->mode == MorseRendererDecayMode))
       {
         // This sample is on if not doing interelement and this is not a space character.
-        if ((lengthBits > 0 && !state->doingInterelementSpace) || state->mode == MorseRendererOnMode || state->mode == MorseRendererDecayMode)
+        if ((lengthBits > 0 && !state->doingInterelementSpace) ||
+            state->mode == MorseRendererOnMode ||
+            state->mode == MorseRendererDecayMode)
         {
           if (waveType == MorseRendererWaveSine)
           {
@@ -245,7 +255,6 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames, AudioBu
     }
     *lBuffer++ = lsample;
     *rBuffer++ = rsample;
-    //printf("%f\n", lsample);
     ampz  = 0.001f * amp  + 0.999f * ampz;
     freqz = 0.001f * freq + 0.999f * freqz;
     state->agendaItemElementSamplesDone++;
@@ -485,9 +494,9 @@ static void local_SendRange(MorseRenderState* state)
   pmax = (numRows + 1) * (1 << (kPinkRandomBits-1));
   _state.pinkScalar = 1.0f / pmax;
   // Initialize rows
-  for( index = 0; index < numRows; index++ )
+  for (index = 0; index < numRows; index++)
   {
-    _state.pinkRows[index] = 0;    
+    _state.pinkRows[index] = 0;
   }
   _state.pinkRunningSum = 0;
 }
@@ -545,6 +554,7 @@ static void local_SendRange(MorseRenderState* state)
 
 -(void)setLoop:(BOOL)flag {_state.loop = flag;}
 -(void)setQRN:(float)val { _state.qrn = val; }
+-(void)setWeight:(float)val { _state.weight = val; }
 -(void)setQRNWhite:(BOOL)flag { _state.goWhite = flag; }
 -(void)setWaveType:(MorseRendererWaveType)type { _state.waveType = type; }
 -(BOOL)flash { return _state.flash; }
