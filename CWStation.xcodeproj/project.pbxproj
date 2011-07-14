@@ -358,7 +358,6 @@
 			isa = PBXProject;
 			buildConfigurationList = A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "CWStation" */;
 			compatibilityVersion = "Xcode 3.1";
-			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				English,
