@@ -6,7 +6,7 @@
   int _age; /* PERSON'S AGE, SO THEY AREN'T LICENSED MORE THAN THEIR AGE */
   NSString* _receiver;
   NSString* _sender;
-  NSString* _bk; // Can be BK, or . (period)
+  NSString* _bt; // Can be BT, or . (period)
 }
 -(NSString*)QSO;
 @end

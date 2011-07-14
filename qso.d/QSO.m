@@ -123,7 +123,7 @@ NSDictionary* gDict = nil;
   _qso = [[NSMutableString alloc] init];
   _age = Roll(70) + 16;
    unichar ol = 0x0305;
-  _bk = [[NSString alloc] initWithFormat:(Roll(2))? @" B%CK%C":@".", ol, ol];
+  _bt = [[NSString alloc] initWithFormat:(Roll(2))? @" B%CT%C":@".", ol, ol];
   [self PutQSO];
   return self;
 }
@@ -131,14 +131,14 @@ NSDictionary* gDict = nil;
 -(void)dealloc
 {
   if (_qso) [_qso release];
-  if (_bk) [_bk release];
+  if (_bt) [_bt release];
   [super dealloc];
 }
 
 -(NSString*)QSO
 {
-  NSString* bkStr = [NSString stringWithFormat:@"%@\n", _bk];
-  [_qso replaceOccurrencesOfString:@".\n" withString:bkStr
+  NSString* btStr = [NSString stringWithFormat:@"%@\n", _bt];
+  [_qso replaceOccurrencesOfString:@".\n" withString:btStr
         options:NSLiteralSearch range:NSMakeRange(0, [_qso length])];
   return [NSString stringWithString:_qso];
 }
