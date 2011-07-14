@@ -186,19 +186,21 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     NSMutableString* ms = [[NSMutableString alloc] initWithString:[[sto string] substringWithRange:sel]];
     NSString* ph = [NSString stringWithFormat:@"%C", 0x0305];
     unsigned i;
-    BOOL ok = YES;
+    BOOL changed = NO;
     for (i = 0; i < [ms length]; i++)
     {
       unichar ch = [ms characterAtIndex:i];
-      if (ch == ' ' || ch == 0x0305)
+      if (ch == ' ' || ch == '\n' || ch == 0x0305) continue;
+      if (i+1<[ms length])
       {
-        ok = NO;
-        break;
+        ch = [ms characterAtIndex:i+1];
+        if (ch == 0x0305) continue;
       }
       [ms insertString:ph atIndex:i+1];
       i++;
+      changed = YES;
     }
-    if (ok)
+    if (changed)
     {
       [sto replaceCharactersInRange:sel withString:ms];
       sel.length = [ms length];
@@ -576,14 +578,19 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   return YES;
 }
 
+// In tab 1 (Generate) we ignore if the text field is  first responder
+// and we are not playing.
+// Other tabs we always start and stop.
 -(void)windowDidReceiveSpace:(id)sender
 {
   BOOL doIt = YES;
   id tabID = [[tabs selectedTabViewItem] identifier];
-  if (![tabID isEqual:@"1"])
+  if ([tabID isEqual:@"1"])
   {
-    if (inputField == [sender firstResponder]) doIt = NO;
+    //NSLog(@"if %@, FR %@", inputField, [sender firstResponder]);
+    if (inputField == [sender firstResponder] && ![renderer isPlaying]) doIt = NO;
   }
+  //NSLog(@"Got space: startStop? %s", (doIt)?"YES":"NO");
   if (doIt) [self startStop:sender];
 }
 
@@ -698,6 +705,10 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   {
     //NSLog(@"wave type: %@", newval);
     [renderer setWaveType:[newval intValue]];
+  }
+  else if ([path isEqual:@"weight"])
+  {
+    [renderer setWeight:[newval floatValue]];
   }
   unsigned src = [[NSUserDefaults standardUserDefaults] integerForKey:@"source"];
   unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
