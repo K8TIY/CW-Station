@@ -7,11 +7,11 @@ I hereby place this code in the public domain.
 #include <IOKit/hid/IOHIDUsageTables.h>
 #include "LED.h";
 
-static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement,
+static NSMutableDictionary* _CreateMatchingDict(Boolean isDeviceNotElement,
                                     uint32_t inUsagePage,
                                     uint32_t inUsage);
 
-static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement,
+static NSMutableDictionary* _CreateMatchingDict(Boolean isDeviceNotElement,
                                     uint32_t inUsagePage,
                                     uint32_t inUsage)
 {
@@ -31,6 +31,11 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
 @implementation LED
 -(id)init
 {
+  return [self initWithUsage:kHIDUsage_LED_CapsLock];
+}
+
+-(id)initWithUsage:(uint32_t)usage
+{
   self = [super init];
   CFSetRef deviceCFSetRef = NULL;
   IOHIDDeviceRef* refs = NULL;
@@ -38,8 +43,8 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
   IOHIDManagerRef mgr = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
   require(mgr, Oops);
   // Create a device matching dictionary
-  NSDictionary* dic = _CreateMatchingDictionary(true, kHIDPage_GenericDesktop,
-                                                kHIDUsage_GD_Keyboard);
+  NSDictionary* dic = _CreateMatchingDict(true, kHIDPage_GenericDesktop,
+                                          kHIDUsage_GD_Keyboard);
   require(dic, Oops);
   // set the HID device matching dictionary
   IOHIDManagerSetDeviceMatching(mgr, (CFDictionaryRef)dic);
@@ -57,13 +62,14 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
   require(refs, Oops);
   // now extract the device refs from the set
   CFSetGetValues(deviceCFSetRef, (const void**)refs);
-  // before we get into the device loop we'll setup our element matching dictionary
-  dic = _CreateMatchingDictionary(false, kHIDPage_LEDs, 0);
+  // before we get into the device loop set up element matching dictionary
+  dic = _CreateMatchingDict(false, kHIDPage_LEDs, 0);
   require(dic, Oops);
   for (deviceIndex = 0; deviceIndex < deviceCount; deviceIndex++)
   {
     // if this isn't a keyboard device...
-    if (!IOHIDDeviceConformsTo(refs[deviceIndex], kHIDPage_GenericDesktop, kHIDUsage_GD_Keyboard))
+    if (!IOHIDDeviceConformsTo(refs[deviceIndex], kHIDPage_GenericDesktop,
+                               kHIDUsage_GD_Keyboard))
     {
       //printf("skipping nonconforming device at %d\n", deviceIndex);
       continue;  // ...skip it
@@ -82,8 +88,8 @@ static NSMutableDictionary* _CreateMatchingDictionary(Boolean isDeviceNotElement
       uint32_t usagePage = IOHIDElementGetUsagePage(element);
       // if this isn't an LED element, skip it
       if (kHIDPage_LEDs != usagePage) continue;
-      uint32_t usage = IOHIDElementGetUsage(element);
-      if (usage == kHIDUsage_LED_CapsLock)
+      uint32_t elusage = IOHIDElementGetUsage(element);
+      if (elusage == usage)
       {
         ledDevice = (IOHIDDeviceRef)CFRetain(refs[deviceIndex]);
         ledElement = (IOHIDElementRef)CFRetain(element);
@@ -118,8 +124,11 @@ Oops:  ;
     IOReturn err = IOHIDDeviceOpen(ledDevice, 0);
     if (!err)
     {
-      uint64_t timestamp = 0; // create the IO HID Value to be sent to this LED element
-      IOHIDValueRef val = IOHIDValueCreateWithIntegerValue( kCFAllocatorDefault, ledElement, timestamp, value );
+      // create the IO HID Value to be sent to this LED element
+      uint64_t timestamp = 0;
+      IOHIDValueRef val = IOHIDValueCreateWithIntegerValue(kCFAllocatorDefault,
+                                                          ledElement, timestamp,
+                                                          value);
       if (val)
       {
         // now set it on the device
