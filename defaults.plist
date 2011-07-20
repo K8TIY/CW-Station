@@ -40,5 +40,7 @@
 	<false/>
 	<key>weight</key>
 	<real>3</real>
+	<key>kochIndex</key>
+	<integer>0</integer>
 </dict>
 </plist>

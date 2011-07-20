@@ -56,6 +56,8 @@
 		A64D2B6A09211FE800BA6154 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A64D2B6B09211FE800BA6154 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D7F92510098D1857F000001 /* CoreAudio.framework */; };
 		A64D2B6C09211FE800BA6154 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D7F92690099588A7F000001 /* CoreFoundation.framework */; };
+		A6D42C9513D21CC40094AD41 /* MorseScore.h in Headers */ = {isa = PBXBuildFile; fileRef = A6D42C9313D21CC40094AD41 /* MorseScore.h */; };
+		A6D42C9613D21CC40094AD41 /* MorseScore.m in Sources */ = {isa = PBXBuildFile; fileRef = A6D42C9413D21CC40094AD41 /* MorseScore.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -138,6 +140,8 @@
 		A63F8E420C518612006781E2 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		A64D2B6E09211FE900BA6154 /* CWStation-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CWStation-Info.plist"; sourceTree = "<group>"; };
 		A64D2B6F09211FE900BA6154 /* CW Station.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CW Station.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6D42C9313D21CC40094AD41 /* MorseScore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MorseScore.h; sourceTree = "<group>"; };
+		A6D42C9413D21CC40094AD41 /* MorseScore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MorseScore.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +215,8 @@
 				1F64E20C00996E677F000001 /* MorseRenderer.m */,
 				1F64E20D00996E677F000001 /* MorseController.h */,
 				1F64E20E00996E677F000001 /* MorseController.m */,
+				A6D42C9313D21CC40094AD41 /* MorseScore.h */,
+				A6D42C9413D21CC40094AD41 /* MorseScore.m */,
 				323183B911E781C500E9FFA0 /* BigLetterView.h */,
 				323183BA11E781C500E9FFA0 /* BigLetterView.m */,
 				3256063F121C410700656629 /* Wordlist.h */,
@@ -279,7 +285,7 @@
 				3237A413131D91CC00824AD4 /* StandardUI */,
 			);
 			path = Onizuka;
-			sourceTree = SOURCE_ROOT;
+			sourceTree = "<group>";
 		};
 		324305BA13256B3A00A01CFC /* qso.d */ = {
 			isa = PBXGroup;
@@ -308,6 +314,7 @@
 				3237A417131D91CC00824AD4 /* Onizuka.h in Headers */,
 				3243060613256DD300A01CFC /* QSO.h in Headers */,
 				322B68A81339296600632232 /* LED.h in Headers */,
+				A6D42C9513D21CC40094AD41 /* MorseScore.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,6 +436,7 @@
 				324305D913256B3A00A01CFC /* put_form.m in Sources */,
 				324305DB13256B3A00A01CFC /* QSO.m in Sources */,
 				322B68A91339296600632232 /* LED.m in Sources */,
+				A6D42C9613D21CC40094AD41 /* MorseScore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

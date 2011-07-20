@@ -65,12 +65,10 @@ make my head hurt.)
 ### Todo
 
 * Do I need to give users more time for their panicky typing in Test mode?
-* Koch method?
 * Make the QSO library more up to date and/or more realistic
   (in progress; comments welcome).
 * Simulate contest QSOs?
 * Option to flash num lock LED (if it exists) instead of caps lock.
-* Weight random character selection by score (done now rather crudely).
 
 ### Not Todo
 

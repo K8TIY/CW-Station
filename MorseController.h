@@ -1,7 +1,8 @@
 #import <Cocoa/Cocoa.h>
-#import "MorseRenderer.h"
-#import "BigLetterView.h"
 #import <SecurityInterface/SFAuthorizationView.h>
+#import "MorseRenderer.h"
+#import "MorseScore.h"
+#import "BigLetterView.h"
 #import "Wordlist.h";
 
 @interface MorseWindow : NSWindow
@@ -41,7 +42,7 @@
   MorseRecognizer* recognizer;
   NSTimer* timer;
   unsigned state;
-  NSMutableDictionary* score;
+  MorseScore* score;
   CFRunLoopSourceRef _src;
   CFMachPortRef _tap;
   CGEventTimestamp lastKey;

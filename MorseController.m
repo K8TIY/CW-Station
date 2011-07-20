@@ -58,9 +58,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 @interface MorseController (Private)
 -(void)gotoState:(unsigned)s;
 -(void)startNewTest;
+-(NSArray*)kochArray;
 -(BOOL)checkTestResponseWithFeedback:(BOOL)fb;
 -(void)updateScore;
--(void)updateScoreForString:(NSString*)s correct:(BOOL)correct;
 -(NSString*)randomStringFromArray:(NSArray*)array ofLength:(unsigned)length;
 -(void)shiftKey:(BOOL)isdown atTime:(CGEventTimestamp)time fromTimer:(BOOL)flag;
 -(void)keycheck:(CGEventRef)event;
@@ -94,15 +94,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tintChanged:) name:NSControlTintDidChangeNotification object:nil];
   [self tintChanged:nil];
   [tabs selectTabViewItemWithIdentifier:[[NSUserDefaults standardUserDefaults] objectForKey:@"tab"]];
-  score = [[NSMutableDictionary alloc] init];
-  NSDictionary* scoredic = [[NSUserDefaults standardUserDefaults] objectForKey:@"score"];
-  for (NSString* key in scoredic) 
-  {
-    NSDictionary* dic = [scoredic objectForKey:key];
-    NSMutableDictionary* sdic = [dic mutableCopy];
-    [score setObject:sdic forKey:key];
-    [sdic release];
-  }
+  score = [[MorseScore alloc] initWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:@"score"]];
   [scoreTable reloadData];
   words = [[Wordlist alloc] init];
   [window makeKeyAndOrderFront:self];
@@ -140,6 +132,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [words release];
   [recognizer release];
   [qso release];
+  [score release];
   [super dealloc];
 }
 
@@ -156,7 +149,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 
 -(IBAction)clearScore:(id)sender
 {
-  [score removeAllObjects];
+  [score clear];
   [scoreTable reloadData];
 }
 
@@ -168,7 +161,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(IBAction)genQSO:(id)sender
 {
   #pragma unused (sender)
-  [inputField setString:@""];
+  //[inputField setString:@""];
   QSO* q = [[QSO alloc] init];
   NSString* s = [q QSO];
   if (![[NSUserDefaults standardUserDefaults] boolForKey:@"lowercaseQSO"])
@@ -270,8 +263,10 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     case CWSWaitingState:
     // Pause 12.5 units for testing; 7 for training.
     // At 5 wpm 12.5 units is about 3 secs.
+    // Always pause at least a second.
     when = ([Morse millisecondsPerUnitAtWPM:wpm]/1000.0) * 
           (([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"])? 7.0:12.5);
+    if (when < 1.0) when = 1.0;
     //NSLog(@"Waiting %f seconds from %f ms at %f", when, [Morse millisecondsPerUnitAtWPM:wpm], wpm);
     timer = [NSTimer scheduledTimerWithTimeInterval:when target:self selector:@selector(timer:) userInfo:nil repeats:NO];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
@@ -319,6 +314,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
       case 3: whichArray = [Morse lettersAndNumbers]; break;
       case 4: whichArray = [Morse punctuation]; break;
       case 5: whichArray = [Morse prosigns]; n = 1; break;
+      case 6: whichArray = [self kochArray]; break;
       default: whichArray = [Morse letters]; break;
     }
     s = [self randomStringFromArray:whichArray ofLength:n];
@@ -353,6 +349,37 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   }
 }
 
+// Go thru the Koch array and add any character with 95% or higher.
+// Then, if the last item has at least 20 observations, add another.
+// Make sure the returned array has at least one item.
+static const float goodNuff = 0.95;
+static const unsigned seenNuff = 20;
+-(NSArray*)kochArray
+{
+  NSArray* k = [Morse koch];
+  unsigned kn = [k count];
+  NSMutableArray* a = [[NSMutableArray alloc] init];
+  unsigned i, n = [[NSUserDefaults standardUserDefaults] integerForKey:@"kochIndex"];
+  if (n < 2) n = 2;
+  else if (n > kn) n = kn;
+  for (i = 0; i < n; i++) [a addObject:[k objectAtIndex:i]];
+  if ([score countObservationsForString:[a lastObject]] >= seenNuff &&
+      [score scoreForString:[a lastObject]] >= goodNuff &&
+      [a count] < kn &&
+      ![[NSUserDefaults standardUserDefaults] boolForKey:@"practice"])
+  {
+    [a addObject:[k objectAtIndex:n]];
+    n++;
+    [[NSUserDefaults standardUserDefaults] setInteger:n forKey:@"kochIndex"];
+    // FIXME: put in a user-"dont show me again"-able alert when the new
+    // character is put into play.
+  }
+  NSArray* ret = [NSArray arrayWithArray:a];
+  [a release];
+  //NSLog(@"Koch array: %@", ret);
+  return ret;
+}
+
 -(BOOL)checkTestResponseWithFeedback:(BOOL)fb
 {
   if ([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"]) return YES;
@@ -379,12 +406,8 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   unsigned i;
   NSString* s1 = [renderer string];
   NSString* s2 = [Morse formatString:[bottomBLV string]];
-  // Remove the overline from prosigns.
-  // I'd prefer to treat them as full entities, but that will require mods
-  // to levenshtein, so this is a stopgap.
-  NSCharacterSet* cs = [NSCharacterSet characterSetWithCharactersInString:@"\xCC\x85"];
-  s1 = [[s1 componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
-  s2 = [[s2 componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
+  s1 = [Morse translateFromProsigns:s1];
+  s2 = [Morse translateFromProsigns:s2];
   //NSLog(@"s1: '%@' s2: '%@'", s1, s2);
   Levenshtein* lev = [[Levenshtein alloc] initWithString:s1 andString:s2];
   NSArray* a = [lev alignmentWithPlaceholder:kPlaceholder];
@@ -398,28 +421,15 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     if (c1 == kPlaceholderCh) continue;
     NSString* s3 = [[NSString alloc] initWithFormat:@"%C", c1];
     BOOL correct = (c1 == c2 && c2 != kPlaceholderCh);
-    [self updateScoreForString:s3 correct:correct];
+    [score addObservation:correct forString:[Morse translateToProsigns:s3]];
     [s3 release];
   }
   [lev release];
   //NSLog(@"Score is now %@", score);
 }
 
--(void)updateScoreForString:(NSString*)s correct:(BOOL)correct
-{
-  NSMutableDictionary* d = [score objectForKey:s];
-  if (!d)
-  {
-    d = [[NSMutableDictionary alloc] init];
-    [score setObject:d forKey:s];
-    [d release];
-  }
-  unsigned n = [[d objectForKey:@"n"] unsignedIntValue] + (correct)? 1:0;
-  unsigned of = [[d objectForKey:@"of"] unsignedIntValue] + 1;
-  [d setObject:[NSNumber numberWithUnsignedInt:n] forKey:@"n"];
-  [d setObject:[NSNumber numberWithUnsignedInt:of] forKey:@"of"];
-}
-
+// FIXME: have to make sure if this is the koch array and we choose a prosign,
+// no other characters should be allowed, or should we put a word space between?
 -(NSString*)randomStringFromArray:(NSArray*)array ofLength:(unsigned)length
 {
   NSMutableString* ms = [[NSMutableString alloc] init];
@@ -429,15 +439,10 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   {
     NSString* str1 = [array objectAtIndex:arc4random() % n];
     NSString* str2 = [array objectAtIndex:arc4random() % n];
-    float score1 = 0.0f;
-    float score2 = 0.0f;
-    NSDictionary* d = [score objectForKey:str1];
-    if (d) score1 = 3.0f - (2.0f * [[d objectForKey:@"n"] floatValue] / [[d objectForKey:@"of"] floatValue]);
-    d = [score objectForKey:str2];
-    if (d) score2 = 3.0f - (2.0f * [[d objectForKey:@"n"] floatValue] / [[d objectForKey:@"of"] floatValue]);
-    //if (score1 > score2) NSLog(@"Chose %@ (%f) over %@ (%f)", str1, score1, str2, score2);
-    //else NSLog(@"Chose %@ (%f) over %@ (%f)", str2, score2, str1, score1);
-    [ms appendString:(score1 > score2)? str1:str2];
+    float score1 = [score scoreForString:str1];
+    float score2 = [score scoreForString:str2];
+    [ms appendString:(score1 < score2)? str1:str2];
+    //NSLog(@"Choosing %@ (%f) vs %@ (%f)? %@", str1, score1, str2, score2, (score1 < score2)? str1:str2);
   }
   NSString* ret = [NSString stringWithString:ms];
   [ms release];
@@ -514,7 +519,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(void)applicationWillTerminate:(id)sender
 {
   [[NSUserDefaults standardUserDefaults] setObject:[[tabs selectedTabViewItem] identifier] forKey:@"tab"];
-  [[NSUserDefaults standardUserDefaults] setObject:score forKey:@"score"];
+  [[NSUserDefaults standardUserDefaults] setObject:[score dictionaryRepresentation] forKey:@"score"];
   if (_tap)
   {
     CGEventTapEnable(_tap, false);
@@ -625,7 +630,11 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(void)renderDone:(NSNotification*)note
 {
   //NSLog(@"renderDone:");
-  if ([[[tabs selectedTabViewItem] identifier] isEqual:@"1"]) [self gotoState:CWSNotTestingState];
+  if ([[[tabs selectedTabViewItem] identifier] isEqual:@"1"])
+  {
+    [inputField setSelectedRange:NSMakeRange(0,0)];
+    [self gotoState:CWSNotTestingState];
+  }
   else
   {
     if ([self checkTestResponseWithFeedback:NO]) [self gotoState:CWSShowingState];
@@ -712,8 +721,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   }
   unsigned src = [[NSUserDefaults standardUserDefaults] integerForKey:@"source"];
   unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
-  [minButton setEnabled:(src<3&&set<5)];
-  [maxButton setEnabled:(src<3&&set<5)];
+  //NSLog(@"src %d set %d", src, set);
+  [minButton setEnabled:(src<3&&set!=5)];
+  [maxButton setEnabled:(src<3&&set!=5)];
   [setButton setEnabled:(src==1)];
 }
 
@@ -743,12 +753,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   id key = [keys objectAtIndex:row];
   if ([[col identifier] isEqual:@"Correct"])
   {
-    NSDictionary* d = [score objectForKey:key];
-    unsigned n = [[d objectForKey:@"n"] unsignedIntValue];
-    unsigned of = [[d objectForKey:@"of"] unsignedIntValue];
-    float pct = 100.0f*(float)n/(float)of;
-    key = [NSString stringWithFormat:@"%d/%d (%.2f%%)", n, of, pct];
-    if (pct >= 95.0f)
+    float pct = [score scoreForString:key] * 100.0;
+    key = [NSString stringWithFormat:@"%.1f%%", pct];
+    if (pct >= goodNuff)
     {
       NSColor* green = [NSColor colorWithCalibratedRed:0.0f green:0.67f blue:0.0f alpha:1.0f];
       NSDictionary* attrs = [[NSDictionary alloc] initWithObjectsAndKeys:green, NSForegroundColorAttributeName, NULL];
