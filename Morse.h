@@ -33,7 +33,10 @@ typedef struct
 +(NSArray*)lettersAndNumbers;
 +(NSArray*)punctuation;
 +(NSArray*)prosigns;
++(NSArray*)koch;
 +(NSString*)formatString:(NSString*)string;
++(NSString*)translateFromProsigns:(NSString*)string;
++(NSString*)translateToProsigns:(NSString*)string;
 @end
 
 typedef struct

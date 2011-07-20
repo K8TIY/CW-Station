@@ -243,6 +243,11 @@ uint16_t MorseInterwordSpace = 0x0018;
   return [[Morse dictionary] objectForKey:@"Prosigns"];
 }
 
++(NSArray*)koch
+{
+  return [[Morse dictionary] objectForKey:@"Koch"];
+}
+
 // Merges consecutive uppercase characters into prosigns.
 +(NSString*)formatString:(NSString*)string
 {
@@ -258,6 +263,32 @@ uint16_t MorseInterwordSpace = 0x0018;
   NSString* ret = [ms uppercaseString];
   [ms release];
   //NSLog(@"%@ -> %@", string, ret);
+  return ret;
+}
+
++(NSString*)translateFromProsigns:(NSString*)string
+{
+  NSDictionary* d = [[Morse dictionary] objectForKey:@"ProsignToSymbol"];
+  NSMutableString* s = [[NSMutableString alloc] initWithString:string];
+  for (NSString* pro in [d allKeys])
+    [s replaceOccurrencesOfString:pro withString:[d objectForKey:pro]
+                                      options:NSCaseInsensitiveSearch
+                                      range:NSMakeRange(0, [s length])];
+  NSString* ret = [NSString stringWithString:s];
+  [s release];
+  return ret;
+}
+
++(NSString*)translateToProsigns:(NSString*)string
+{
+  NSDictionary* d = [[Morse dictionary] objectForKey:@"SymbolToProsign"];
+  NSMutableString* s = [[NSMutableString alloc] initWithString:string];
+  for (NSString* pro in [d allKeys])
+    [s replaceOccurrencesOfString:pro withString:[d objectForKey:pro]
+                                      options:NSCaseInsensitiveSearch
+                                      range:NSMakeRange(0, [s length])];
+  NSString* ret = [NSString stringWithString:s];
+  [s release];
   return ret;
 }
 @end
