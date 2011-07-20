@@ -95,10 +95,8 @@
 
 -(void)PutQSO
 {
-    
   [self putFirstCallsign];
   unsigned roll = Roll(6);
-  //[_qso appendFormat:@"Roll %d\n", roll];
   switch (roll)
   {
     case 0:
@@ -120,9 +118,6 @@
     [self putForm5];
     break;
   }
-  unichar ol = 0x0305;
-  [_qso appendFormat:@"A%CR%C S%CK%C\n", ol, ol, ol, ol];
   [self putLastCallsign];
-  //[_qso appendFormat:@"\n"];
 }
 @end
