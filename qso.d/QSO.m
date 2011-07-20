@@ -2,6 +2,7 @@
  * Copyright (c) 1991 Paul J. Drongowski.
  * Copyright (c) 1992 Joe Dellinger.
  * Copyright (c) 2005 Eric S. Raymond.
+ * Copyright (c) 2011 Brian S. Hall
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -111,19 +112,30 @@
 #include <time.h>
 #include "QSO.h"
 
-static NSString* A_Or_An(NSString* string);
-static BOOL is_vowel(unichar first);
+static NSString* A_An(NSString* string);
+static BOOL IsVowel(unichar first);
 
-NSDictionary* gDict = nil;
-
+static NSDictionary* gDict = nil;
+const unichar gOverline = 0x0305;
+static NSString* gBT = @" B\xCC\x85T\xCC\x85";
+static NSString* gPeriod = @".";
+static NSString* gNoDelim = @"";
 @implementation QSO
 -(id)init
 {
   self = [super init];
   _qso = [[NSMutableString alloc] init];
   _age = Roll(70) + 16;
-   unichar ol = 0x0305;
-  _bt = [[NSString alloc] initWithFormat:(Roll(2))? @" B%CT%C":@".", ol, ol];
+  switch (Roll(3))
+  {
+    case 0: _delim = gBT; break;
+    case 1: _delim = gPeriod; break;
+    default: _delim = gNoDelim; break;
+  }
+  _sender = Choose(@"Call");
+  _receiver = Choose(@"Call");
+  // Make sure sender and receiver are different calls!
+  while ([_sender isEqualToString:_receiver]) _receiver = Choose(@"Call");
   [self PutQSO];
   return self;
 }
@@ -131,15 +143,15 @@ NSDictionary* gDict = nil;
 -(void)dealloc
 {
   if (_qso) [_qso release];
-  if (_bt) [_bt release];
   [super dealloc];
 }
 
 -(NSString*)QSO
 {
-  NSString* btStr = [NSString stringWithFormat:@"%@\n", _bt];
-  [_qso replaceOccurrencesOfString:@".\n" withString:btStr
+  NSString* delimstr = [[NSString alloc] initWithFormat:@"%@\n", _delim];
+  [_qso replaceOccurrencesOfString:@".\n" withString:delimstr
         options:NSLiteralSearch range:NSMakeRange(0, [_qso length])];
+  [delimstr release];
   return [NSString stringWithString:_qso];
 }
 @end
@@ -161,7 +173,7 @@ NSDictionary* gDict = nil;
 
 -(void)putThanks
 {
-  switch (Roll (6))
+  switch (Roll(6))
   {
     case 2:
     [_qso appendFormat:@"thanks for your call.\n"];
@@ -187,7 +199,7 @@ NSDictionary* gDict = nil;
 
 -(void)putName
 {
-  switch (Roll (6))
+  switch (Roll(6))
   {
     case 2:
     [_qso appendFormat:@"name is %@.\n", Choose(@"Name")];
@@ -211,7 +223,7 @@ NSDictionary* gDict = nil;
 {
   if (_age > 17)
   {
-    switch (Roll (20))
+    switch (Roll(20))
     {
       case 2:
       case 3:
@@ -220,11 +232,11 @@ NSDictionary* gDict = nil;
 
       case 4:
       case 5:
-      [_qso appendFormat:@"i work as %@.\n", A_Or_An(Choose(@"Job"))];
+      [_qso appendFormat:@"i work as %@.\n", A_An(Choose(@"Job"))];
       break;
 
       case 6:
-      [_qso appendFormat:@"i was %@, now unemployed.\n", A_Or_An(Choose(@"Job"))];
+      [_qso appendFormat:@"i was %@, now unemployed.\n", A_An(Choose(@"Job"))];
       break;
 
       case 11:
@@ -236,7 +248,7 @@ NSDictionary* gDict = nil;
       break;
 
       default:
-      [_qso appendFormat:@"i am %@.\n", A_Or_An(Choose(@"Job"))];
+      [_qso appendFormat:@"i am %@.\n", A_An(Choose(@"Job"))];
       break;
     }
   }
@@ -244,7 +256,7 @@ NSDictionary* gDict = nil;
 
 -(void)putAge
 {
-  switch (Roll (5))
+  switch (Roll(5))
   {
     case 3:
     [_qso appendFormat:@"my age is %d.\n", _age];
@@ -263,21 +275,21 @@ NSDictionary* gDict = nil;
 -(void)putLicense
 {
   int years = Roll([self licenseSeed]) + 1;
-  switch (Roll (13))
+  switch (Roll(13))
   {
     case 1:
     [_qso appendFormat:@"i have %@ class licence.\n",
-      A_Or_An(Choose(@"License"))];
+      A_An(Choose(@"License"))];
     break;
 
     case 2:
     [_qso appendFormat:@"i am %@ license ham.\n",
-      A_Or_An(Choose(@"License"))];
+      A_An(Choose(@"License"))];
     break;
 
     case 3:
     [_qso appendFormat:@"i am %@ licence ham.\n",
-      A_Or_An(Choose(@"License"))];
+      A_An(Choose(@"License"))];
     break;
 
     case 4:
@@ -287,12 +299,12 @@ NSDictionary* gDict = nil;
 
     case 5:
     [_qso appendFormat:@"i have %@ class license.\n",
-      A_Or_An(Choose(@"License"))];
+      A_An(Choose(@"License"))];
     break;
 
     case 6:
     [_qso appendFormat:@"i am %@ class ham.\n",
-      A_Or_An(Choose(@"License"))];
+      A_An(Choose(@"License"))];
     break;
 
     case 7:
@@ -307,19 +319,30 @@ NSDictionary* gDict = nil;
 
     default:
     [_qso appendFormat:@"i have been %@ class ham for %d year%s.\n",
-      A_Or_An(Choose(@"License")), years, (years==1)? "":"s"];
+      A_An(Choose(@"License")), years, (years==1)? "":"s"];
     break;
   }
 }
 
 -(void)putTemperature
 {
-  [_qso appendFormat:@"temperature is %d.\n", Roll (80) + 10];
+  unsigned temp = Roll(100) + Roll(10);
+  switch (Roll(3))
+  {
+    case 0:
+    [_qso appendFormat:@"temperature is %d.\n", temp];
+    break;
+    
+    default:
+    [_qso appendFormat:@"temp is %d.\n", temp];
+    break;
+  }
 }
 
 -(void)putWeather1
 {
-  switch (Roll (17))
+  unsigned temp = Roll(100) + Roll(10);
+  switch (Roll(17))
   {
     case 2:
     [_qso appendFormat:@"wx is %@.\n", Choose(@"Weather1")];
@@ -355,12 +378,12 @@ NSDictionary* gDict = nil;
 
     case 9:
     [_qso appendFormat:@"weather here is %@ and temperature is %d.\n",
-      Choose(@"Weather1"), Roll (80) + 10];
+      Choose(@"Weather1"), temp];
     break;
 
     case 10:
     [_qso appendFormat:@"weather is %@, temperature %d.\n",
-      Choose(@"Weather1"), Roll (80) + 10];
+      Choose(@"Weather1"), temp];
     break;
 
     case 11:
@@ -370,7 +393,7 @@ NSDictionary* gDict = nil;
 
     case 12:
     [_qso appendFormat:@"The wx is %@ and the temp is %d degrees.\n",
-      Choose(@"Weather1"), Roll (80) + 10];
+      Choose(@"Weather1"), temp];
     break;
 
     case 14:
@@ -385,13 +408,14 @@ NSDictionary* gDict = nil;
 
     default:
     [_qso appendFormat:@"wx is %@ and %d degrees.\n",
-      Choose(@"Weather1"), Roll (80) + 10];
+      Choose(@"Weather1"), temp];
   }
 }
 
 -(void)putWeather2
 {
-  switch (Roll (10))
+  unsigned temp = Roll(100) + Roll(10);
+  switch (Roll(10))
   {
     case 0:
     [_qso appendFormat:@"it is %@.\n", Choose(@"Weather2")];
@@ -399,17 +423,17 @@ NSDictionary* gDict = nil;
 
     case 1:
     [_qso appendFormat:@"it is %@ and %d degrees.\n",
-      Choose(@"Weather2"), Roll (80) + 10];
+      Choose(@"Weather2"), temp];
     break;
 
     case 2:
     [_qso appendFormat:@"the WX is %@ and the temp is %d degrees.\n",
-      Choose(@"Weather2"), Roll (80) + 10];
+      Choose(@"Weather2"), temp];
     break;
 
     case 3:
     [_qso appendFormat:@"wx is %@ and the temp is %d degrees.\n",
-      Choose(@"Weather2"), Roll (80) + 10];
+      Choose(@"Weather2"), temp];
     break;
 
     case 4:
@@ -418,17 +442,17 @@ NSDictionary* gDict = nil;
 
     case 5:
     [_qso appendFormat:@"it is %@ and %d degrees.\n",
-      Choose(@"Weather2"), Roll (100) + 3];
+      Choose(@"Weather2"), temp];
     break;
 
     case 6:
     [_qso appendFormat:@"the wx is %@ and the temp is %d degrees.\n",
-      Choose(@"Weather2"), Roll (90) + 10];
+      Choose(@"Weather2"), temp];
     break;
 
     case 7:
     [_qso appendFormat:@"wx is %@ and the temp is %d degrees.\n",
-      Choose(@"Weather2"), Roll (80) + 10];
+      Choose(@"Weather2"), temp];
     break;
 
     default:
@@ -453,7 +477,7 @@ NSDictionary* gDict = nil;
 
 -(void)putCityState
 {
-  switch (Roll (6))
+  switch (Roll(6))
   {
     case 4:
     [_qso appendFormat:@"%@ %@, ",
@@ -474,7 +498,7 @@ NSDictionary* gDict = nil;
 -(void)putLocation
 {
 
-  switch (Roll (5))
+  switch (Roll(5))
   {
     case 3:
     [_qso appendFormat:@"my qth is "];
@@ -493,12 +517,12 @@ NSDictionary* gDict = nil;
 
 -(void)putRig
 {
-  switch (Roll (19))
+  switch (Roll(19))
   {
     case 0:
     case 1:
     [_qso appendFormat:@"my rig runs %@ watts into %@ up %@ feet.\n",
-      Choose(@"Power"), A_Or_An(Choose(@"Antenna")),
+      Choose(@"Power"), A_An(Choose(@"Antenna")),
       Choose(@"Upfeet")];
     break;
 
@@ -506,22 +530,22 @@ NSDictionary* gDict = nil;
     case 3:
     [_qso appendFormat:@"rig is a %@ watt %@ and antenna is %@.\n",
       Choose(@"Power"), Choose(@"Rig"),
-      A_Or_An(Choose(@"Antenna"))];
+      A_An(Choose(@"Antenna"))];
     break;
 
     case 4:
     case 5:
-    [_qso appendFormat:@"my transceiver is %@.\n", A_Or_An(Choose(@"Rig"))];
+    [_qso appendFormat:@"my transceiver is %@.\n", A_An(Choose(@"Rig"))];
     [_qso appendFormat:@"it runs %@ watts into %@.\n",
-      Choose(@"Power"), A_Or_An(Choose(@"Antenna"))];
+      Choose(@"Power"), A_An(Choose(@"Antenna"))];
     break;
 
     case 6:
     case 7:
     [_qso appendFormat:@"the rig is %@ running %@ watts.\n",
-      A_Or_An(Choose(@"Rig")), Choose(@"Power")];
+      A_An(Choose(@"Rig")), Choose(@"Power")];
     [_qso appendFormat:@"antenna is %@ up %@ m.\n",
-      A_Or_An(Choose(@"Antenna")), Choose(@"Upfeet")];
+      A_An(Choose(@"Antenna")), Choose(@"Upfeet")];
     break;
 
     case 8:
@@ -529,67 +553,63 @@ NSDictionary* gDict = nil;
     case 10:
     case 11:
     [_qso appendFormat:@"my rig runs %@ watts into %@ up %@ meters.\n",
-      Choose(@"Power"), A_Or_An(Choose(@"Antenna")),
-      Choose(@"Upfeet")];
+      Choose(@"Power"), A_An(Choose(@"Antenna")), Choose(@"Upfeet")];
     break;
 
     case 12:
     [_qso appendFormat:@"my rig runs %@ watts into %@ up %@ feet, but the antenna has partly fallen.\n",
-      Choose(@"Power"), A_Or_An(Choose(@"Antenna")),
-      Choose(@"Upfeet")];
+      Choose(@"Power"), A_An(Choose(@"Antenna")), Choose(@"Upfeet")];
     break;
 
     case 13:
     [_qso appendFormat:@"rig is %@ running %@ watts ",
-      A_Or_An(Choose(@"Rig")), Choose(@"Power")];
+      A_An(Choose(@"Rig")), Choose(@"Power")];
     [_qso appendFormat:@"into %@ up %@ ft.\n",
-      A_Or_An(Choose(@"Antenna")), Choose(@"Upfeet")];
+      A_An(Choose(@"Antenna")), Choose(@"Upfeet")];
     break;
 
     case 14:
     [_qso appendFormat:@"my rig runs %@ watts into %@ up %@ feet.\n",
-      Choose(@"Power"), A_Or_An(Choose(@"Antenna")),
-      Choose(@"Upfeet")];
+      Choose(@"Power"), A_An(Choose(@"Antenna")), Choose(@"Upfeet")];
     break;
 
     case 15:
     [_qso appendFormat:@"rig is %@ watt %@ and antenna is %@.\n",
-      A_Or_An(Choose(@"Power")),
+      A_An(Choose(@"Power")),
       Choose(@"Rig"),
       Choose(@"Antenna")];
     break;
 
     case 16:
     [_qso appendFormat:@"my transceiver is %@.\n",
-      A_Or_An(Choose(@"Rig"))];
+      A_An(Choose(@"Rig"))];
     [_qso appendFormat:@"it runs %@ watts into %@.\n",
       Choose(@"Power"),
-      A_Or_An(Choose(@"Antenna"))];
+      A_An(Choose(@"Antenna"))];
     break;
 
     case 17:
     [_qso appendFormat:@"the rig is %@ running %@ watts.\n",
-      A_Or_An(Choose(@"Rig")),
+      A_An(Choose(@"Rig")),
       Choose(@"Power")];
     [_qso appendFormat:@"antenna is %@ up %@ feet.\n",
-      A_Or_An(Choose(@"Antenna")),
+      A_An(Choose(@"Antenna")),
       Choose(@"Upfeet")];
     break;
 
     default:
-    [_qso appendFormat:@"rig is %@ ", A_Or_An(Choose(@"Rig"))];
+    [_qso appendFormat:@"rig is %@ ", A_An(Choose(@"Rig"))];
     [_qso appendFormat:@"running %@ watts into %@ up %@ feet.\n",
-      Choose(@"Power"),
-      A_Or_An(Choose(@"Antenna")),
-      Choose(@"Upfeet")];
+      Choose(@"Power"), A_An(Choose(@"Antenna")), Choose(@"Upfeet")];
     break;
   }
 }
 
 -(void)putRST
 {
+  // FIXME: shouldn't we generate these randomly?
   NSString* rst = Choose(@"RST");
-  switch (Roll (8))
+  switch (Roll(8))
   {
     case 0:
     [_qso appendFormat:@"ur rst %@=%@.\n", rst, rst];
@@ -608,7 +628,7 @@ NSDictionary* gDict = nil;
     break;
 
     case 4:
-    [_qso appendFormat:@"your RST is %@=%@.\n", rst, rst];
+    [_qso appendFormat:@"your rst is %@=%@.\n", rst, rst];
     break;
 
     case 5:
@@ -628,7 +648,7 @@ NSDictionary* gDict = nil;
 
 -(void)putQFreq
 {
-  switch (Roll (8))
+  switch (Roll(8))
   {
     case 2:
     [_qso appendFormat:Choose(@"Frqmisc"), MakeFrequency(0, 0)];
@@ -649,19 +669,40 @@ NSDictionary* gDict = nil;
     default:
     return;
   }
-  [_qso appendFormat:@"\n"];
+  [_qso appendFormat:@"%s\n", ([_qso characterAtIndex:[_qso length]-1]=='?')? "":"."];
 }
 
 -(void)putFirstCallsign
 {
-  _sender = Choose(@"Call");
-  _receiver = Choose(@"Call");
   [_qso appendFormat:@"%@ de %@\n", _receiver, _sender];
 }
 
 -(void)putLastCallsign
 {
   [_qso appendFormat:@"%@ de %@", _receiver, _sender];
+  // Put K, KN, AR, SK, or CL
+  switch (Roll(5))
+  {
+    case 0:
+    [_qso appendString:@" K"];
+    break;
+    
+    case 1:
+    [_qso appendFormat:@" K%CN%C", gOverline, gOverline];
+    break;
+    
+    case 2:
+    [_qso appendFormat:@" A%CR%C", gOverline, gOverline];
+    break;
+    
+    case 3:
+    [_qso appendFormat:@" S%CK%C", gOverline, gOverline];
+    break;
+    
+    case 4:
+    [_qso appendFormat:@" C%CL%C", gOverline, gOverline];
+    break;
+  }
 }
 
 -(int)licenseSeed
@@ -684,13 +725,21 @@ NSString* Choose(NSString* name)
   return [a objectAtIndex:Roll([a count])];
 }
 
-static NSString* A_Or_An(NSString* string)
+// With u-initial words, check if next letters are Cons+Vow,
+// if so use 'a'. (Examples: uni-, user, uvula.)
+// Will fail with acronym like UPS.
+static NSString* A_An(NSString* string)
 {
-  return [NSString stringWithFormat:@"%s %@",
-         (is_vowel([string characterAtIndex:0]))? "an":"a", string];
+  unichar c1 = [string characterAtIndex:0];
+  BOOL v = IsVowel(c1);
+  if ((c1 == 'u' || c1 == 'U') &&
+      [string length] >= 3 &&
+      IsVowel([string characterAtIndex:2]) &&
+      !IsVowel([string characterAtIndex:1])) v = NO;
+  return [NSString stringWithFormat:@"%s %@", v? "an":"a", string];
 }
 
-static BOOL is_vowel(unichar first)
+static BOOL IsVowel(unichar first)
 {
   return (
   first == 'A' ||
@@ -706,11 +755,14 @@ static BOOL is_vowel(unichar first)
   );
 }
 
-int Roll(int Number)
+// Returns from 0 to n-1 inclusive
+unsigned Roll(unsigned n)
 {
-  return arc4random() % Number;
+  return arc4random() % n;
 }
 
+// Why did I include voice? Because I used this code in another 1-off
+// project that needed the info.
 int MakeFrequency(unsigned band, BOOL voice)
 {
   if (!band) band = Roll(M6);
