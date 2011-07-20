@@ -1,12 +1,14 @@
 #import <Cocoa/Cocoa.h>
 
+extern const unichar gOverline;
+
 @interface QSO : NSObject
 {
   NSMutableString* _qso;
   int _age; /* PERSON'S AGE, SO THEY AREN'T LICENSED MORE THAN THEIR AGE */
   NSString* _receiver;
   NSString* _sender;
-  NSString* _bt; // Can be BT, or . (period)
+  NSString* _delim; // Can be BT, . (period), or nothing
 }
 -(NSString*)QSO;
 @end
@@ -58,6 +60,6 @@ enum
 };
 
 int MakeFrequency(unsigned band, BOOL voice);
-int Roll(int Number);
+unsigned Roll(unsigned Number);
 NSString* Choose(NSString* name);
 
