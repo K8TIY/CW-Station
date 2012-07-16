@@ -407,7 +407,6 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
           {
             item = NULL;
             atEnd = YES;
-            local_SendNote();
           }
         }
         //NSLog(@"item 0x%X", item);
@@ -424,6 +423,11 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
   state->freqz = freqz;
   state->ampz = ampz;
   state->lastMode = state->mode;
+  if (atEnd && !state->sentNote)
+  {
+    state->sentNote = YES;
+    local_SendNote();
+  }
   return samples;
 }
 
@@ -694,6 +698,7 @@ static void local_SendRange(MorseRenderState* state)
   _state.doingLoopSpace = NO;
   _state.play = NO;
   _state.wasOn = NO;
+  _state.sentNote = NO;
   [_state.led setValue:0];
 }
 

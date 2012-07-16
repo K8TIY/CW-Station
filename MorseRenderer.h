@@ -98,6 +98,7 @@ typedef struct
   BOOL                  wasOn;
   BOOL                  flash;
   BOOL                  noNote;
+  BOOL                  sentNote;
   // Noise stuff
   // Once I figure out how to synthesize genuine-sounding radio noise
   // I'll get rid of all this white/pink/brown crap.
