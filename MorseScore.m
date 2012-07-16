@@ -1,8 +1,8 @@
 /*
-Copyright © 2010-2011 Brian S. Hall
+Copyright © 2010-2012 Brian S. Hall
 
 This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License version 2 as
+it under the terms of the GNU General Public License version 2 or later as
 published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
@@ -15,9 +15,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 #import "MorseScore.h"
 
-static NSString* local_BinaryStringForByte(uint8_t b);
 #define BA_DOTEST 0
 #if BA_DOTEST
+static NSString* local_BinaryStringForByte(uint8_t b);
 static void local_TestBitArray(void);
 #endif
 
@@ -292,6 +292,7 @@ static unsigned const maxScoreBits = 128;
 }
 @end
 
+#if BA_DOTEST
 static NSString* local_BinaryStringForByte(uint8_t b)
 {
   return [NSString stringWithFormat:@"%C%C%C%C%C%C%C%C [0x%02X]",
@@ -305,7 +306,6 @@ static NSString* local_BinaryStringForByte(uint8_t b)
     (b&(1))?'1':'0',b];
 }
 
-#if BA_DOTEST
 static void local_TestBitArray(void)
 {
   BitArray* ba = [[BitArray alloc] initWithCapacity:0];
