@@ -161,12 +161,17 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(IBAction)genQSO:(id)sender
 {
   #pragma unused (sender)
-  //[inputField setString:@""];
   QSO* q = [[QSO alloc] init];
   NSString* s = [q QSO];
   if (![[NSUserDefaults standardUserDefaults] boolForKey:@"lowercaseQSO"])
     s = [s uppercaseString];
+  BOOL playing = [renderer isPlaying];
   [inputField setString:s];
+  if (playing)
+  {
+    [renderer stop];
+    [renderer start:s withDelay:(playing)];
+  }
   [q release];
 }
 
@@ -249,7 +254,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     break;
     
     case CWSPlayingState:
-    if ([tabID isEqual:@"1"]) [renderer start:[inputField string]];
+    if ([tabID isEqual:@"1"]) [renderer start:[inputField string] withDelay:NO];
     else if ([tabID isEqual:@"2"]) [self startNewTest];
     [startStopButton setImage:[NSImage imageNamed:@"StopEnabled.tiff"]];
     [startStopButton setAlternateImage:[NSImage imageNamed:@"StopPressed.tiff"]];
@@ -345,7 +350,8 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   if (s)
   {
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"]) [topBLV setString:s];
-    [renderer start:s];
+    [renderer stop];
+    [renderer start:s withDelay:NO];
   }
 }
 
@@ -731,7 +737,7 @@ static const unsigned seenNuff = 20;
     [sheet orderOut:nil];
     MorseRenderer* mr = [renderer copy];
     [mr setMode:MorseRendererAgendaMode];
-    [mr setString:[inputField string]];
+    [mr setString:[inputField string] withDelay:NO];
     [mr exportAIFF:[sheet URL]];
     [mr release];
   }

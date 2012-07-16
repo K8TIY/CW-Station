@@ -25,7 +25,7 @@ static const float gSampleRate = 44100.0f;
 @interface MorseRenderer (Private)
 -(OSStatus)_initAUGraph;
 -(void)_updatePadding;
--(void)setAgenda:(NSString*)string;
+-(void)setAgenda:(NSString*)string withDelay:(BOOL)del;
 @end
 
 
@@ -580,7 +580,7 @@ static void local_SendRange(MorseRenderState* state)
 -(id)copyWithZone:(NSZone*)z
 {
   MorseRenderer* cpy = [[MorseRenderer alloc] init];
-  [cpy setString:_string];
+  [cpy setString:_string withDelay:NO];
   [cpy setState:&_state];
   return cpy;
 }
@@ -648,15 +648,17 @@ static void local_SendRange(MorseRenderState* state)
   //NSLog(@"intercharacter %f sec, interword %f sec", tc, tw);
 }
 
--(void)setAgenda:(NSString*)str
+-(void)setAgenda:(NSString*)s withDelay:(BOOL)del
 {
   if (_state.agenda) free(_state.agenda);
   _state.agenda = NULL;
   if (_state.offsets) [_state.offsets release];
   _state.offsets = nil;
-  if (str)
+  if (s)
   {
-    _state.agenda = [Morse morseFromString:str length:&_state.agendaCount offsets:&(_state.offsets)];
+    _state.agenda = [Morse morseFromString:s withDelay:del
+                           length:&_state.agendaCount
+                           offsets:&(_state.offsets)];
     [_state.offsets retain];
   }
 }
@@ -668,13 +670,13 @@ static void local_SendRange(MorseRenderState* state)
     if (mode == MorseRendererOffMode) mode = MorseRendererDecayMode;
     _state.mode = mode;
     if (mode == MorseRendererAgendaMode) [self stop];
-    else [self start:nil];
+    else [self start:nil withDelay:NO];
   }
 }
 
--(void)start:(NSString*)str
+-(void)start:(NSString*)s withDelay:(BOOL)del
 {
-  [self setString:(str)? str:@""];
+  [self setString:(s)? s:@"" withDelay:del];
   if (!_state.play)
   {
     OSStatus err = AUGraphStart(_ag);
@@ -706,10 +708,10 @@ static void local_SendRange(MorseRenderState* state)
 
 -(NSString*)string { return _string; }
 
--(void)setString:(NSString*)s
+-(void)setString:(NSString*)s withDelay:(BOOL)del
 {
   [_string setString:s];
-  if (s) [self setAgenda:s];
+  if (s) [self setAgenda:s withDelay:del];
   // initialize phase and de-zipper filters.
   _state.phase = 0.0f;
   _state.freqz = _state.freq;

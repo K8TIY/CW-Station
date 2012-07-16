@@ -136,16 +136,18 @@ uint16_t MorseInterwordSpace = 0x0018;
   return [rd objectForKey:[NSNumber numberWithUnsignedShort:morse]];
 }
 
-+(uint16_t*)morseFromString:(NSString*)string length:(unsigned*)outLength offsets:(NSDictionary**)offsets
++(uint16_t*)morseFromString:(NSString*)string withDelay:(BOOL)del
+            length:(unsigned*)outLength offsets:(NSDictionary**)offsets
 {
   NSMutableArray* symbols = [[NSMutableArray alloc] init];
-  NSMutableDictionary* offs = (offsets)? [[NSMutableDictionary alloc] init] : nil;
+  NSMutableDictionary* offs = (offsets)? [[NSMutableDictionary alloc] init]:nil;
   NSDictionary* d = [[Morse dictionary] objectForKey:@"Code"];
   unsigned i, length = [string length];
   BOOL wasSpace = YES;
   BOOL didPro = NO;
   int wordStart = -1;
   int wordStartElem = -1;
+  if (del) [symbols addObject:[NSNumber numberWithUnsignedInt:MorseInterwordSpace]];
   for (i = 0; i < length; i++)
   {
     NSNumber* num;

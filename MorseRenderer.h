@@ -116,7 +116,7 @@ typedef struct
 
 -(BOOL)isPlaying;
 -(void)setMode:(MorseRendererMode)mode;
--(void)start:(NSString*)string;
+-(void)start:(NSString*)s withDelay:(BOOL)del;
 -(void)stop;
 -(void)setAmp:(float)val;
 -(void)setFreq:(float)val;
@@ -130,7 +130,7 @@ typedef struct
 -(BOOL)flash;
 -(void)setFlash:(BOOL)flag;
 -(NSString*)string;
--(void)setString:(NSString*)s;
+-(void)setString:(NSString*)s withDelay:(BOOL)del;
 -(void)setState:(MorseRenderState*)s;
 -(void)exportAIFF:(NSURL*)url;
 @end
