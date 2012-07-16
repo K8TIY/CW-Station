@@ -8,8 +8,6 @@
 	<real>0.5</real>
 	<key>qrn</key>
 	<integer>0</integer>
-	<key>qrnWhite</key>
-	<false/>
 	<key>waveType</key>
 	<integer>0</integer>
 	<key>pan</key>

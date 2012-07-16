@@ -1,8 +1,8 @@
 /*
-Copyright © 2010-2011 Brian S. Hall
+Copyright © 2010-2012 Brian S. Hall
 
 This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License version 2 as
+it under the terms of the GNU General Public License version 2 or later as
 published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
@@ -705,10 +705,6 @@ static const unsigned seenNuff = 20;
   else if ([path isEqual:@"qrn"])
   {
     [renderer setQRN:[newval floatValue]];
-  }
-  else if ([path isEqual:@"qrnWhite"])
-  {
-    [renderer setQRNWhite:[newval boolValue]];
   }
   else if ([path isEqual:@"waveType"])
   {

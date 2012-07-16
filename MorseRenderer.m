@@ -1,8 +1,8 @@
 /*
-Copyright © 2010-2011 Brian S. Hall
+Copyright © 2010-2012 Brian S. Hall
 
 This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License version 2 as
+it under the terms of the GNU General Public License version 2 or later as
 published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
@@ -24,7 +24,6 @@ static const float gSampleRate = 44100.0f;
 
 @interface MorseRenderer (Private)
 -(OSStatus)_initAUGraph;
--(void)_initRandomEnv:(long)numRows;
 -(void)_updatePadding;
 -(void)setAgenda:(NSString*)string;
 @end
@@ -37,6 +36,10 @@ static OSStatus RendererCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionF
 static OSStatus NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFlags,
                         const AudioTimeStamp* inTimeStamp, UInt32 inBusNumber,
                         UInt32 inNumberFrames, AudioBufferList* ioData);
+
+static void init_3band_state(EQSTATE* es, int lowfreq, int highfreq, int mixfreq);
+static double do_3band(EQSTATE* es, double sample);
+
 static unsigned Renderer(MorseRenderState* inState, UInt32 inNumberFrames,
                          AudioBufferList* ioData);
 static void local_SendNote(void);
@@ -66,50 +69,20 @@ static OSStatus  NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFla
   float* lBuffer = ioData->mBuffers[0].mData;
   float* rBuffer = ioData->mBuffers[1].mData;
   UInt32 i;
+  float inv = (float)(1.0f / INT32_MAX);
   for (i = 0; i < inNumberFrames; i++)
   {
     float lsample = 0.0f;
     float rsample = 0.0f;
+    int32_t rnd = arc4random();
     // White Noise
-    if (state->goWhite)
+    if (state->qrn > 0.0)
     {
-      lsample = (float)arc4random()/(float)INT_MAX;
+      lsample = rnd * inv;
+      lsample = do_3band(&state->eq, lsample);
     }
-    else
-    {
-      long newRandom;
-      // Increment and mask index
-      state->pinkIndex = (state->pinkIndex + 1) & state->pinkIndexMask;
-      // If index is zero, don't update any random values
-      if (state->pinkIndex)
-      {
-        int numZeros = 0;
-        int n = state->pinkIndex;
-        // Determine how many trailing zeros in pinkIndex
-        // this will hang if n == 0 so test first
-        while ((n & 1) == 0)
-        {
-          n = n >> 1;
-          ++numZeros;
-        }
-        // Replace the indexed rows random value
-        // Subtract and add back to pinkRunningSum instead of adding all 
-        // the random values together. only one changes each time
-        state->pinkRunningSum -= state->pinkRows[numZeros];
-        newRandom = ((long)arc4random()) >> kPinkRandomShift;
-        state->pinkRunningSum += newRandom;
-        state->pinkRows[numZeros] = newRandom;
-      }
-      // Add extra white noise value
-      newRandom = ((long)arc4random()) >> kPinkRandomShift;
-      long sum = state->pinkRunningSum + newRandom;
-      // Scale to range of -1.0 to 0.999 and factor in volume
-      lsample = state->pinkScalar * sum;
-    }
-    //float old = lsample;
-    lsample *= state->qrn;
-    //printf("%f from %f*%f\n", lsample, old, state->qrn);
-    //lsample = 0.0;
+    float m = state->qrn * state->amp;
+    lsample *= m;
     if (lsample > 1.0) lsample = 1.0;
     if (lsample < -1.0) lsample = -1.0;
     rsample = lsample;
@@ -118,11 +91,130 @@ static OSStatus  NoiseCB(void* inRefCon, AudioUnitRenderActionFlags* ioActionFla
       lsample *= ((-2.0f * state->pan) + 2.0f);
       rsample *= (2.0f * state->pan);
     }
-    //printf("sample %f\n", lsample);
     *lBuffer++ = lsample;
     *rBuffer++ = rsample;
   }
   return noErr;
+}
+
+//----------------------------------------------------------------------------
+//
+//                                3 Band EQ :)
+//
+// EQ.C - Main Source file for 3 band EQ
+//
+// (c) Neil C / Etanza Systems / 2K6
+//
+// Shouts / Loves / Moans = etanza at lycos dot co dot uk 
+//
+// This work is hereby placed in the public domain for all purposes, including
+// use in commercial applications.
+//
+// The author assumes NO RESPONSIBILITY for any problems caused by the use of
+// this software.
+//
+//----------------------------------------------------------------------------
+
+// NOTES :
+//
+// - Original filter code by Paul Kellet (musicdsp.pdf)
+//
+// - Uses 4 first order filters in series, should give 24dB per octave
+//
+// - Now with P4 Denormal fix :)
+
+
+
+// -----------
+//| Constants |
+// -----------
+
+static double vsa = (1.0 / 4294967295.0);   // Very small amount (Denormal Fix)
+
+
+// ---------------
+//| Initialise EQ |
+// ---------------
+
+// Recommended frequencies are ...
+//
+//  lowfreq  = 880  Hz
+//  highfreq = 5000 Hz
+//
+// Set mixfreq to whatever rate your system is using (eg 48Khz)
+
+static void init_3band_state(EQSTATE* es, int lowfreq, int highfreq, int mixfreq)
+{
+  // Clear state 
+
+  memset(es,0,sizeof(EQSTATE));
+
+  // Set Low/Mid/High gains to unity
+
+  es->lg = 0.8;
+  es->mg = 1.0;
+  es->hg = 0.1;
+
+  // Calculate filter cutoff frequencies
+
+  es->lf = 2 * sin(M_PI * ((double)lowfreq / (double)mixfreq)); 
+  es->hf = 2 * sin(M_PI * ((double)highfreq / (double)mixfreq));
+}
+
+
+// ---------------
+//| EQ one sample |
+// ---------------
+
+// - sample can be any range you like :)
+//
+// Note that the output will depend on the gain settings for each band 
+// (especially the bass) so may require clipping before output, but you 
+// knew that anyway :)
+
+static double do_3band(EQSTATE* es, double sample)
+{
+  // Locals
+
+  double  l,m,h;      // Low / Mid / High - Sample Values
+
+  // Filter #1 (lowpass)
+
+  es->f1p0  += (es->lf * (sample   - es->f1p0)) + vsa;
+  es->f1p1  += (es->lf * (es->f1p0 - es->f1p1));
+  es->f1p2  += (es->lf * (es->f1p1 - es->f1p2));
+  es->f1p3  += (es->lf * (es->f1p2 - es->f1p3));
+
+  l          = es->f1p3;
+
+  // Filter #2 (highpass)
+  
+  es->f2p0  += (es->hf * (sample   - es->f2p0)) + vsa;
+  es->f2p1  += (es->hf * (es->f2p0 - es->f2p1));
+  es->f2p2  += (es->hf * (es->f2p1 - es->f2p2));
+  es->f2p3  += (es->hf * (es->f2p2 - es->f2p3));
+
+  h          = es->sdm3 - es->f2p3;
+
+  // Calculate midrange (signal - (low + high))
+
+  m          = es->sdm3 - (h + l);
+
+  // Scale, Combine and store
+
+  l         *= es->lg;
+  m         *= es->mg;
+  h         *= es->hg;
+
+  // Shuffle history buffer 
+
+  es->sdm3   = es->sdm2;
+  es->sdm2   = es->sdm1;
+  es->sdm1   = sample;                
+
+  // Return result
+
+  return(l + m + h);
 }
 
 static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
@@ -366,7 +458,6 @@ static void local_SendRange(MorseRenderState* state)
   _string = [[NSMutableString alloc] init];
   OSStatus err = noErr;
   _state.led = [[LED alloc] init];
-  [self _initRandomEnv:5];
   err = [self _initAUGraph];
   if (err)
   {
@@ -482,25 +573,6 @@ static void local_SendRange(MorseRenderState* state)
   return AUGraphInitialize(_ag);
 }
 
--(void)_initRandomEnv:(long)numRows
-{
-  int index;
-  long pmax;
-  
-  _state.pinkIndex = 0;
-  _state.pinkIndexMask = (1 << numRows) - 1;
-  _state.goWhite = NO;
-  // Calculate max possible signed random value. extra 1 for white noise always added
-  pmax = (numRows + 1) * (1 << (kPinkRandomBits-1));
-  _state.pinkScalar = 1.0f / pmax;
-  // Initialize rows
-  for (index = 0; index < numRows; index++)
-  {
-    _state.pinkRows[index] = 0;
-  }
-  _state.pinkRunningSum = 0;
-}
-
 -(id)copyWithZone:(NSZone*)z
 {
   MorseRenderer* cpy = [[MorseRenderer alloc] init];
@@ -555,7 +627,6 @@ static void local_SendRange(MorseRenderState* state)
 -(void)setLoop:(BOOL)flag {_state.loop = flag;}
 -(void)setQRN:(float)val { _state.qrn = val; }
 -(void)setWeight:(float)val { _state.weight = val; }
--(void)setQRNWhite:(BOOL)flag { _state.goWhite = flag; }
 -(void)setWaveType:(MorseRendererWaveType)type { _state.waveType = type; }
 -(BOOL)flash { return _state.flash; }
 
@@ -641,6 +712,7 @@ static void local_SendRange(MorseRenderState* state)
   _state.agendaDone = 0;
   _state.agendaItemElementsDone = 0;
   _state.agendaItemElementSamplesDone = 0;
+  init_3band_state(&_state.eq, 200, 2000, gSampleRate);
 }
 
 -(void)setState:(MorseRenderState*)s
