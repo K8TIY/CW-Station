@@ -123,14 +123,12 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     else NSLog(@"Could not create event tap");
   }
   qso = [[NSMutableArray alloc] init];
-  recognizer = [[MorseRecognizer alloc]
-                   initWithWPM:[[[NSUserDefaults standardUserDefaults] objectForKey:@"wpm"] doubleValue]];
 }
 
 -(void)dealloc
 {
   [words release];
-  [recognizer release];
+  if (recognizer) [recognizer release];
   [qso release];
   [score release];
   [super dealloc];
@@ -141,10 +139,24 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 {
   if (state == CWSNotTestingState)
   {
-    if ([[[tabs selectedTabViewItem] identifier] isEqual:@"4"]) [self gotoState:CWSSendingState];
+    if ([[[tabs selectedTabViewItem] identifier] isEqual:@"4"])
+    {
+      if (recognizer) [recognizer release];
+      recognizer = [[MorseRecognizer alloc]
+                   initWithWPM:[[[NSUserDefaults standardUserDefaults] objectForKey:@"wpm"] doubleValue]];
+      [self gotoState:CWSSendingState];
+    }
     else [self gotoState:CWSPlayingState];
   }
-  else [self gotoState:CWSNotTestingState];
+  else
+  {
+    if (timer)
+    {
+      [timer invalidate];
+      timer = nil;
+    }
+    [self gotoState:CWSNotTestingState];
+  }
 }
 
 -(IBAction)clearScore:(id)sender
@@ -227,6 +239,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 #pragma mark Internal
 -(void)gotoState:(unsigned)s
 {
+  //NSLog(@"gotoState %d from %d", s, state);
   [timer invalidate];
   timer = nil;
   double when;
@@ -250,10 +263,10 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     [bottomBLV setBGColor:[NSColor grayColor]];
     [bottomBLV setCanBecomeFirstResponder:NO];
     if (_tap) CGEventTapEnable(_tap, false);
-    lastKey = 0.0;
     break;
     
     case CWSPlayingState:
+    [renderer setSendsNote:YES];
     if ([tabID isEqual:@"1"]) [renderer start:[inputField string] withDelay:NO];
     else if ([tabID isEqual:@"2"]) [self startNewTest];
     [startStopButton setImage:[NSImage imageNamed:@"StopEnabled.tiff"]];
@@ -270,7 +283,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     // At 5 wpm 12.5 units is about 3 secs.
     // Always pause at least a second.
     when = ([Morse millisecondsPerUnitAtWPM:wpm]/1000.0) * 
-          (([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"])? 7.0:12.5);
+                   (([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"])? 7.0:12.5);
     if (when < 1.0) when = 1.0;
     //NSLog(@"Waiting %f seconds from %f ms at %f", when, [Morse millisecondsPerUnitAtWPM:wpm], wpm);
     timer = [NSTimer scheduledTimerWithTimeInterval:when target:self selector:@selector(timer:) userInfo:nil repeats:NO];
@@ -278,10 +291,11 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     break;
     
     case CWSSendingState:
+    [renderer setSendsNote:NO];
+    if (_tap) CGEventTapEnable(_tap, true);
     [startStopButton setImage:[NSImage imageNamed:@"StopEnabled.tiff"]];
     [startStopButton setAlternateImage:[NSImage imageNamed:@"StopPressed.tiff"]];
     [sentField setStringValue:@""];
-    if (_tap) CGEventTapEnable(_tap, true);
     break;
   }
   state = s;
@@ -483,26 +497,23 @@ static const unsigned seenNuff = 20;
   double wpm = [recognizer WPM];
   MorseSpacing spacing = [Morse spacingForWPM:wpm CWPM:wpm];
   double delay = spacing.interwordMilliseconds;
-  //NSLog(@"%s at %llu (0x%X)", (down)? "down":"up", time, flags);
-  if (lastKey)
+  //NSLog(@"%s at %llu", (down)? "down":"up", time);
+  double time2 = (double)time/1000000.0;
+  uint16_t morse;
+  double* tp = &time2;
+  //NSLog(@"Before: %@", recognizer);
+  do
   {
-    double dur = ((double)time-(double)lastKey)/1000000.0;
-    if (flag) dur = delay;
-    uint16_t morse;
-    double* dp = &dur;
-    do
-    {
-      morse = [recognizer feed:dp];
-      NSString* str = [Morse stringFromMorse:morse];
-      //NSLog(@"You typed %@ (%d)", str, morse);
-      if (!str && morse != MorseNoCharacter) str = [NSString stringWithFormat:@"%C", 0x203D]; // interrobang
-      else if ([str length] > 1) str = [Morse formatString:str];
-      if (str) [sentField setStringValue:[NSString stringWithFormat:@"%@%@", [sentField stringValue], str]];
-      dp = NULL;
-    } while (morse != MorseNoCharacter);
-    q = [recognizer quality];
-    //NSLog(@"QUALITY %f", q.quality);
-  }
+    morse = [recognizer feed:tp];
+    NSString* str = [Morse stringFromMorse:morse];
+    //NSLog(@"You typed %@ (%d) %@", str, morse, recognizer);
+    if (!str && morse != MorseNoCharacter) str = [NSString stringWithFormat:@"%C", 0x25A2]; // box
+    else if ([str length] > 1) str = [Morse formatString:str];
+    if (str) [sentField setStringValue:[NSString stringWithFormat:@"%@%@", [sentField stringValue], str]];
+    tp = NULL;
+  } while (morse != MorseNoCharacter);
+  q = [recognizer quality];
+  //NSLog(@"QUALITY %f", q.quality);
   if (down) [renderer setMode:MorseRendererOnMode];
   else
   {
@@ -518,7 +529,7 @@ static const unsigned seenNuff = 20;
       timer = [NSTimer scheduledTimerWithTimeInterval:delay target:self selector:@selector(spaceTimer:) userInfo:nil repeats:NO];
     }
   }
-  lastKey = time;
+  if (flag) [recognizer clear];
 }
 
 #pragma mark Delegate
@@ -544,8 +555,8 @@ static const unsigned seenNuff = 20;
 -(void)tabView:(NSTabView*)tv didSelectTabViewItem:(NSTabViewItem*)item
 {
   [self gotoState:CWSNotTestingState];
-  BOOL loop = ([[[tabs selectedTabViewItem] identifier] isEqual:@"1"])? [[[NSUserDefaults standardUserDefaults] valueForKey:@"loop"] boolValue]:NO;
-  [renderer setLoop:loop];
+  //BOOL loop = ([[[tabs selectedTabViewItem] identifier] isEqual:@"1"])? [[[NSUserDefaults standardUserDefaults] valueForKey:@"loop"] boolValue]:NO;
+  //[renderer setLoop:loop];
 }
 
 -(void)authorizationViewDidAuthorize:(SFAuthorizationView*)view
@@ -608,6 +619,7 @@ static const unsigned seenNuff = 20;
 #pragma mark Callbacks
 -(void)timer:(NSTimer*)t
 {
+  //NSLog(@"timer fired: %@", t);
   if (state == CWSWaitingState) [self gotoState:CWSShowingState];
   else if (state == CWSShowingState) [self gotoState:CWSPlayingState];
 }
@@ -616,9 +628,8 @@ static const unsigned seenNuff = 20;
 {
   if (spaceTimerGo && t == timer)
   {
-    //NSLog(@"timer fired: %@", t);
+    //NSLog(@"space timer fired: %@", t);
     [self shiftKey:NO atTime:UpTimeInNanoseconds() fromTimer:YES];
-    lastKey = 0.0;
   }
   spaceTimerGo = NO;
   [timer invalidate];
@@ -635,7 +646,8 @@ static const unsigned seenNuff = 20;
 
 -(void)renderDone:(NSNotification*)note
 {
-  //NSLog(@"renderDone:");
+  //NSLog(@"renderDone: state %d", state);
+  if (state == CWSSendingState) return;
   if ([[[tabs selectedTabViewItem] identifier] isEqual:@"1"])
   {
     [inputField setSelectedRange:NSMakeRange(0,0)];

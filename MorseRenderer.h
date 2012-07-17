@@ -97,7 +97,7 @@ typedef struct
   BOOL                  play;
   BOOL                  wasOn;
   BOOL                  flash;
-  BOOL                  noNote;
+  BOOL                  sendsNote;
   BOOL                  sentNote;
   // Noise stuff
   // Once I figure out how to synthesize genuine-sounding radio noise
@@ -116,6 +116,7 @@ typedef struct
 
 -(BOOL)isPlaying;
 -(void)setMode:(MorseRendererMode)mode;
+-(void)setSendsNote:(BOOL)flag;
 -(void)start:(NSString*)s withDelay:(BOOL)del;
 -(void)stop;
 -(void)setAmp:(float)val;

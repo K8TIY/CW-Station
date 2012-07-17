@@ -60,7 +60,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   MorseScore* score;
   CFRunLoopSourceRef _src;
   CFMachPortRef _tap;
-  CGEventTimestamp lastKey;
   BOOL down;
   BOOL spaceTimerGo;
 }

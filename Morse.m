@@ -307,10 +307,10 @@ uint16_t MorseInterwordSpace = 0x0018;
   return self;
 }
 
--(uint16_t)feed:(double*)duration
+-(uint16_t)feed:(double*)time
 {
   // Put the event in the buffer
-  if (duration)
+  if (time)
   {
     unsigned where = (_bufferStart + _bufferCount) % MorseBufferSize;
     if (_bufferCount == MorseBufferSize)
@@ -319,112 +319,145 @@ uint16_t MorseInterwordSpace = 0x0018;
       _bufferStart++;
       if (_bufferStart >= MorseBufferSize) _bufferStart = 0;
     }
-    //char* type = (where % 2 == 0)? "tone":"space";
-    //NSLog(@"Put %s %f ms at position %d (%d,%d)", type, *duration, where, _bufferStart, _bufferCount);
-    if (_bufferCount < MorseBufferSize) _bufferCount++;
-    _buffer[where] = *duration;
+    double duration = *time - _lastTime;
+    if (_lastTime)
+    {
+      _buffer[where] = duration;
+      if (_bufferCount < MorseBufferSize) _bufferCount++;
+      //char* type = (where % 2 == 0)? "tone":"space";
+      //NSLog(@"Put %s %f ms at position %d (%d,%d)", type, duration, where, _bufferStart, _bufferCount);
+    }
+    _lastTime = *time;
   }
   return [self _recognize];
 }
 
+-(void)clear
+{
+  _bufferStart = 0;
+  _bufferCount = 0;
+  _lastTime = 0.0;
+}
+
 -(MorseRecognizerQuality)quality
 {
-  double twpm = 0.0;
-  double swpm = 0.0;
-  unsigned seen = 0;
+  return _quality;
+}
+
+-(NSString*)description
+{
+  NSMutableString* s = [[NSMutableString alloc] init];
   int i = _bufferStart;
-  unsigned n = 0;
-  unsigned nt = 0;
-  unsigned ns = 0;
-  float dev = 0.0;
   float tone = [Morse millisecondsPerUnitAtWPM:_wpm];
   MorseSpacing spacing = [Morse spacingForWPM:_wpm CWPM:_wpm];
   float intercharacterCutoff = (tone + spacing.intercharacterMilliseconds)/2.0L;
   float interwordCutoff = (spacing.intercharacterMilliseconds + spacing.interwordMilliseconds)/2.0L;
-  while (YES)
+  unsigned seen = 0;
+  while (seen < _bufferCount)
   {
-    double unit = _buffer[i];
-    if (unit > 0.0L)
+    float delta = _buffer[i];
+    BOOL isTone = (i % 2 == 0);
+    //NSLog(@"i=%d key %s", i, isKeyUp? "UP":"DOWN");
+    if (isTone)
     {
-      if (i % 2 == 0)
-      {
-        if (unit > 2.0 * tone) unit /= MorseDahUnits;
-        twpm += [Morse WPMPerUnitMilliseconds:unit];
-        nt++;
-      }
-      else
-      {
-        if (unit > interwordCutoff) unit /= MorseInterwordUnits;
-        else if (unit > intercharacterCutoff) unit /= MorseDahUnits;
-        swpm += [Morse WPMPerUnitMilliseconds:unit];
-        ns++;
-      }
-      dev += fmin(1.0,fabs((unit-tone)/tone));
-      //NSLog(@"%d: dev now %f from %f = fabs((%f-%f)/%f)", i, dev, fabs((unit-tone)/tone), unit, tone, tone);
-      n++;
+      [s appendFormat:@"%C", (delta > 2.0 * tone)? '-':'.'];
     }
+    else
+    {
+      if (delta > intercharacterCutoff)
+      {
+        // interword or intercharacter: emit character.
+        if (delta > interwordCutoff)
+        {
+          [s appendString:@" "];
+        }
+        //else [s appendString:@"_"];
+      }
+    }
+    seen++;
     i++;
     if (i >= MorseBufferSize) i = 0;
-    seen++;
-    if (seen >= MorseBufferSize) break;
   }
-  MorseRecognizerQuality mrq = {0.0,0.0,0.0};
-  if (n) mrq.quality = (1.0L - (dev/(float)n));
-  if (nt) mrq.toneWPM = twpm/(float)nt;
-  if (ns) mrq.spaceWPM = swpm/(float)ns;
-  //NSLog(@"q %f from dev %f for %d units", mrq.quality, dev, n);
-  return mrq;
+  NSString* ret = [NSString stringWithFormat:@"<MR start=%d count=%d [%@]>", _bufferStart, _bufferCount, s];
+  [s release];
+  return ret;
 }
 
 -(uint16_t)_recognize
 {
   uint16_t chr = MorseNoCharacter;
   uint16_t inProgress = 0x0000;
+  //if (_bufferCount < 2) return inProgress;
+  double twpm = 0.0;
+  double swpm = 0.0;
   unsigned seen = 0;
+  unsigned n = 0;
+  unsigned nt = 0;
+  unsigned ns = 0;
+  float dev = 0.0;
   int i = _bufferStart;
-  //NSLog(@"Start while loop");
+  //NSLog(@"====== Start while loop");
   float tone = [Morse millisecondsPerUnitAtWPM:_wpm];
   MorseSpacing spacing = [Morse spacingForWPM:_wpm CWPM:_wpm];
   float intercharacterCutoff = (tone + spacing.intercharacterMilliseconds)/2.0L;
   float interwordCutoff = (spacing.intercharacterMilliseconds + spacing.interwordMilliseconds)/2.0L;
+  //NSLog(@"intercharacterMilliseconds=%f, intercharacterCutoff=%f, interwordCutoff=%f", spacing.intercharacterMilliseconds, intercharacterCutoff, interwordCutoff);
   while (YES)
   {
+    float delta = _buffer[i];
     BOOL isTone = (i % 2 == 0);
-    //NSLog(@"i=%d tone %s", i, isTone? "YES":"NO");
+    //NSLog(@"i=%d seen=%d %s", i, seen, isTone? "TONE":"SPACE");
     if (isTone)
     {
       unsigned char len = inProgress & 0x0007;
       len++;
       inProgress = len | (inProgress & 0xFFF8);
-      //NSLog(@"Tone: _buffer[%d] (%f) > 2.0 * tone (%f)? %s", i, _buffer[i], tone, (_buffer[i] > 2.0 * tone)?"dah":"dit");
-      if (_buffer[i] > 2.0 * tone) inProgress |= 1 << (len+2);
-      //NSLog(@"morse now %d (len %d)", inProgress, len);
+      //NSLog(@"Tone: _buffer[%d] (%f) > 2.0 * tone (%f)? %s", i, _buffer[i], tone, (delta > 2.0 * tone)?"dah":"dit");
+      if (delta > 2.0 * tone) inProgress |= 1 << (len+2);
+      //NSLog(@"morse now 0x%04X (len %d)", inProgress, len);
+      if (delta > 2.0 * tone) delta /= MorseDahUnits;
+      if (delta) twpm += [Morse WPMPerUnitMilliseconds:delta];
+      //NSLog(@"twpm now %f from delta %f", twpm, delta);
+      nt++;
     }
     else
     {
-      //NSLog(@"Space: _buffer[%d] (%f) > interchar cutoff (%f)? %s", i, _buffer[i], intercharacterCutoff, (_buffer[i] > 2.0 * intercharacterCutoff)?"long":"short");
-      if (_buffer[i] > intercharacterCutoff)
+      //NSLog(@"Space: _buffer[%d] (%f) > interchar cutoff (%f)? %s", i, _buffer[i], intercharacterCutoff, (delta > 2.0 * intercharacterCutoff)?"long":"short");
+      if (delta > intercharacterCutoff)
       {
         // interword or intercharacter: emit character.
         seen++;
         chr = inProgress;
-        //NSLog(@"Long space: _buffer[%d] (%f) > interword cutoff (%f)? %s (%d)", i, _buffer[i], interwordCutoff, (_buffer[i] > interwordCutoff)?"YES":"NO", inProgress);
-        if (_buffer[i] > interwordCutoff)
+        //NSLog(@"Long space: _buffer[%d] (%f) > interword cutoff (%f)? %s (%d)", i, _buffer[i], interwordCutoff, (delta > interwordCutoff)?"YES":"NO", inProgress);
+        if (delta > interwordCutoff)
         {
           if (inProgress == MorseNoCharacter) chr = MorseInterwordSpace;
           else seen--;
         }
         _bufferStart = (_bufferStart + seen) % MorseBufferSize;
         _bufferCount -= seen;
-        //NSLog(@"Emit %d; _bufferStart %d, _bufferCount %d, seen %d", chr, _bufferStart, _bufferCount, seen);
+        //NSLog(@"Emit 0x%04X; _bufferStart %d, _bufferCount %d, seen %d", chr, _bufferStart, _bufferCount, seen);
       }
+      if (delta > interwordCutoff) delta /= MorseInterwordUnits;
+      else if (delta > intercharacterCutoff) delta /= MorseDahUnits;
+      swpm += (delta)? [Morse WPMPerUnitMilliseconds:delta]:_wpm;
+      //NSLog(@"swpm now %f from delta %f", swpm, delta);
+      ns++;
     }
+    dev += fmin(1.0,fabs((delta-tone)/tone));
+    //NSLog(@"%d: dev now %f from %f = fabs((%f-%f)/%f) twpm %f, swpm %f", i, dev, fabs((delta-tone)/tone), delta, tone, tone, twpm, swpm);
+    n++;
     if (chr) break;
     i++;
     if (i >= MorseBufferSize) i = 0;
     seen++;
     if (seen >= MorseBufferSize || seen >= _bufferCount) break;
   }
+  if (n) _quality.quality = (1.0L - (dev/(float)n));
+  if (nt) _quality.toneWPM = twpm/(float)nt;
+  if (ns) _quality.spaceWPM = swpm/(float)ns;
+  if (chr == MorseInterwordSpace) _lastTime = 0.0;
+  //NSLog(@"q %f (t %f, s %f) from dev %f for %d units", _quality.quality, _quality.toneWPM, _quality.spaceWPM, dev, n);
   return chr;
 }
 

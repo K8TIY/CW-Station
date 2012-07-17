@@ -42,7 +42,7 @@ static double do_3band(EQSTATE* es, double sample);
 
 static unsigned Renderer(MorseRenderState* inState, UInt32 inNumberFrames,
                          AudioBufferList* ioData);
-static void local_SendNote(void);
+static void local_SendNote(MorseRenderState* state);
 static void local_SendRange(MorseRenderState* state);
 
 #if __MORSE_RENDERER_DEBUG__
@@ -227,14 +227,14 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
   float freq = state->freq;
   float ampz = state->ampz;
   float freqz = state->freqz;
-  float decay = 1.0;
   float* lBuffer = ioData->mBuffers[0].mData;
   float* rBuffer = ioData->mBuffers[1].mData;
   uint16_t* item = NULL;
   uint16_t code = 0;
   int waveType = state->waveType;
   BOOL atEnd = (state->agendaCount < 1 || state->agendaCount <= state->agendaDone);
-  //NSLog(@"atEnd (%d > %d) = %s", state->agendaCount, state->agendaDone, (atEnd)? "yes":"no");
+  //NSLog(@"atEnd (%d > %d) = %s phase %f mode %d",
+  //      state->agendaCount, state->agendaDone, (atEnd)? "yes":"no", phase, state->mode);
   if (state->agenda && state->play)
   {
     item = &(state->agenda)[state->agendaDone];
@@ -251,6 +251,7 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
   {
     float lsample = 0.0f;
     float rsample = 0.0f;
+    float decay = 1.0f;
     if ((item && state->agendaDone < state->agendaCount) ||
          state->mode == MorseRendererOnMode ||
          state->mode == MorseRendererDecayMode)
@@ -282,7 +283,9 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
           {
             state->mode = MorseRendererOffMode;
           }
-          //if (decay != 1.0f) NSLog(@"decay %f from samples %d, %f", decay, state->agendaItemElementsDone, (1.0/fadeSamples));
+          if (decay < 0.0f) decay = 0.0f;
+          //if (decay != 1.0f) NSLog(@"decay %f from samples %d, %f mode %d (%f)",
+          //                        decay, state->agendaItemElementsDone, (1.0/fadeSamples), state->mode, fadeSamples);
         }
         else if (state->agendaItemElementSamplesDone < fadeSamples)
         {
@@ -329,13 +332,16 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
             if (phase < M_PI) lsample = -ampz + (2.0f*ampz/M_PI*phase);
             else lsample = (3.0f*ampz) - (2.0f*ampz/M_PI*phase);
           }
-          //if (ampz != 1.0f) lsample *= ampz;
           // Update phase and wrap around if necessary
           //phase += ((2.0f * M_PI * freq) / gSampleRate);
           phase += freq;
           if (phase > M_PI * 2.0f) phase -= M_PI * 2.0f;
           //printf("phase %f from %f\n", phase, freqz);
-          if (decay != 1.0f) lsample *= decay;
+          if (decay != 1.0f)
+          {
+            lsample *= decay;
+            //printf("applying decay: %f from %f * %f %f)\n", lsample * decay, decay, lsample, phase);
+          }
           rsample = lsample;
           if (lsample != 0.0f)
           {
@@ -419,6 +425,7 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
     if (atEnd) state->play = NO;
     else samples++;
   }
+  //printf("Now setting phase to %f\n", phase);
   state->phase = phase;
   state->freqz = freqz;
   state->ampz = ampz;
@@ -426,22 +433,25 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
   if (atEnd && !state->sentNote)
   {
     state->sentNote = YES;
-    local_SendNote();
+    local_SendNote(state);
   }
   return samples;
 }
 
-static void local_SendNote(void)
+static void local_SendNote(MorseRenderState* state)
 {
-  NSAutoreleasePool* arp = [[NSAutoreleasePool alloc] init];
-  NSNotification* note = [NSNotification notificationWithName:MorseRendererFinishedNotification object:nil];
-  [[NSNotificationCenter defaultCenter] performSelectorOnMainThread:@selector(postNotification:) withObject:note waitUntilDone:NO];
-  [arp release];
+  if (state->sendsNote)
+  {
+    NSAutoreleasePool* arp = [[NSAutoreleasePool alloc] init];
+    NSNotification* note = [NSNotification notificationWithName:MorseRendererFinishedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] performSelectorOnMainThread:@selector(postNotification:) withObject:note waitUntilDone:NO];
+    [arp release];
+  }
 }
 
 static void local_SendRange(MorseRenderState* state)
 {
-  if (!state->noNote)
+  if (state->sendsNote)
   {
     NSAutoreleasePool* arp = [[NSAutoreleasePool alloc] init];
     NSString* s = [state->offsets objectForKey:[NSNumber numberWithUnsignedShort:state->agendaDone]];
@@ -670,8 +680,13 @@ static void local_SendRange(MorseRenderState* state)
     if (mode == MorseRendererOffMode) mode = MorseRendererDecayMode;
     _state.mode = mode;
     if (mode == MorseRendererAgendaMode) [self stop];
-    else [self start:nil withDelay:NO];
+    else if (mode != MorseRendererDecayMode) [self start:nil withDelay:NO];
   }
+}
+
+-(void)setSendsNote:(BOOL)flag
+{
+  _state.sendsNote = flag;
 }
 
 -(void)start:(NSString*)s withDelay:(BOOL)del
@@ -734,7 +749,7 @@ static void local_SendRange(MorseRenderState* state)
 -(void)exportAIFF:(NSURL*)url
 {
   //AudioStreamBasicDescription destFormat;
-  _state.noNote = YES;
+  _state.sendsNote = NO;
   float* buff1 = NULL;
   float* buff2 = NULL;
   buff1 = malloc(BUFF_SIZE);

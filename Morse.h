@@ -62,16 +62,19 @@ typedef struct
   double spaceWPM;
 } MorseRecognizerQuality;
 
-#define MorseBufferSize (18)
+#define MorseBufferSize (32)
 @interface MorseRecognizer : NSObject
 {
   double _buffer[MorseBufferSize];
-  unsigned _bufferCount; 
+  double _lastTime;
+  unsigned _bufferCount;
   unsigned _bufferStart;
   float _wpm;
+  MorseRecognizerQuality _quality;
 }
 -(id)initWithWPM:(float)wpm;
--(uint16_t)feed:(double*)duration;
+-(uint16_t)feed:(double*)time;
+-(void)clear;
 -(MorseRecognizerQuality)quality;
 -(float)WPM;
 -(void)setWPM:(float)wpm;
