@@ -27,13 +27,17 @@
 "__MAX_CHARS__" = "最小数文字";
 "__RAND_CHARS__" = "ランダムな文字";
 "__DICT_WORDS__" = "辞書の単語";
+"__SETS__" = "Character Sets";
 "__LETTERS__" = "文字";
 "__NUMBERS__" = "数字";
-"__LETTERS_NUMBERS__" = "文字と数字";
 "__PUNCTUATION__" = "句読文字";
+"__INTERNATIONAL__" = "国家字";
 "__PROSIGNS__" = "プロサイン";
 "__KOCH__" = "Koch連続";
 "__PRACTICE_MODE__" = "練習モード";
+
+"__NEW_CHARACTER__" = "よく出来ました！すぐには「A」文字を学習を開始します。";
+"__NEW_CHARACTER_EXP__" = "この通知は、新しい文字を聞いて驚きを防ぐために示されています。";
 
 "__CHAR__" = "字";
 "__CORRECT__" = "点";
@@ -44,7 +48,6 @@
 
 // Prefs
 "__LOWERCASE_QSO__" = "小文字のQSO";
-"__QRN_WHITE__" = "ホワイトノイズのQRM";
 "__CORRECT_RESP__" = "正しい応答";
 "__INCORRECT_RESP__" = "不正な応答";
 "__WAVE_TYPE__" = "音波の種類";

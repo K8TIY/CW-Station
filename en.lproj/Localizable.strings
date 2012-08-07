@@ -27,13 +27,17 @@
 "__MAX_CHARS__" = "Max Characters";
 "__RAND_CHARS__" = "Random Characters";
 "__DICT_WORDS__" = "Dictionary Words";
+"__SETS__" = "Character Sets";
 "__LETTERS__" = "Letters";
 "__NUMBERS__" = "Numbers";
-"__LETTERS_NUMBERS__" = "Letters & Numbers";
 "__PUNCTUATION__" = "Punctuation";
+"__INTERNATIONAL__" = "International";
 "__PROSIGNS__" = "Prosigns";
 "__KOCH__" = "Koch Sequence";
 "__PRACTICE_MODE__" = "Practice Mode";
+
+"__NEW_CHARACTER__" = "Well done! You're about to start on the '%@' character.";
+"__NEW_CHARACTER_EXP__" = "This notification is being shown to keep you from being surprised when you hear a new character.";
 
 "__CHAR__" = "Character";
 "__CORRECT__" = "Correct";
@@ -44,7 +48,6 @@
 
 // Prefs
 "__LOWERCASE_QSO__" = "Lowercase QSO";
-"__QRN_WHITE__" = "QRN is white noise";
 "__CORRECT_RESP__" = "Correct response";
 "__INCORRECT_RESP__" = "Incorrect response";
 "__WAVE_TYPE__" = "Wave Type";
