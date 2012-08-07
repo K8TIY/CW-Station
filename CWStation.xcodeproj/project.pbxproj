@@ -40,7 +40,6 @@
 		32560642121C410700656629 /* Wordlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 32560640121C410700656629 /* Wordlist.m */; };
 		325B407111DAA44D00F39F0D /* Morse.h in Headers */ = {isa = PBXBuildFile; fileRef = 325B406F11DAA44D00F39F0D /* Morse.h */; };
 		325B407211DAA44D00F39F0D /* Morse.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B407011DAA44D00F39F0D /* Morse.m */; };
-		325B409A11DAAA8500F39F0D /* Morse.strings in Resources */ = {isa = PBXBuildFile; fileRef = 325B409911DAAA8500F39F0D /* Morse.strings */; };
 		3279A4401215F614007180F1 /* SecurityInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3279A43F1215F614007180F1 /* SecurityInterface.framework */; };
 		3279A4771215FE90007180F1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3279A4761215FE90007180F1 /* Security.framework */; };
 		32859CD811E6245A003319E7 /* Morse.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32859CD711E6245A003319E7 /* Morse.plist */; };
@@ -129,7 +128,6 @@
 		32560640121C410700656629 /* Wordlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wordlist.m; sourceTree = "<group>"; };
 		325B406F11DAA44D00F39F0D /* Morse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Morse.h; sourceTree = "<group>"; };
 		325B407011DAA44D00F39F0D /* Morse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Morse.m; sourceTree = "<group>"; };
-		325B409911DAAA8500F39F0D /* Morse.strings */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; path = Morse.strings; sourceTree = "<group>"; };
 		3279A43F1215F614007180F1 /* SecurityInterface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityInterface.framework; path = /System/Library/Frameworks/SecurityInterface.framework; sourceTree = "<absolute>"; };
 		3279A4761215FE90007180F1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		327A3EC8133CF11A008EE70A /* README.markdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.markdown; sourceTree = "<group>"; };
@@ -225,7 +223,6 @@
 				3292CEDC123ECE5E009B0B9C /* Levenshtein.m */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				32190E841222CB81008B4E80 /* mktrusted.c */,
-				325B409911DAAA8500F39F0D /* Morse.strings */,
 				32859CD711E6245A003319E7 /* Morse.plist */,
 				322E274E11E4DE8400B9241E /* defaults.plist */,
 				324305BA13256B3A00A01CFC /* qso.d */,
@@ -391,7 +388,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3237A3EF131D8D9800824AD4 /* MainMenu.xib in Resources */,
-				325B409A11DAAA8500F39F0D /* Morse.strings in Resources */,
 				322E274F11E4DE8400B9241E /* defaults.plist in Resources */,
 				322E284511E4FC5000B9241E /* repeat_embedded.png in Resources */,
 				322E284611E4FC5000B9241E /* repeat_embedded_graphite.png in Resources */,
