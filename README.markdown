@@ -1,4 +1,4 @@
-## This is CW Station version 1.1
+## This is CW Station version 1.3
 
 ### What can you do with this thing?
 
@@ -21,12 +21,8 @@
   * To enter a prosign here, hold down the shift key.
 * You can "Send" CW using your shift key as a Morse keyer.
   CW Station will try to recognize what you're sending.
-  * Note: this does not work all that well, and is probably inferior to more
-          specialized practice setups. In fact, if no one tells me this is a 
-          useful feature, I may remove it. It would make the code a lot cleaner.
-          I ended up building a picokeyer and getting a straight key, so to
-          rate my sending I just "play along" with a QSO and try to match the
-          spacing.
+  * Note: this does not work spectacularly well, but it much improved in version
+    1.3.1.
   * It will use your deviation from the calculated tone/space timings to try to
     rate your fist "Quality".
   * Hint: click the "Play" button or hit the spacebar to go into keyer mode.
@@ -68,7 +64,9 @@ make my head hurt.)
 * Make the QSO library more up to date and/or more realistic
   (in progress; comments welcome).
 * Simulate contest QSOs?
-* Option to flash num lock LED (if it exists) instead of caps lock.
+* Add a "Don't Warn Me Again" to the auth dialog box for users that can't
+  or do not wish to authorize the program.
+* International characters and a way to enter them in the Test pane.
 
 ### Not Todo
 
