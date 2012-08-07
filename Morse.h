@@ -28,6 +28,16 @@ extern uint8_t  MorseDitUnits;
 extern uint8_t  MorseDahUnits;
 extern uint8_t  MorseInterwordUnits;
 
+enum
+{
+  MorseSetLetters,
+  MorseSetNumbers,
+  MorseSetPunctuation,
+  MorseSetProsigns,
+  MorseSetInternational,
+  MorseSetKoch
+};
+
 typedef struct
 {
   float intercharacterMilliseconds;
@@ -44,13 +54,9 @@ typedef struct
 +(NSString*)stringFromMorse:(uint16_t)morse;
 +(uint16_t*)morseFromString:(NSString*)string withDelay:(BOOL)del
             length:(unsigned*)outLength offsets:(NSDictionary**)offsets;
-+(NSArray*)letters;
-+(NSArray*)numbers;
-+(NSArray*)lettersAndNumbers;
-+(NSArray*)punctuation;
-+(NSArray*)prosigns;
-+(NSArray*)koch;
++(NSArray*)charactersFromSets:(unsigned)sets;
 +(NSString*)formatString:(NSString*)string;
++(BOOL)isProsign:(NSString*)string;
 +(NSString*)translateFromProsigns:(NSString*)string;
 +(NSString*)translateToProsigns:(NSString*)string;
 @end

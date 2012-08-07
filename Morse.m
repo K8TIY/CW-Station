@@ -215,39 +215,41 @@ uint16_t MorseInterwordSpace = 0x0018;
   return a;
 }
 
-+(NSArray*)letters
++(NSArray*)charactersFromSets:(unsigned)sets
 {
-  return [[Morse dictionary] objectForKey:@"Letters"];
-}
-
-+(NSArray*)numbers
-{
-  return [[Morse dictionary] objectForKey:@"Numbers"];
-}
-
-+(NSArray*)lettersAndNumbers
-{
+  NSMutableArray* a = [[NSMutableArray alloc] init];
   NSDictionary* d = [Morse dictionary];
-  NSMutableArray* a = [[NSMutableArray alloc] initWithArray:[d objectForKey:@"Letters"]];
-  [a addObjectsFromArray:[d objectForKey:@"Numbers"]];
-  NSArray* ret = [NSArray arrayWithArray:a];
-  [a release];
-  return ret;
-}
-
-+(NSArray*)punctuation
-{
-  return [[Morse dictionary] objectForKey:@"Punctuation"];
-}
-
-+(NSArray*)prosigns
-{
-  return [[Morse dictionary] objectForKey:@"Prosigns"];
-}
-
-+(NSArray*)koch
-{
-  return [[Morse dictionary] objectForKey:@"Koch"];
+  if (sets & 1 << MorseSetLetters)
+  {
+    [a addObjectsFromArray:[d objectForKey:@"Letters"]];
+    //NSLog(@"%@ from %@", a, [d objectForKey:@"Letters"]);
+  }
+  if (sets & 1 << MorseSetNumbers)
+  {
+    [a addObjectsFromArray:[d objectForKey:@"Numbers"]];
+    //NSLog(@"%@ from %@", a, [d objectForKey:@"Numbers"]);
+  }
+  if (sets & 1 << MorseSetPunctuation)
+  {
+    [a addObjectsFromArray:[d objectForKey:@"Punctuation"]];
+    //NSLog(@"%@ from %@", a, [d objectForKey:@"Punctuation"]);
+  }
+  if (sets & 1 << MorseSetProsigns)
+  {
+    [a addObjectsFromArray:[d objectForKey:@"Prosigns"]];
+    //NSLog(@"%@ from %@", a, [d objectForKey:@"Prosigns"]);
+  }
+  if (sets & 1 << MorseSetInternational)
+  {
+    [a addObjectsFromArray:[d objectForKey:@"International"]];
+    //NSLog(@"%@ from %@", a, [d objectForKey:@"International"]);
+  }
+  if (sets & 1 << MorseSetKoch)
+  {
+    [a addObjectsFromArray:[d objectForKey:@"Koch"]];
+    //NSLog(@"%@ from %@", a, [d objectForKey:@"Koch"]);
+  }
+  return [a autorelease];
 }
 
 // Merges consecutive uppercase characters into prosigns.
@@ -266,6 +268,17 @@ uint16_t MorseInterwordSpace = 0x0018;
   [ms release];
   //NSLog(@"%@ -> %@", string, ret);
   return ret;
+}
+
++(BOOL)isProsign:(NSString*)string
+{
+  unsigned i, n = [string length];
+  for (i = 0; i < n; i++)
+  {
+    unichar chr = [string characterAtIndex:i];
+    if (chr == 0x0305) return YES;
+  }
+  return NO;
 }
 
 +(NSString*)translateFromProsigns:(NSString*)string
