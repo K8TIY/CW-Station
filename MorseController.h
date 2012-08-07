@@ -23,6 +23,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 @interface MorseWindow : NSWindow
 @end
 
+typedef enum
+{
+  CWSNotTestingState,
+  CWSPlayingState,
+  CWSWaitingState,
+  CWSShowingState,
+  CWSSendingState
+} CWSState;
+
 @interface MorseController : NSObject
 {
   IBOutlet NSWindow* window;
@@ -39,6 +48,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   IBOutlet NSPopUpButton* maxButton;
   IBOutlet NSPopUpButton* sourceButton;
   IBOutlet NSPopUpButton* setButton;
+  IBOutlet NSButton* lettersSetButton;
+  IBOutlet NSButton* numbersSetButton;
+  IBOutlet NSButton* punctuationSetButton;
+  IBOutlet NSButton* prosignsSetButton;
+  IBOutlet NSButton* internationalSetButton;
+  IBOutlet NSButton* kochSetButton;
   // Score pane
   IBOutlet NSTableView* scoreTable;
   // Send pane
@@ -56,7 +71,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
   unsigned qsoIndex;
   MorseRecognizer* recognizer;
   NSTimer* timer;
-  unsigned state;
+  CWSState state;
   MorseScore* score;
   CFRunLoopSourceRef _src;
   CFMachPortRef _tap;
@@ -70,5 +85,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -(IBAction)makeProsign:(id)sender;
 -(IBAction)orderFrontPrefsWindow:(id)sender;
 -(IBAction)exportAIFF:(id)sender;
+-(IBAction)setCheckbox:(id)sender;
 -(void)windowDidReceiveSpace:(id)sender;
 @end
