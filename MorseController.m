@@ -43,19 +43,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
 @end
 
-enum
-{
-  CWSNotTestingState,
-  CWSPlayingState,
-  CWSWaitingState,
-  CWSShowingState,
-  CWSSendingState
-};
-
 static CGEventRef TapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* refcon);
 static CGEventTimestamp UpTimeInNanoseconds(void);
 
 @interface MorseController (Private)
+-(void)setupSets;
 -(void)gotoState:(unsigned)s;
 -(void)startNewTest;
 -(NSArray*)kochArray;
@@ -69,6 +61,8 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
 -(void)renderDone:(NSNotification*)note;
 -(void)wordStarted:(NSNotification*)note;
 -(void)tintChanged:(NSNotification*)note;
+-(void)endSheet:(NSPanel*)sheet returnCode:(int)code
+       contextInfo:(void*)contextInfo;
 @end
 
 
@@ -123,6 +117,7 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     else NSLog(@"Could not create event tap");
   }
   qso = [[NSMutableArray alloc] init];
+  [self setupSets];
 }
 
 -(void)dealloc
@@ -232,11 +227,32 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     [panel setRequiredFileType:@"aiff"];
     [panel beginSheetForDirectory:nil file:nil modalForWindow:window
            modalDelegate:self
-           didEndSelector:@selector(aiffExportDidEnd:returnCode:contextInfo:)
-           contextInfo:nil];
+           didEndSelector:@selector(endSheet:returnCode:contextInfo:)
+           contextInfo:@"aiff"];
+}
+
+-(IBAction)setCheckbox:(NSButton*)sender
+{
+  unsigned sets = [[NSUserDefaults standardUserDefaults] integerForKey:@"sets"];
+  unsigned tag = [sender tag];
+  if ([sender state] == NSOnState) sets |= 1 << tag;
+  else sets &= ~(1 << tag);
+  //NSLog(@"0x%X", sets);
+  [[NSUserDefaults standardUserDefaults] setInteger:sets forKey:@"sets"];
 }
 
 #pragma mark Internal
+-(void)setupSets
+{
+  unsigned sets = [[NSUserDefaults standardUserDefaults] integerForKey:@"sets"];
+  if (sets & 1 << MorseSetLetters) [lettersSetButton setState:NSOnState];
+  if (sets & 1 << MorseSetNumbers) [numbersSetButton setState:NSOnState];
+  if (sets & 1 << MorseSetPunctuation) [punctuationSetButton setState:NSOnState];
+  if (sets & 1 << MorseSetProsigns) [prosignsSetButton setState:NSOnState];
+  if (sets & 1 << MorseSetInternational) [internationalSetButton setState:NSOnState];
+  if (sets & 1 << MorseSetKoch) [kochSetButton setState:NSOnState];
+}
+
 -(void)gotoState:(unsigned)s
 {
   //NSLog(@"gotoState %d from %d", s, state);
@@ -285,8 +301,9 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     when = ([Morse millisecondsPerUnitAtWPM:wpm]/1000.0) * 
                    (([[NSUserDefaults standardUserDefaults] boolForKey:@"practice"])? 7.0:12.5);
     if (when < 1.0) when = 1.0;
-    //NSLog(@"Waiting %f seconds from %f ms at %f", when, [Morse millisecondsPerUnitAtWPM:wpm], wpm);
-    timer = [NSTimer scheduledTimerWithTimeInterval:when target:self selector:@selector(timer:) userInfo:nil repeats:NO];
+    //NSLog(@"Waiting %f seconds from %f ms at %f", when, 1000 * [Morse millisecondsPerUnitAtWPM:wpm], wpm);
+    timer = [NSTimer scheduledTimerWithTimeInterval:when target:self
+                     selector:@selector(timer:) userInfo:nil repeats:NO];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
     break;
     
@@ -322,21 +339,14 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   }
   //NSLog(@"%d characters", n);
   unsigned src = [[NSUserDefaults standardUserDefaults] integerForKey:@"source"];
-  unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
+  unsigned sets = [[NSUserDefaults standardUserDefaults] integerForKey:@"sets"];
   NSString* s = nil;
   if (src == 1)
   {
-    NSArray* whichArray;
-    switch (set)
-    {
-      case 2: whichArray = [Morse numbers]; break;
-      case 3: whichArray = [Morse lettersAndNumbers]; break;
-      case 4: whichArray = [Morse punctuation]; break;
-      case 5: whichArray = [Morse prosigns]; n = 1; break;
-      case 6: whichArray = [self kochArray]; break;
-      default: whichArray = [Morse letters]; break;
-    }
-    s = [self randomStringFromArray:whichArray ofLength:n];
+    if (sets == 0) sets = MorseSetLetters;
+    NSArray* whichArray = (sets & 1 << MorseSetKoch)?
+      [self kochArray]:[Morse charactersFromSets:sets];
+    if (whichArray) s = [self randomStringFromArray:whichArray ofLength:n];
   }
   else if (src == 2)
   {
@@ -376,13 +386,15 @@ static const float goodNuff = 0.95;
 static const unsigned seenNuff = 20;
 -(NSArray*)kochArray
 {
-  NSArray* k = [Morse koch];
+  NSArray* k = [Morse charactersFromSets:1 << MorseSetKoch];
   unsigned kn = [k count];
   NSMutableArray* a = [[NSMutableArray alloc] init];
   unsigned i, n = [[NSUserDefaults standardUserDefaults] integerForKey:@"kochIndex"];
   if (n < 2) n = 2;
   else if (n > kn) n = kn;
   for (i = 0; i < n; i++) [a addObject:[k objectAtIndex:i]];
+  //NSLog(@"Observations for %@: %d", [a lastObject], [score countObservationsForString:[a lastObject]]);
+  //NSLog(@"Score: %f", [score scoreForString:[a lastObject]]);
   if ([score countObservationsForString:[a lastObject]] >= seenNuff &&
       [score scoreForString:[a lastObject]] >= goodNuff &&
       [a count] < kn &&
@@ -391,8 +403,20 @@ static const unsigned seenNuff = 20;
     [a addObject:[k objectAtIndex:n]];
     n++;
     [[NSUserDefaults standardUserDefaults] setInteger:n forKey:@"kochIndex"];
-    // FIXME: put in a user-"dont show me again"-able alert when the new
-    // character is put into play.
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"noKochAlert"])
+    {
+      NSAlert* alert = [NSAlert new];
+      NSString* fmt = [[Onizuka sharedOnizuka] copyLocalizedTitle:@"__NEW_CHARACTER__"];
+      NSString* msg = [NSString stringWithFormat:fmt, [a lastObject]];
+      [fmt release];
+      [alert setInformativeText:msg];
+      [alert setShowsSuppressionButton:YES];
+      [alert beginSheetModalForWindow:window modalDelegate:self
+             didEndSelector:@selector(endSheet:returnCode:contextInfo:)
+             contextInfo:@"koch"];
+      //[self gotoState:CWSNotTestingState];
+      return nil;
+    }
   }
   NSArray* ret = [NSArray arrayWithArray:a];
   [a release];
@@ -448,10 +472,9 @@ static const unsigned seenNuff = 20;
   //NSLog(@"Score is now %@", score);
 }
 
-// FIXME: have to make sure if this is the koch array and we choose a prosign,
-// no other characters should be allowed, or should we put a word space between?
 -(NSString*)randomStringFromArray:(NSArray*)array ofLength:(unsigned)length
 {
+  if (nil == array) return nil;
   NSMutableString* ms = [[NSMutableString alloc] init];
   unsigned i;
   unsigned n = [array count];
@@ -461,8 +484,15 @@ static const unsigned seenNuff = 20;
     NSString* str2 = [array objectAtIndex:arc4random() % n];
     float score1 = [score scoreForString:str1];
     float score2 = [score scoreForString:str2];
-    [ms appendString:(score1 < score2)? str1:str2];
-    //NSLog(@"Choosing %@ (%f) vs %@ (%f)? %@", str1, score1, str2, score2, (score1 < score2)? str1:str2);
+    if (score1 > score2) str1 = str2;
+    if ([Morse isProsign:str1])
+      str1 = [NSString stringWithFormat:@"%s%@%s",
+                       ([ms length]>0 && !isspace([ms characterAtIndex:[ms length]-1]))? " ":"",
+                       str1,
+                       (i+1 < length)? " ":""];
+    [ms appendString:str1];
+    //NSLog(@"Choosing %@ (%f) vs %@ (%f)? %@", str1, score1, str2,
+    //      score2, (score1 < score2)? str1:str2);
   }
   NSString* ret = [NSString stringWithString:ms];
   [ms release];
@@ -497,7 +527,7 @@ static const unsigned seenNuff = 20;
   double wpm = [recognizer WPM];
   MorseSpacing spacing = [Morse spacingForWPM:wpm CWPM:wpm];
   double delay = spacing.interwordMilliseconds;
-  //NSLog(@"%s at %llu", (down)? "down":"up", time);
+  //NSLog(@"%s at %llu (0x%X)", (down)? "down":"up", time, flags);
   double time2 = (double)time/1000000.0;
   uint16_t morse;
   double* tp = &time2;
@@ -537,6 +567,7 @@ static const unsigned seenNuff = 20;
 {
   [[NSUserDefaults standardUserDefaults] setObject:[[tabs selectedTabViewItem] identifier] forKey:@"tab"];
   [[NSUserDefaults standardUserDefaults] setObject:[score dictionaryRepresentation] forKey:@"score"];
+  [renderer stop];
   if (_tap)
   {
     CGEventTapEnable(_tap, false);
@@ -589,11 +620,9 @@ static const unsigned seenNuff = 20;
     [ti release];
     if ([tabID isEqual:@"3"]) return NO;
   }
-  else*/ if (action == @selector(genQSO:))
-  {
-    if (![tabID isEqual:@"1"]) return NO;
-  }
-  else if (action == @selector(makeProsign:))
+  else*/ if (action == @selector(genQSO:) || 
+             action == @selector(makeProsign:) ||
+             action == @selector(exportAIFF:))
   {
     if (![tabID isEqual:@"1"]) return NO;
   }
@@ -619,7 +648,7 @@ static const unsigned seenNuff = 20;
 #pragma mark Callbacks
 -(void)timer:(NSTimer*)t
 {
-  //NSLog(@"timer fired: %@", t);
+  //NSLog(@"timer: state is %d", state);
   if (state == CWSWaitingState) [self gotoState:CWSShowingState];
   else if (state == CWSShowingState) [self gotoState:CWSPlayingState];
 }
@@ -677,7 +706,15 @@ static const unsigned seenNuff = 20;
   [repeatButton setAlternateImage:[NSImage imageNamed:tintImageName]];
 }
 
--(void)observeValueForKeyPath:(NSString*)path ofObject:(id)object change:(NSDictionary*)change context:(void*)ctx
+enum
+{
+  MorseSourceRandChars = 1,
+  MorseSourceDictWords,
+  MorseSourceQSO
+};
+
+-(void)observeValueForKeyPath:(NSString*)path ofObject:(id)object
+       change:(NSDictionary*)change context:(void*)ctx
 {
   #pragma unused (object,ctx)
   //NSLog(@"observeValueForKeyPath:%@ ofObject:%@ change:%@", path, object, change);
@@ -734,24 +771,34 @@ static const unsigned seenNuff = 20;
     [renderer setWeight:[newval floatValue]];
   }
   unsigned src = [[NSUserDefaults standardUserDefaults] integerForKey:@"source"];
-  unsigned set = [[NSUserDefaults standardUserDefaults] integerForKey:@"set"];
-  //NSLog(@"src %d set %d", src, set);
-  [minButton setEnabled:(src<3&&set!=5)];
-  [maxButton setEnabled:(src<3&&set!=5)];
-  [setButton setEnabled:(src==1)];
+  //unsigned sets = [[NSUserDefaults standardUserDefaults] integerForKey:@"sets"];
+  //NSLog(@"src %d sets %d", src, sets);
+  [minButton setEnabled:(src<MorseSourceQSO)];
+  [maxButton setEnabled:(src<MorseSourceQSO)];
+  [setButton setEnabled:(src==MorseSourceRandChars)];
 }
 
--(void)aiffExportDidEnd:(NSSavePanel*)sheet returnCode:(int)code contextInfo:(void*)contextInfo
+-(void)endSheet:(NSPanel*)sheet returnCode:(int)code
+       contextInfo:(void*)ctx
 {
-  #pragma unused (contextInfo)
-  if (code == NSOKButton)
+  if ([(id)ctx isEqualToString:@"aiff"])
   {
-    [sheet orderOut:nil];
-    MorseRenderer* mr = [renderer copy];
-    [mr setMode:MorseRendererAgendaMode];
-    [mr setString:[inputField string] withDelay:NO];
-    [mr exportAIFF:[sheet URL]];
-    [mr release];
+    if (code == NSOKButton)
+    {
+      [sheet orderOut:nil];
+      MorseRenderer* mr = [renderer copy];
+      [mr setString:[inputField string] withDelay:NO];
+      [mr exportAIFF:[(NSSavePanel*)sheet URL]];
+      [mr release];
+    }
+  }
+  else if ([(id)ctx isEqualToString:@"koch"])
+  {
+    if ([[(NSAlert*)sheet suppressionButton] state] == NSOnState)
+    {
+      [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"noKochAlert"];
+    }
+    [self gotoState:CWSPlayingState];
   }
 }
 
