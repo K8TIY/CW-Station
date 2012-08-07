@@ -227,6 +227,7 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
   float freq = state->freq;
   float ampz = state->ampz;
   float freqz = state->freqz;
+  float decay = 1.0f;
   float* lBuffer = ioData->mBuffers[0].mData;
   float* rBuffer = ioData->mBuffers[1].mData;
   uint16_t* item = NULL;
@@ -251,7 +252,6 @@ static unsigned Renderer(MorseRenderState* state, UInt32 inNumberFrames,
   {
     float lsample = 0.0f;
     float rsample = 0.0f;
-    float decay = 1.0f;
     if ((item && state->agendaDone < state->agendaCount) ||
          state->mode == MorseRendererOnMode ||
          state->mode == MorseRendererDecayMode)
