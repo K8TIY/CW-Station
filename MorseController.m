@@ -485,6 +485,17 @@ static const unsigned seenNuff = 20;
     NSString* str2 = [array objectAtIndex:arc4random() % n];
     float score1 = [score scoreForString:str1];
     float score2 = [score scoreForString:str2];
+    // Discount the score for anything not seen many times.
+    // Up to 50% off depending on how few times seen.
+    unsigned obs1 = [score countObservationsForString:str1];
+    unsigned obs2 = [score countObservationsForString:str2];
+    float disc1 = .5 - ((.5 * obs1)/MorseScoreMaxObservations);
+    float disc2 = .5 - ((.5 * obs2)/MorseScoreMaxObservations);
+    score1 -= disc1;
+    score2 -= disc2;
+    /*NSLog(@"Choosing %@ (%f d %f from %d) vs %@ (%f d %f from %d)? %@", str1, score1,
+          disc1, obs1, str2, score2, disc2, obs2,
+          (score1 < score2)? str1:str2);*/
     if (score1 > score2) str1 = str2;
     if ([Morse isProsign:str1])
       str1 = [NSString stringWithFormat:@"%s%@%s",
@@ -492,8 +503,6 @@ static const unsigned seenNuff = 20;
                        str1,
                        (i+1 < length)? " ":""];
     [ms appendString:str1];
-    //NSLog(@"Choosing %@ (%f) vs %@ (%f)? %@", str1, score1, str2,
-    //      score2, (score1 < score2)? str1:str2);
   }
   NSString* ret = [NSString stringWithString:ms];
   [ms release];
