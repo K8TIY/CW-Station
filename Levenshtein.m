@@ -42,36 +42,47 @@ typedef struct
   self = [super init];
   _s1 = [string1 copy];
   _s2 = [string2 copy];
+  unsigned n = [_s1 length] + 1;
+  unsigned m = [_s2 length] + 1;
+  _d = calloc(sizeof(LevCell), m * n);
   [self _updateDistance];
   return self;
 }
 
+-(void)dealloc
+{
+  if (_d) free(_d);
+  [_s1 release];
+  [_s2 release];
+  [super dealloc];
+}
+
 -(NSString*)description
 {
-  NSMutableString* desc = [NSMutableString stringWithFormat:@"%@ '%@' vs '%@' = %ld (0x%X)", [super description], _s1, _s2, _distance, _d];
-  if (_d)
+  NSMutableString* desc = [NSMutableString stringWithFormat:@"%@ '%@' vs '%@' = %ld (0x%X)",
+                                                            [super description],
+                                                            _s1, _s2, _distance,
+                                                            _d];
+  [desc appendFormat:@"\n\n<table border='1'>\n"];
+  unsigned n = [_s1 length] + 1;
+  unsigned m = [_s2 length] + 1;
+  if (n && m)
   {
-    [desc appendFormat:@"\n\n<table border='1'>\n"];
-    unsigned n = [_s1 length] + 1;
-    unsigned m = [_s2 length] + 1;
     unsigned i, j;
-    if (n && m)
+    LevCell* d = _d;
+    for (i = -1; i < n; i++)
     {
-      LevCell* d = _d;
-      for (i = -1; i < n; i++)
+      [desc appendFormat:@"<tr><th>%C</th>", (i > 0)? [_s1 characterAtIndex:i-1]:' '];
+      for (j = 0; j < m; j++)
       {
-        [desc appendFormat:@"<tr><th>%C</th>", (i > 0)? [_s1 characterAtIndex:i-1]:' '];
-        for (j = 0; j < m; j++)
-        {
-          LevCell* dp = &d[j * n + i];
-          if (i == -1) [desc appendFormat:@"<th>%C</th>", (j > 0)? [_s2 characterAtIndex:j-1]:' '];
-          else [desc appendFormat:@"<td>%ld %s%s%s</td>", dp->d, (dp->p & levPtrUpLeft)? "&#x2196":"", (dp->p & levPtrLeft)? "&#x2190":"", (dp->p & levPtrUp)? "&#x2191":""];
-        }
-        [desc appendString:@"</tr>\n"];
+        LevCell* dp = &d[j * n + i];
+        if (i == -1) [desc appendFormat:@"<th>%C</th>", (j > 0)? [_s2 characterAtIndex:j-1]:' '];
+        else [desc appendFormat:@"<td>%ld %s%s%s</td>", dp->d, (dp->p & levPtrUpLeft)? "&#x2196":"", (dp->p & levPtrLeft)? "&#x2190":"", (dp->p & levPtrUp)? "&#x2191":""];
       }
+      [desc appendString:@"</tr>\n"];
     }
-    [desc appendFormat:@"</table>"];
   }
+  [desc appendFormat:@"</table>"];
   NSArray* alignment = [self alignmentWithPlaceholder:@"_"];
   NSString* s1 = [alignment objectAtIndex:0];
   NSString* s2 = [alignment objectAtIndex:1];
@@ -130,14 +141,6 @@ typedef struct
   return [NSArray arrayWithObjects:desc1, desc2, NULL];
 }
 
--(void)dealloc
-{
-  if (_d) free(_d);
-  [_s1 release];
-  [_s2 release];
-  [super dealloc];
-}
-
 -(unsigned)distance
 {
   return _distance;
@@ -147,11 +150,9 @@ typedef struct
 {
   // Step 1
   unsigned k, i, j;
-  if (_d) free(_d);
   _distance = 0;
   unsigned n = [_s1 length] + 1;
   unsigned m = [_s2 length] + 1;
-  _d = calloc( sizeof(LevCell), m * n );
   LevCell* d = _d;
   // Step 2
   for (k = 0; k < n; k++)
