@@ -198,14 +198,19 @@ static unsigned const maxScoreBits = 128;
 {
   unsigned bytes = bits >> 3;
   if (bits % 8) bytes++;
-  uint8_t* newbits = calloc(sizeof(uint8_t), bytes);
-  if (_bits)
+  uint8_t* newbits = NULL;
+  if (bytes > 0)
   {
-    unsigned oldbytes = _capacity >> 3;
-    if (_capacity % 8) oldbytes++;
-    bytes = MIN(bytes,oldbytes);
-    memcpy(newbits,_bits,bytes);
+    newbits = calloc(sizeof(uint8_t), bytes);
+    if (_bits)
+    {
+      unsigned oldbytes = _capacity >> 3;
+      if (_capacity % 8) oldbytes++;
+      bytes = MIN(bytes,oldbytes);
+      memcpy(newbits,_bits,bytes);
+    }
   }
+  if (_bits) free(_bits);
   _bits = newbits;
   _capacity = bits;
 }
@@ -224,6 +229,9 @@ static unsigned const maxScoreBits = 128;
   if (i >= _capacity) [self setCapacity:i+1];
   unsigned whichByte = i >> 3;
   unsigned whichBit = 7 - (i % 8);
+  // Clang analyzer gives me a null pointer deref warning for these
+  // but _bits can't be NULLed unless capacity is 0, which
+  // can't happen with the setCapacity: call above.
   if (on) _bits[whichByte] |= (1 << whichBit);
   else _bits[whichByte] &= (~(1 << whichBit));
 }
@@ -318,5 +326,11 @@ static void local_TestBitArray(void)
   NSLog(@"3 %@", [ba description]);
   [ba setBit:1 atIndex:0];
   NSLog(@"4 %@", [ba description]);
+  [ba setBit:1 atIndex:10];
+  NSLog(@"5 %@", [ba description]);
+  [ba setBit:0 atIndex:11];
+  NSLog(@"6 %@", [ba description]);
+  [ba setBit:0 atIndex:21];
+  NSLog(@"7 %@", [ba description]);
 }
 #endif
