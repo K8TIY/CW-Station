@@ -21,6 +21,8 @@ static NSString* local_BinaryStringForByte(uint8_t b);
 static void local_TestBitArray(void);
 #endif
 
+unsigned const MorseScoreMaxObservations = 128;
+
 @implementation MorseScore
 #if BA_DOTEST
 +(void)initialize
@@ -98,7 +100,6 @@ static void local_TestBitArray(void);
   return score;
 }
 
-static unsigned const maxScoreBits = 128;
 -(void)addObservation:(BOOL)good forString:(NSString*)s
 {
   BitArray* ba = [_dict objectForKey:s];
@@ -109,7 +110,7 @@ static unsigned const maxScoreBits = 128;
     [ba release];
   }
   unsigned cap = [ba capacity];
-  if (cap < maxScoreBits)
+  if (cap < MorseScoreMaxObservations)
   {
     cap++;
     [ba setCapacity:cap];
