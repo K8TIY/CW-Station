@@ -393,6 +393,7 @@ static const unsigned seenNuff = 20;
   if (n < 2) n = 2;
   else if (n > kn) n = kn;
   for (i = 0; i < n; i++) [a addObject:[k objectAtIndex:i]];
+  BOOL didAlert = NO;
   //NSLog(@"Observations for %@: %d", [a lastObject], [score countObservationsForString:[a lastObject]]);
   //NSLog(@"Score: %f", [score scoreForString:[a lastObject]]);
   if ([score countObservationsForString:[a lastObject]] >= seenNuff &&
@@ -415,10 +416,10 @@ static const unsigned seenNuff = 20;
              didEndSelector:@selector(endSheet:returnCode:contextInfo:)
              contextInfo:@"koch"];
       //[self gotoState:CWSNotTestingState];
-      return nil;
+      didAlert = YES;
     }
   }
-  NSArray* ret = [NSArray arrayWithArray:a];
+  NSArray* ret = (didAlert)? nil:[NSArray arrayWithArray:a];
   [a release];
   //NSLog(@"Koch array: %@", ret);
   return ret;
@@ -522,7 +523,6 @@ static const unsigned seenNuff = 20;
   timer = nil;
   spaceTimerGo = NO;
   //if (flag) NSLog(@"SPACE TIMER");
-  MorseRecognizerQuality q = {0.0,0.0};
   down = isdown;
   double wpm = [recognizer WPM];
   MorseSpacing spacing = [Morse spacingForWPM:wpm CWPM:wpm];
@@ -542,7 +542,7 @@ static const unsigned seenNuff = 20;
     if (str) [sentField setStringValue:[NSString stringWithFormat:@"%@%@", [sentField stringValue], str]];
     tp = NULL;
   } while (morse != MorseNoCharacter);
-  q = [recognizer quality];
+  MorseRecognizerQuality q = [recognizer quality];
   //NSLog(@"QUALITY %f", q.quality);
   if (down) [renderer setMode:MorseRendererOnMode];
   else
