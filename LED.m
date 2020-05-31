@@ -3,9 +3,9 @@ Based on code by Apple, heavily modified by Brian "Moses" Hall (me).
 I hereby place this code in the public domain.
 */
 
-#include <mach/mach_error.h>
+//#include <mach/mach_error.h>
 #include <IOKit/hid/IOHIDUsageTables.h>
-#include "LED.h";
+#include "LED.h"
 
 static NSMutableDictionary* _CreateMatchingDict(Boolean isDeviceNotElement,
                                     uint32_t inUsagePage,
@@ -41,30 +41,31 @@ static NSMutableDictionary* _CreateMatchingDict(Boolean isDeviceNotElement,
   IOHIDDeviceRef* refs = NULL;
   // create a IO HID Manager reference
   IOHIDManagerRef mgr = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
-  require(mgr, Oops);
+  if (!mgr) goto Oops;
   // Create a device matching dictionary
   NSDictionary* dic = _CreateMatchingDict(true, kHIDPage_GenericDesktop,
                                           kHIDUsage_GD_Keyboard);
-  require(dic, Oops);
+  if (!dic) goto Oops;
   // set the HID device matching dictionary
   IOHIDManagerSetDeviceMatching(mgr, (CFDictionaryRef)dic);
   [dic release];
+  dic = nil;
   // Now open the IO HID Manager reference
   IOReturn err = IOHIDManagerOpen(mgr, kIOHIDOptionsTypeNone);
-  require_noerr(err, Oops);
+  if (err != noErr) goto Oops;
   // and copy out its devices
   deviceCFSetRef = IOHIDManagerCopyDevices(mgr);
-  require(deviceCFSetRef, Oops);
+  if (!deviceCFSetRef) goto Oops;
   // how many devices in the set?
   CFIndex deviceIndex, deviceCount = CFSetGetCount(deviceCFSetRef);
   // allocate a block of memory to extact the device refs from the set into
   refs = malloc(sizeof(IOHIDDeviceRef) * deviceCount);
-  require(refs, Oops);
+  if (!refs) goto Oops;
   // now extract the device refs from the set
   CFSetGetValues(deviceCFSetRef, (const void**)refs);
   // before we get into the device loop set up element matching dictionary
   dic = _CreateMatchingDict(false, kHIDPage_LEDs, 0);
-  require(dic, Oops);
+  if (!dic) goto Oops;
   for (deviceIndex = 0; deviceIndex < deviceCount; deviceIndex++)
   {
     // if this isn't a keyboard device...
@@ -78,33 +79,37 @@ static NSMutableDictionary* _CreateMatchingDict(Boolean isDeviceNotElement,
     CFArrayRef elements = IOHIDDeviceCopyMatchingElements(refs[deviceIndex],
                                      (CFDictionaryRef)dic,
                                      kIOHIDOptionsTypeNone);
-    require(elements, next_device);
-    // iterate over all the elements
-    CFIndex i, n = CFArrayGetCount(elements);
-    for (i = 0; i < n; i++)
+    //require(elements, next_device);
+    if (elements)
     {
-      IOHIDElementRef element = (IOHIDElementRef)CFArrayGetValueAtIndex(elements, i);
-      require(element, next_element);
-      uint32_t usagePage = IOHIDElementGetUsagePage(element);
-      // if this isn't an LED element, skip it
-      if (kHIDPage_LEDs != usagePage) continue;
-      uint32_t elusage = IOHIDElementGetUsage(element);
-      if (elusage == usage)
+      // iterate over all the elements
+      CFIndex i, n = CFArrayGetCount(elements);
+      for (i = 0; i < n; i++)
       {
-        ledDevice = (IOHIDDeviceRef)CFRetain(refs[deviceIndex]);
-        ledElement = (IOHIDElementRef)CFRetain(element);
-        break;
+        IOHIDElementRef element = (IOHIDElementRef)CFArrayGetValueAtIndex(elements, i);
+        if (element)
+        {
+          uint32_t usagePage = IOHIDElementGetUsagePage(element);
+          // if this isn't an LED element, skip it
+          if (kHIDPage_LEDs != usagePage) continue;
+          uint32_t elusage = IOHIDElementGetUsage(element);
+          if (elusage == usage)
+          {
+            ledDevice = (IOHIDDeviceRef)CFRetain(refs[deviceIndex]);
+            ledElement = (IOHIDElementRef)CFRetain(element);
+            break;
+          }
+        }
+        continue;
       }
-    next_element:  ;
-      continue;
     }
-  next_device: ;
+  //next_device: ;
     if (elements) CFRelease(elements);
     continue;
   }
-  if (mgr) CFRelease(mgr);
   [dic release];
-Oops:  ;
+Oops:
+  if (mgr) CFRelease(mgr);
   if (deviceCFSetRef) CFRelease(deviceCFSetRef);
   if (refs) free(refs);
   return self;

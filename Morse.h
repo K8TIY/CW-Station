@@ -15,10 +15,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 #import <Cocoa/Cocoa.h>
 
-@interface NSArray (StringComparison)
--(BOOL)isEqual:(NSArray*)other;
-@end
-
 extern uint16_t MorseNoCharacter;
 extern uint16_t MorseInterelementSpace;
 extern uint16_t MorseIntercharacterSpace;

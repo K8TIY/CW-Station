@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		3204AEB91284B9A800EAE00E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3204AEB81284B9A800EAE00E /* IOKit.framework */; };
 		3213560A11EE2AD800EBC97E /* CWStation.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3213560911EE2AD800EBC97E /* CWStation.icns */; };
-		32190E851222CB81008B4E80 /* mktrusted.c in Sources */ = {isa = PBXBuildFile; fileRef = 32190E841222CB81008B4E80 /* mktrusted.c */; };
-		32190F491222CD96008B4E80 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D7F92690099588A7F000001 /* CoreFoundation.framework */; };
-		32190F8A1222CFA0008B4E80 /* mktrusted in CopyFiles */ = {isa = PBXBuildFile; fileRef = 32190E6B1222C75D008B4E80 /* mktrusted */; };
 		32264F92131EC7A8006D4698 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 32264F8A131EC7A8006D4698 /* Credits.rtf */; };
 		32264F93131EC7A8006D4698 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 32264F8D131EC7A8006D4698 /* Localizable.strings */; };
 		322B68A81339296600632232 /* LED.h in Headers */ = {isa = PBXBuildFile; fileRef = 322B68A61339296600632232 /* LED.h */; };
@@ -40,8 +37,6 @@
 		32560642121C410700656629 /* Wordlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 32560640121C410700656629 /* Wordlist.m */; };
 		325B407111DAA44D00F39F0D /* Morse.h in Headers */ = {isa = PBXBuildFile; fileRef = 325B406F11DAA44D00F39F0D /* Morse.h */; };
 		325B407211DAA44D00F39F0D /* Morse.m in Sources */ = {isa = PBXBuildFile; fileRef = 325B407011DAA44D00F39F0D /* Morse.m */; };
-		3279A4401215F614007180F1 /* SecurityInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3279A43F1215F614007180F1 /* SecurityInterface.framework */; };
-		3279A4771215FE90007180F1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3279A4761215FE90007180F1 /* Security.framework */; };
 		32859CD811E6245A003319E7 /* Morse.plist in Resources */ = {isa = PBXBuildFile; fileRef = 32859CD711E6245A003319E7 /* Morse.plist */; };
 		32859E2F11E66FE1003319E7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32859E2E11E66FE1003319E7 /* AudioToolbox.framework */; };
 		3292CEDD123ECE5E009B0B9C /* Levenshtein.h in Headers */ = {isa = PBXBuildFile; fileRef = 3292CEDB123ECE5E009B0B9C /* Levenshtein.h */; };
@@ -59,16 +54,6 @@
 		A6D42C9613D21CC40094AD41 /* MorseScore.m in Sources */ = {isa = PBXBuildFile; fileRef = A6D42C9413D21CC40094AD41 /* MorseScore.m */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		32190F881222CF8A008B4E80 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 32190E6A1222C75D008B4E80;
-			remoteInfo = mktrusted;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		32190F831222CEDB008B4E80 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -76,7 +61,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				32190F8A1222CFA0008B4E80 /* mktrusted in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,8 +80,6 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		3204AEB81284B9A800EAE00E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		3213560911EE2AD800EBC97E /* CWStation.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = CWStation.icns; sourceTree = "<group>"; };
-		32190E6B1222C75D008B4E80 /* mktrusted */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mktrusted; sourceTree = BUILT_PRODUCTS_DIR; };
-		32190E841222CB81008B4E80 /* mktrusted.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mktrusted.c; sourceTree = "<group>"; };
 		32264F8B131EC7A8006D4698 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ja; path = ja.lproj/Credits.rtf; sourceTree = "<group>"; };
 		32264F8E131EC7A8006D4698 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		32264F90131EC7A8006D4698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
@@ -128,8 +110,6 @@
 		32560640121C410700656629 /* Wordlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Wordlist.m; sourceTree = "<group>"; };
 		325B406F11DAA44D00F39F0D /* Morse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Morse.h; sourceTree = "<group>"; };
 		325B407011DAA44D00F39F0D /* Morse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Morse.m; sourceTree = "<group>"; };
-		3279A43F1215F614007180F1 /* SecurityInterface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityInterface.framework; path = /System/Library/Frameworks/SecurityInterface.framework; sourceTree = "<absolute>"; };
-		3279A4761215FE90007180F1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		327A3EC8133CF11A008EE70A /* README.markdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.markdown; sourceTree = "<group>"; };
 		32859CD711E6245A003319E7 /* Morse.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Morse.plist; sourceTree = "<group>"; };
 		32859E2E11E66FE1003319E7 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
@@ -143,14 +123,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		32190E691222C75D008B4E80 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				32190F491222CD96008B4E80 /* CoreFoundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A64D2B6909211FE800BA6154 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -160,8 +132,6 @@
 				A64D2B6C09211FE800BA6154 /* CoreFoundation.framework in Frameworks */,
 				A63F8E440C518612006781E2 /* AudioUnit.framework in Frameworks */,
 				32859E2F11E66FE1003319E7 /* AudioToolbox.framework in Frameworks */,
-				3279A4401215F614007180F1 /* SecurityInterface.framework in Frameworks */,
-				3279A4771215FE90007180F1 /* Security.framework in Frameworks */,
 				3204AEB91284B9A800EAE00E /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -173,8 +143,6 @@
 			isa = PBXGroup;
 			children = (
 				3204AEB81284B9A800EAE00E /* IOKit.framework */,
-				3279A4761215FE90007180F1 /* Security.framework */,
-				3279A43F1215F614007180F1 /* SecurityInterface.framework */,
 				32859E2E11E66FE1003319E7 /* AudioToolbox.framework */,
 				A63F8E420C518612006781E2 /* AudioUnit.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
@@ -197,7 +165,6 @@
 			isa = PBXGroup;
 			children = (
 				A64D2B6F09211FE900BA6154 /* CW Station.app */,
-				32190E6B1222C75D008B4E80 /* mktrusted */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -222,7 +189,6 @@
 				3292CEDB123ECE5E009B0B9C /* Levenshtein.h */,
 				3292CEDC123ECE5E009B0B9C /* Levenshtein.m */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
-				32190E841222CB81008B4E80 /* mktrusted.c */,
 				32859CD711E6245A003319E7 /* Morse.plist */,
 				322E274E11E4DE8400B9241E /* defaults.plist */,
 				324305BA13256B3A00A01CFC /* qso.d */,
@@ -318,22 +284,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		32190E6A1222C75D008B4E80 /* mktrusted */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 32190E771222C7C5008B4E80 /* Build configuration list for PBXNativeTarget "mktrusted" */;
-			buildPhases = (
-				32190E681222C75D008B4E80 /* Sources */,
-				32190E691222C75D008B4E80 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = mktrusted;
-			productName = mktrusted;
-			productReference = 32190E6B1222C75D008B4E80 /* mktrusted */;
-			productType = "com.apple.product-type.tool";
-		};
 		A64D2B5D09211FE800BA6154 /* CW Station */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "CW Station" */;
@@ -347,7 +297,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				32190F891222CF8A008B4E80 /* PBXTargetDependency */,
 			);
 			name = "CW Station";
 			productInstallPath = "$(HOME)/Applications";
@@ -360,6 +309,9 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1140;
+			};
 			buildConfigurationList = A6E430C60C5184DE00BA6C4B /* Build configuration list for PBXProject "CWStation" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
@@ -377,7 +329,6 @@
 			projectRoot = "";
 			targets = (
 				A64D2B5D09211FE800BA6154 /* CW Station */,
-				32190E6A1222C75D008B4E80 /* mktrusted */,
 			);
 		};
 /* End PBXProject section */
@@ -410,14 +361,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		32190E681222C75D008B4E80 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				32190E851222CB81008B4E80 /* mktrusted.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A64D2B6509211FE800BA6154 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -438,14 +381,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		32190F891222CF8A008B4E80 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 32190E6A1222C75D008B4E80 /* mktrusted */;
-			targetProxy = 32190F881222CF8A008B4E80 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		32264F8A131EC7A8006D4698 /* Credits.rtf */ = {
@@ -479,74 +414,13 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		32190E6D1222C75E008B4E80 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					ppc,
-					i386,
-					x86_64,
-				);
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Carbon,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = mktrusted;
-				SDKROOT = macosx10.5;
-			};
-			name = Debug;
-		};
-		32190E6E1222C75E008B4E80 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = (
-					ppc,
-					i386,
-					x86_64,
-				);
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Carbon,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = mktrusted;
-				SDKROOT = macosx10.5;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		A6E430BF0C5184DE00BA6C4B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-					x86_64,
-				);
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_VERSION = "";
@@ -555,10 +429,12 @@
 				INFOPLIST_FILE = "CWStation-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.blugs.CWStation;
 				PRODUCT_NAME = "CW Station";
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 				WARNING_CFLAGS = (
@@ -567,21 +443,15 @@
 					"-Wno-unknown-pragmas",
 				);
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		A6E430C00C5184DE00BA6C4B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-					x86_64,
-				);
+				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
@@ -589,10 +459,12 @@
 				INFOPLIST_FILE = "CWStation-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.blugs.CWStation;
 				PRODUCT_NAME = "CW Station";
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 				WARNING_CFLAGS = (
@@ -601,24 +473,21 @@
 					"-Wno-unknown-pragmas",
 				);
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		A6E430C70C5184DE00BA6C4B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					x86_64,
-					ppc,
-				);
 				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
-				PREBINDING = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx10.4;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 			};
@@ -627,17 +496,13 @@
 		A6E430C80C5184DE00BA6C4B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-					x86_64,
-				);
 				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
-				PREBINDING = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx10.4;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 			};
@@ -646,15 +511,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		32190E771222C7C5008B4E80 /* Build configuration list for PBXNativeTarget "mktrusted" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				32190E6E1222C75E008B4E80 /* Release */,
-				32190E6D1222C75E008B4E80 /* Debug */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
 		A6E430BE0C5184DE00BA6C4B /* Build configuration list for PBXNativeTarget "CW Station" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

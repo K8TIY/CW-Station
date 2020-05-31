@@ -80,7 +80,18 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [d setValue:[NSArchiver archivedDataWithRootObject:[NSColor greenColor]] forKey:@"correctColor"];
   [d setValue:[NSArchiver archivedDataWithRootObject:[NSColor redColor]] forKey:@"incorrectColor"];
   for (NSString* key in d)
+  {
     [defs addObserver:self forKeyPath:key options:NSKeyValueObservingOptionNew context:NULL];
+    id val = [defs valueForKey:key];
+    if (val)
+    {
+      NSDictionary* change = [[NSMutableDictionary alloc] init];
+      [change setValue:val forKey:NSKeyValueChangeNewKey];
+      [self observeValueForKeyPath:key ofObject:self
+            change:change context:nil];
+      [change release];
+    }
+  }
   [[NSUserDefaults standardUserDefaults] registerDefaults:d];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(renderDone:) name:MorseRendererFinishedNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wordStarted:) name:MorseRendererStartedWordNotification object:nil];
@@ -92,30 +103,17 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
   [scoreTable reloadData];
   words = [[Wordlist alloc] init];
   [window makeKeyAndOrderFront:self];
-  if (!AXIsProcessTrusted() && !AXAPIEnabled())
+  ProcessSerialNumber psn;
+  (void)GetProcessForPID(getpid(), &psn);
+  _tap = CGEventTapCreateForPSN(&psn, kCGTailAppendEventTap, kCGEventTapOptionListenOnly,
+                                CGEventMaskBit(kCGEventFlagsChanged), TapCallback, self);
+  if (_tap)
   {
-    AuthorizationItem items = {kAuthorizationRightExecute, 0, NULL, 0};
-    AuthorizationRights rights = {1, &items};
-    [authView setAuthorizationRights:&rights];
-    [authView setDelegate:self];
-    [authView setAutoupdate:YES];
-    [[Onizuka sharedOnizuka] localizeWindow:authWindow];
-    [authWindow makeKeyAndOrderFront:self];
+    _src = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, _tap, 0);
+    CFRunLoopAddSource(CFRunLoopGetMain(), _src, kCFRunLoopCommonModes);
+    CGEventTapEnable(_tap, false);
   }
-  else
-  {
-    ProcessSerialNumber psn;
-    (void)GetProcessForPID(getpid(), &psn);
-    _tap = CGEventTapCreateForPSN(&psn, kCGTailAppendEventTap, kCGEventTapOptionListenOnly,
-                                  CGEventMaskBit(kCGEventFlagsChanged), TapCallback, self);
-    if (_tap)
-    {
-      _src = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, _tap, 0);
-      CFRunLoopAddSource(CFRunLoopGetMain(), _src, kCFRunLoopCommonModes);
-      CGEventTapEnable(_tap, false);
-    }
-    else NSLog(@"Could not create event tap");
-  }
+  else NSLog(@"Could not create event tap");
   qso = [[NSMutableArray alloc] init];
   [self setupSets];
 }
@@ -284,11 +282,14 @@ static CGEventTimestamp UpTimeInNanoseconds(void);
     case CWSPlayingState:
     [renderer setSendsNote:YES];
     if ([tabID isEqual:@"1"]) [renderer start:[inputField string] withDelay:NO];
-    else if ([tabID isEqual:@"2"]) [self startNewTest];
+    else if ([tabID isEqual:@"2"])
+    {
+      [bottomBLV setCanBecomeFirstResponder:YES];
+      [window makeFirstResponder:bottomBLV];
+      [self startNewTest];
+    }
     [startStopButton setImage:[NSImage imageNamed:@"StopEnabled.tiff"]];
     [startStopButton setAlternateImage:[NSImage imageNamed:@"StopPressed.tiff"]];
-    [bottomBLV setCanBecomeFirstResponder:YES];
-    [window makeFirstResponder:bottomBLV];
     break;
     
     case CWSShowingState:
@@ -599,25 +600,6 @@ static const unsigned seenNuff = 20;
   //[renderer setLoop:loop];
 }
 
--(void)authorizationViewDidAuthorize:(SFAuthorizationView*)view
-{
-  AuthorizationRef auth = [[view authorization] authorizationRef];
-  NSString* me = [[NSBundle mainBundle] executablePath];
-  NSString* mktrusted = [[NSBundle mainBundle] pathForAuxiliaryExecutable:@"mktrusted"];
-  char* args[2] = {NULL,NULL};
-  args[0] = (char*)[me UTF8String];
-  OSStatus authErr = AuthorizationExecuteWithPrivileges(auth, [mktrusted UTF8String], kAuthorizationFlagDefaults, &args[0], NULL);
-  NSString* ti = [[Onizuka sharedOnizuka] copyLocalizedTitle:(0 == authErr)? @"__AUTH_SUCCESS__":@"__AUTH_FAILURE__"];
-  if (0 != authErr)
-  {
-    NSString* tmp = ti;
-    ti = [[NSString alloc] initWithFormat:ti, authErr];
-    [tmp release];
-  }
-  [authField setStringValue:ti];
-  [ti release];
-}
-
 -(BOOL)validateMenuItem:(NSMenuItem*)item
 {
   id tabID = [[tabs selectedTabViewItem] identifier];
@@ -726,7 +708,6 @@ enum
        change:(NSDictionary*)change context:(void*)ctx
 {
   #pragma unused (object,ctx)
-  //NSLog(@"observeValueForKeyPath:%@ ofObject:%@ change:%@", path, object, change);
   id newval = [change objectForKey:NSKeyValueChangeNewKey];
   if ([path isEqual:@"freq"])
   {

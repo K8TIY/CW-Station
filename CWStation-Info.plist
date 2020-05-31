@@ -9,17 +9,17 @@
 	<key>CFBundleIconFile</key>
 	<string>CWStation.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.blugs.CWStation</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.3</string>
+	<string>1.3.4</string>
 	<key>CFBundleVersion</key>
-	<string>2012.09.27</string>
+	<string>2020.05.30</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2010-2012 Brian &quot;Moses&quot; Hall K8TIY</string>
+	<string>Copyright © 2010-2020 Brian &quot;Moses&quot; Hall K8TIY</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

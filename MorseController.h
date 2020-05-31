@@ -14,11 +14,10 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 #import <Cocoa/Cocoa.h>
-#import <SecurityInterface/SFAuthorizationView.h>
 #import "MorseRenderer.h"
 #import "MorseScore.h"
 #import "BigLetterView.h"
-#import "Wordlist.h";
+#import "Wordlist.h"
 
 @interface MorseWindow : NSWindow
 @end
@@ -62,7 +61,6 @@ typedef enum
   IBOutlet NSTextField* tWPMField;
   IBOutlet NSTextField* sWPMField;
   IBOutlet NSWindow* authWindow;
-  IBOutlet SFAuthorizationView* authView;
   IBOutlet NSTextField* authField;
   IBOutlet MorseRenderer* renderer;
   IBOutlet NSMenuItem* playPauseMenuItem;

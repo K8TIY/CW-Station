@@ -15,20 +15,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Morse.h"
 
-@implementation NSArray (StringComparison)
--(BOOL)isEqual:(NSArray*)other
-{
-  if (self == other) return YES;
-  if ([self count] != [other count]) return NO;
-  unsigned i;
-  for (i = 0; i < [self count]; i++)
-  {
-    if (![[self objectAtIndex:i] isEqual:[other objectAtIndex:i]]) return NO;
-  }
-  return YES;
-}
-@end
-
 uint8_t  MorseDitUnits = 1;
 uint8_t  MorseDahUnits = 3;
 uint8_t  MorseInterwordUnits = 7;
